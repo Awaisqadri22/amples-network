@@ -10,6 +10,7 @@ export default function Home() {
     en: {
       nav: {
         services: 'Services',
+        portfolio: 'Portfolio',
         cities: 'Featured Cities',
         contact: 'Contact',
         bookNow: 'Book Now'
@@ -92,6 +93,7 @@ export default function Home() {
     sv: {
       nav: {
         services: 'Tjänster',
+        portfolio: 'Portfolio',
         cities: 'Utvalda Städer',
         contact: 'Kontakt',
         bookNow: 'Boka Nu'
@@ -192,6 +194,7 @@ export default function Home() {
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <a href="#services" className="text-gray-700 hover:text-cyan-500 transition-colors">{t.nav.services}</a>
+              <a href="#portfolio" className="text-gray-700 hover:text-cyan-500 transition-colors">{t.nav.portfolio}</a>
               <div className="relative group">
                 <button className="text-gray-700 hover:text-cyan-500 transition-colors flex items-center">
                   {t.nav.cities}
