@@ -193,8 +193,40 @@ export default function Home() {
               />
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#services" className="text-gray-700 hover:text-cyan-500 transition-colors">{t.nav.services}</a>
-              <a href="#portfolio" className="text-gray-700 hover:text-cyan-500 transition-colors">{t.nav.portfolio}</a>
+              <div className="relative group">
+                <button className="text-gray-700 hover:text-cyan-500 transition-colors flex items-center">
+                  {t.nav.services}
+                  <svg className="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <div className="py-2">
+                    <div className="px-4 py-2 text-sm font-semibold text-gray-500 border-b border-gray-100">
+                      {language === 'en' ? 'Our Services' : 'Våra Tjänster'}
+                    </div>
+                    {[
+                      { en: 'Moving Cleaning', sv: 'Flyttstädning' },
+                      { en: 'Construction Cleaning', sv: 'Byggstädning' },
+                      { en: 'Stair Cleaning', sv: 'Trappstädning' },
+                      { en: 'Estate Cleaning', sv: 'Fastighetsstädning' },
+                      { en: 'General Cleaning', sv: 'Allmän Städning' },
+                      { en: 'Window Cleaning', sv: 'Fönsterputsning' },
+                      { en: 'Office Cleaning', sv: 'Kontorsstädning' },
+                      { en: 'Home Cleaning', sv: 'Hemstädning' },
+                      { en: 'Rough Cleaning', sv: 'Grovstädning' }
+                    ].map((service) => (
+                      <a
+                        key={service.en}
+                        href={`#${service.en.toLowerCase().replace(' ', '-')}`}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-cyan-50 hover:text-cyan-600 transition-colors"
+                      >
+                        {language === 'en' ? service.en : service.sv}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
               <div className="relative group">
                 <button className="text-gray-700 hover:text-cyan-500 transition-colors flex items-center">
                   {t.nav.cities}
@@ -207,10 +239,10 @@ export default function Home() {
                     <div className="px-4 py-2 text-sm font-semibold text-gray-500 border-b border-gray-100">
                       {language === 'en' ? 'Major Cities' : 'Större Städer'}
                     </div>
-                    {['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose', 'Austin', 'Jacksonville'].map((city) => (
+                    {['Stockholm', 'Göteborg', 'Malmö', 'Uppsala', 'Västerås', 'Örebro', 'Linköping', 'Helsingborg', 'Jönköping', 'Norrköping', 'Lund', 'Umeå'].map((city) => (
                       <a
                         key={city}
-                        href={`#${city.toLowerCase().replace(' ', '-')}`}
+                        href={`#${city.toLowerCase().replace('ö', 'o').replace('å', 'a').replace('ä', 'a')}`}
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-cyan-50 hover:text-cyan-600 transition-colors"
                       >
                         {city}

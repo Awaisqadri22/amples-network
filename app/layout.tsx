@@ -17,7 +17,6 @@ export const metadata: Metadata = {
   description: "Professional cleaning services for homes and offices. Book now for reliable, efficient cleaning solutions.",
 };
 
-// Navigation Component
 
 
 export default function RootLayout({
