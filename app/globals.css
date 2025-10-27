@@ -156,3 +156,33 @@ input:hover, select:hover {
   font-size: 1.1em;
   margin-right: 0.5rem;
 }
+
+/* Mobile Menu Animations */
+@keyframes slideInRight {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+/* Mobile menu overlay transition */
+.mobile-menu-overlay {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+/* Close button animation */
+.mobile-close-btn {
+  transition: transform 0.2s ease;
+}
+
+.mobile-close-btn:hover {
+  transform: rotate(90deg);
+}
