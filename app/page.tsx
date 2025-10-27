@@ -36,13 +36,17 @@ export default function Home() {
           address: 'City/Address',
           date: 'Preferred Service Date',
           submit: 'Get Free Quote',
+          vatNumber: 'VAT Number',
+          private: 'Private',
+          company: 'Company',
           placeholders: {
             name: 'Your full name',
-            company: 'Company name (optional)',
+            company: 'Company name',
             phone: '(555) 123-4567',
             email: 'your@email.com',
             area: 'e.g., 150',
-            address: 'City, State, ZIP Code'
+            address: 'City, State, ZIP Code',
+            vat: 'e.g., SE123456789001'
           },
           services: {
             select: 'Select a service',
@@ -119,13 +123,17 @@ export default function Home() {
           address: 'Stad/Adress',
           date: 'Önskat Servicedatum',
           submit: 'Få Gratis Offer',
+          vatNumber: 'Momsregistreringsnummer',
+          private: 'Privat',
+          company: 'Företag',
           placeholders: {
             name: 'Ditt fullständiga namn',
-            company: 'Företagsnamn (valfritt)',
+            company: 'Företagsnamn',
             phone: '(555) 123-4567',
             email: 'din@email.com',
             area: 't.ex., 150',
-            address: 'Stad, Land, Postnummer'
+            address: 'Stad, Land, Postnummer',
+            vat: 't.ex., SE123456789001'
           },
           services: {
             select: 'Välj en tjänst',

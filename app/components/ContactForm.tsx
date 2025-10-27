@@ -1,3 +1,7 @@
+'use client';
+
+import { useState } from 'react';
+
 interface ContactFormProps {
   t: {
     hero: {
@@ -13,6 +17,9 @@ interface ContactFormProps {
         address: string;
         date: string;
         submit: string;
+        vatNumber: string;
+        private: string;
+        company: string;
         placeholders: {
           name: string;
           company: string;
@@ -20,6 +27,7 @@ interface ContactFormProps {
           email: string;
           area: string;
           address: string;
+          vat: string;
         };
         services: {
           select: string;
@@ -48,38 +56,91 @@ interface ContactFormProps {
 }
 
 export default function ContactForm({ t }: ContactFormProps) {
+  const [formType, setFormType] = useState<'private' | 'company'>('private');
+
   return (
     <div className="bg-white rounded-2xl shadow-2xl p-8 animate-slide-in">
       <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">{t.hero.formTitle}</h2>
-      <form className="space-y-6">
-        {/* Name/Company Name */}
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="form-group">
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-              {t.hero.form.fullName} *
-            </label>
+      
+      {/* Private/Company Radio Buttons */}
+      <div className="mb-6">
+        <div className="flex gap-6">
+          <label className="flex items-center cursor-pointer">
             <input
-              type="text"
-              id="name"
-              name="name"
-              required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 hover:border-cyan-400"
-              placeholder={t.hero.form.placeholders.name}
+              type="radio"
+              name="formType"
+              value="private"
+              checked={formType === 'private'}
+              onChange={(e) => setFormType(e.target.value as 'private' | 'company')}
+              className="h-5 w-5 text-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 cursor-pointer"
             />
-          </div>
-          <div className="form-group">
-            <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-2">
-              {t.hero.form.companyName}
-            </label>
+            <span className="ml-3 text-sm font-medium text-gray-700">
+              {t.hero.form.private}
+            </span>
+          </label>
+          <label className="flex items-center cursor-pointer">
             <input
-              type="text"
-              id="company"
-              name="company"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 hover:border-cyan-400"
-              placeholder={t.hero.form.placeholders.company}
+              type="radio"
+              name="formType"
+              value="company"
+              checked={formType === 'company'}
+              onChange={(e) => setFormType(e.target.value as 'private' | 'company')}
+              className="h-5 w-5 text-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 cursor-pointer"
             />
-          </div>
+            <span className="ml-3 text-sm font-medium text-gray-700">
+              {t.hero.form.company}
+            </span>
+          </label>
         </div>
+      </div>
+
+      <form className="space-y-6">
+        {/* Name Field */}
+        <div className="form-group">
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+            {t.hero.form.fullName} *
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 hover:border-cyan-400"
+            placeholder={t.hero.form.placeholders.name}
+          />
+        </div>
+
+        {/* Company Name & VAT Number (shown only when company is selected) */}
+        {formType === 'company' && (
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="form-group">
+              <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-2">
+                {t.hero.form.companyName} *
+              </label>
+              <input
+                type="text"
+                id="company"
+                name="company"
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 hover:border-cyan-400"
+                placeholder={t.hero.form.placeholders.company}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="vatNumber" className="block text-sm font-medium text-gray-700 mb-2">
+                {t.hero.form.vatNumber} *
+              </label>
+              <input
+                type="text"
+                id="vatNumber"
+                name="vatNumber"
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 hover:border-cyan-400"
+                placeholder={t.hero.form.placeholders.vat}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Service Type */}
         <div className="form-group">
