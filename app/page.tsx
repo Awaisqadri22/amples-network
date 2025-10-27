@@ -188,13 +188,15 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <Image
-                src="/amples logo.png"
-                alt="Amples Logo"
-                width={120}
-                height={40}
-                className="h-10 w-auto"
-              />
+              <a href="#home" className="cursor-pointer hover:opacity-80 transition-opacity">
+                <Image
+                  src="/amples logo.png"
+                  alt="Amples Logo"
+                  width={120}
+                  height={40}
+                  className="h-10 w-auto"
+                />
+              </a>
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <div className="relative group">
@@ -322,13 +324,15 @@ export default function Home() {
         <div className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40" onClick={() => setMobileMenuOpen(false)}>
           <div className="bg-white w-80 h-full shadow-2xl overflow-y-auto animate-slide-in-right" onClick={(e) => e.stopPropagation()}>
             <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-              <Image
-                src="/amples logo.png"
-                alt="Amples Logo"
-                width={120}
-                height={40}
-                className="h-8 w-auto"
-              />
+              <a href="#home" className="cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setMobileMenuOpen(false)}>
+                <Image
+                  src="/amples logo.png"
+                  alt="Amples Logo"
+                  width={120}
+                  height={40}
+                  className="h-8 w-auto"
+                />
+              </a>
               <button 
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-gray-700 hover:text-cyan-500"
