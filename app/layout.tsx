@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CleanPro - Professional Cleaning Services",
+  title: "Städning",
   description: "Professional cleaning services for homes and offices. Book now for reliable, efficient cleaning solutions.",
 };
 

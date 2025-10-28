@@ -9,187 +9,7 @@ import Footer from './components/Footer';
 import HeroCarousel from './components/HeroCarousel';
 
 export default function Home() {
-  const [language, setLanguage] = useState('en');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const translations = {
-    en: {
-      nav: {
-        services: 'Services',
-        portfolio: 'Portfolio',
-        cities: 'Featured Cities',
-        contact: 'Contact',
-        bookNow: 'Book Now'
-      },
-      hero: {
-        title: 'Professional Cleaning Services',
-        subtitle: 'Transform your space with our reliable, efficient, and eco-friendly cleaning solutions. From homes to offices, we deliver exceptional results every time.',
-        formTitle: 'Get Your Free Quote',
-        form: {
-          fullName: 'Full Name',
-          companyName: 'Company Name',
-          serviceType: 'Type of Service',
-          propertyType: 'Type of Property',
-          phone: 'Phone Number',
-          email: 'Email Address',
-          area: 'Property Area (Square Meters)',
-          address: 'City/Address',
-          date: 'Preferred Service Date',
-          submit: 'Get Free Quote',
-          vatNumber: 'VAT Number',
-          private: 'Private',
-          company: 'Company',
-          placeholders: {
-            name: 'Your full name',
-            company: 'Company name',
-            phone: '(555) 123-4567',
-            email: 'your@email.com',
-            area: 'e.g., 150',
-            address: 'City, State, ZIP Code',
-            vat: 'e.g., SE123456789001'
-          },
-          services: {
-            select: 'Select a service',
-            residential: 'Residential Cleaning',
-            commercial: 'Commercial Cleaning',
-            deep: 'Deep Cleaning',
-            move: 'Move-in/Move-out',
-            postConstruction: 'Post-Construction',
-            carpet: 'Carpet Cleaning',
-            window: 'Window Cleaning',
-            other: 'Other'
-          },
-          properties: {
-            select: 'Select property type',
-            apartment: 'Apartment',
-            house: 'House',
-            condo: 'Condominium',
-            office: 'Office',
-            retail: 'Retail Space',
-            warehouse: 'Warehouse',
-            other: 'Other'
-          }
-        }
-      },
-      services: {
-        title: 'Our Services',
-        residential: {
-          title: 'Residential Cleaning',
-          desc: 'Complete home cleaning services including deep cleaning, regular maintenance, and move-in/out cleaning.'
-        },
-        commercial: {
-          title: 'Commercial Cleaning',
-          desc: 'Professional office and commercial space cleaning with flexible scheduling to fit your business needs.'
-        },
-        specialized: {
-          title: 'Specialized Services',
-          desc: 'Carpet cleaning, window washing, post-construction cleanup, and other specialized cleaning solutions.'
-        }
-      },
-      contact: {
-        title: 'Get In Touch',
-        phone: 'Phone',
-        email: 'Email',
-        hours: 'Hours',
-        hoursText: 'Mon-Fri: 8AM-6PM\nSat-Sun: 9AM-4PM'
-      },
-      footer: {
-        tagline: 'Professional cleaning services you can trust.',
-        terms: 'Terms of Service',
-        privacy: 'Privacy Policy',
-        copyright: '© 2025 Amples. All rights reserved.'
-      }
-    },
-    sv: {
-      nav: {
-        services: 'Tjänster',
-        portfolio: 'Portfolio',
-        cities: 'Utvalda Städer',
-        contact: 'Kontakt',
-        bookNow: 'Boka Nu'
-      },
-      hero: {
-        title: 'Professionella Städtjänster',
-        subtitle: 'Förvandla ditt utrymme med våra pålitliga, effektiva och miljövänliga städlösningar. Från hem till kontor levererar vi exceptionella resultat varje gång.',
-        formTitle: 'Få Din Gratis Offer',
-        form: {
-          fullName: 'Fullständigt Namn',
-          companyName: 'Företagsnamn',
-          serviceType: 'Typ av Tjänst',
-          propertyType: 'Typ av Fastighet',
-          phone: 'Telefonnummer',
-          email: 'E-postadress',
-          area: 'Fastighetsarea (Kvadratmeter)',
-          address: 'Stad/Adress',
-          date: 'Önskat Servicedatum',
-          submit: 'Få Gratis Offer',
-          vatNumber: 'Momsregistreringsnummer',
-          private: 'Privat',
-          company: 'Företag',
-          placeholders: {
-            name: 'Ditt fullständiga namn',
-            company: 'Företagsnamn',
-            phone: '(555) 123-4567',
-            email: 'din@email.com',
-            area: 't.ex., 150',
-            address: 'Stad, Land, Postnummer',
-            vat: 't.ex., SE123456789001'
-          },
-          services: {
-            select: 'Välj en tjänst',
-            residential: 'Bostadsstädning',
-            commercial: 'Kontorsstädning',
-            deep: 'Djupstädning',
-            move: 'Flyttstädning',
-            postConstruction: 'Efter Byggnation',
-            carpet: 'Mattstädning',
-            window: 'Fönsterputsning',
-            other: 'Annat'
-          },
-          properties: {
-            select: 'Välj fastighetstyp',
-            apartment: 'Lägenhet',
-            house: 'Hus',
-            condo: 'Bostadsrätt',
-            office: 'Kontor',
-            retail: 'Butikslokal',
-            warehouse: 'Lager',
-            other: 'Annat'
-          }
-        }
-      },
-      services: {
-        title: 'Våra Tjänster',
-        residential: {
-          title: 'Bostadsstädning',
-          desc: 'Komplett hemstädning inklusive djupstädning, regelbunden underhåll och flyttstädning.'
-        },
-        commercial: {
-          title: 'Kontorsstädning',
-          desc: 'Professionell kontors- och kommersiell städning med flexibel schemaläggning som passar ditt företag.'
-        },
-        specialized: {
-          title: 'Specialiserade Tjänster',
-          desc: 'Mattstädning, fönsterputsning, efterbyggnadsstädning och andra specialiserade städlösningar.'
-        }
-      },
-      contact: {
-        title: 'Kontakta Oss',
-        phone: 'Telefon',
-        email: 'E-post',
-        hours: 'Öppettider',
-        hoursText: 'Mån-Fre: 08:00-18:00\nLör-Sön: 09:00-16:00'
-      },
-      footer: {
-        tagline: 'Professionella städtjänster du kan lita på.',
-        terms: 'Användarvillkor',
-        privacy: 'Integritetspolicy',
-        copyright: '© 2025 Amples. Alla rättigheter förbehållna.'
-      }
-    }
-  };
-
-  const t = translations[language as keyof typeof translations];
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-lg sticky top-0 z-50">
@@ -209,7 +29,7 @@ export default function Home() {
             <div className="hidden md:flex items-center space-x-8">
               <div className="relative group">
                 <button className="text-gray-700 hover:text-cyan-500 transition-colors flex items-center">
-                  {t.nav.services}
+                  Services
                   <svg className="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
@@ -217,25 +37,25 @@ export default function Home() {
                 <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                   <div className="py-2">
                     <div className="px-4 py-2 text-sm font-semibold text-gray-500 border-b border-gray-100">
-                      {language === 'en' ? 'Our Services' : 'Våra Tjänster'}
+                      Our Services
                     </div>
                     {[
-                      { en: 'Moving Cleaning', sv: 'Flyttstädning' },
-                      { en: 'Construction Cleaning', sv: 'Byggstädning' },
-                      { en: 'Stair Cleaning', sv: 'Trappstädning' },
-                      { en: 'Estate Cleaning', sv: 'Fastighetsstädning' },
-                      { en: 'General Cleaning', sv: 'Allmän Städning' },
-                      { en: 'Window Cleaning', sv: 'Fönsterputsning' },
-                      { en: 'Office Cleaning', sv: 'Kontorsstädning' },
-                      { en: 'Home Cleaning', sv: 'Hemstädning' },
-                      { en: 'Rough Cleaning', sv: 'Grovstädning' }
+                      { name: 'Move-out Cleaning', href: '/move-out-cleaning' },
+                      { name: 'Home Cleaning', href: '/home-cleaning' },
+                      { name: 'Detail Cleaning', href: '/detail-cleaning' },
+                      { name: 'Office Cleaning', href: '/office-cleaning' },
+                      { name: 'Deep/Heavy-duty Cleaning', href: '/deep-cleaning' },
+                      { name: 'Window Cleaning', href: '/window-cleaning' },
+                      { name: 'Stairwell Cleaning', href: '/stairwell-cleaning' },
+                      { name: 'Construction Cleaning', href: '/construction-cleaning' },
+                      { name: 'Gym Cleaning', href: '/gym-cleaning' }
                     ].map((service) => (
                       <a
-                        key={service.en}
-                        href={`#${service.en.toLowerCase().replace(' ', '-')}`}
+                        key={service.name}
+                        href={service.href}
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-cyan-50 hover:text-cyan-600 transition-colors"
                       >
-                        {language === 'en' ? service.en : service.sv}
+                        {service.name}
                       </a>
                     ))}
                   </div>
@@ -243,7 +63,7 @@ export default function Home() {
               </div>
               <div className="relative group">
                 <button className="text-gray-700 hover:text-cyan-500 transition-colors flex items-center">
-                  {t.nav.cities}
+                  Featured Cities
                   <svg className="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
@@ -251,7 +71,7 @@ export default function Home() {
                 <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                   <div className="py-2">
                     <div className="px-4 py-2 text-sm font-semibold text-gray-500 border-b border-gray-100">
-                      {language === 'en' ? 'Major Cities' : 'Större Städer'}
+                      Major Cities
                     </div>
                     {['Stockholm', 'Göteborg', 'Malmö', 'Uppsala', 'Västerås', 'Örebro', 'Linköping', 'Helsingborg', 'Jönköping', 'Norrköping', 'Lund', 'Umeå'].map((city) => (
                       <a
@@ -265,45 +85,8 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <a href="#contacts" className="text-gray-700 hover:text-cyan-500 transition-colors">{t.nav.contact}</a>
-              <a href="#book" className="bg-gradient-to-r from-cyan-500 to-emerald-500 text-white px-4 py-2 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl">{t.nav.bookNow}</a>
-              
-              {/* Language Switcher */}
-              <div className="relative group">
-                <button className="flex items-center space-x-2 text-gray-700 hover:text-cyan-500 transition-colors">
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-                  </svg>
-                  <span className="text-sm font-medium">{language === 'en' ? 'EN' : 'SV'}</span>
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                <div className="absolute top-full right-0 mt-2 w-32 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                  <div className="py-2">
-                    <button
-                      onClick={() => setLanguage('en')}
-                      className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                        language === 'en' 
-                          ? 'bg-cyan-50 text-cyan-600 font-medium' 
-                          : 'text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      🇺🇸 English
-                    </button>
-                    <button
-                      onClick={() => setLanguage('sv')}
-                      className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                        language === 'sv' 
-                          ? 'bg-cyan-50 text-cyan-600 font-medium' 
-                          : 'text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      🇸🇪 Svenska
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <a href="#contacts" className="text-gray-700 hover:text-cyan-500 transition-colors">Contact</a>
+              <a href="#book" className="bg-gradient-to-r from-cyan-500 to-emerald-500 text-white px-4 py-2 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl">Book Now</a>
             </div>
             {/* Mobile menu button */}
             <div className="md:hidden">
@@ -356,27 +139,27 @@ export default function Home() {
               {/* Services Dropdown */}
               <div className="border-b border-gray-100 pb-4">
                 <div className="flex items-center justify-between py-3 text-gray-700 font-medium">
-                  {t.nav.services}
+                  Services
                 </div>
                 <div className="pl-4 space-y-2">
                   {[
-                    { en: 'Moving Cleaning', sv: 'Flyttstädning' },
-                    { en: 'Construction Cleaning', sv: 'Byggstädning' },
-                    { en: 'Stair Cleaning', sv: 'Trappstädning' },
-                    { en: 'Estate Cleaning', sv: 'Fastighetsstädning' },
-                    { en: 'General Cleaning', sv: 'Allmän Städning' },
-                    { en: 'Window Cleaning', sv: 'Fönsterputsning' },
-                    { en: 'Office Cleaning', sv: 'Kontorsstädning' },
-                    { en: 'Home Cleaning', sv: 'Hemstädning' },
-                    { en: 'Rough Cleaning', sv: 'Grovstädning' }
+                    { name: 'Move-out Cleaning', href: '/move-out-cleaning' },
+                    { name: 'Home Cleaning', href: '/home-cleaning' },
+                    { name: 'Detail Cleaning', href: '/detail-cleaning' },
+                    { name: 'Office Cleaning', href: '/office-cleaning' },
+                    { name: 'Deep/Heavy-duty Cleaning', href: '/deep-cleaning' },
+                    { name: 'Window Cleaning', href: '/window-cleaning' },
+                    { name: 'Stairwell Cleaning', href: '/stairwell-cleaning' },
+                    { name: 'Construction Cleaning', href: '/construction-cleaning' },
+                    { name: 'Gym Cleaning', href: '/gym-cleaning' }
                   ].map((service) => (
                     <a
-                      key={service.en}
-                      href={`#${service.en.toLowerCase().replace(' ', '-')}`}
+                      key={service.name}
+                      href={service.href}
                       onClick={() => setMobileMenuOpen(false)}
                       className="block py-2 text-sm text-gray-600 hover:text-cyan-600 hover:pl-2 transition-all"
                     >
-                      {language === 'en' ? service.en : service.sv}
+                      {service.name}
                     </a>
                   ))}
                 </div>
@@ -385,7 +168,7 @@ export default function Home() {
               {/* Featured Cities Dropdown */}
               <div className="border-b border-gray-100 pb-4">
                 <div className="flex items-center justify-between py-3 text-gray-700 font-medium">
-                  {t.nav.cities}
+                  Featured Cities
                 </div>
                 <div className="pl-4 space-y-2">
                   {['Stockholm', 'Göteborg', 'Malmö', 'Uppsala', 'Västerås', 'Örebro', 'Linköping', 'Helsingborg', 'Jönköping', 'Norrköping', 'Lund', 'Umeå'].map((city) => (
@@ -408,40 +191,8 @@ export default function Home() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="block py-3 text-gray-700 hover:text-cyan-600 transition-colors"
                 >
-                  {t.nav.contact}
+                  Contact
                 </a>
-              </div>
-
-              {/* Language Switcher */}
-              <div className="py-4">
-                <div className="flex items-center space-x-4 px-4">
-                  <button
-                    onClick={() => {
-                      setLanguage('en');
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`px-4 py-2 rounded-lg transition-colors ${
-                      language === 'en' 
-                        ? 'bg-cyan-50 text-cyan-600 font-medium' 
-                        : 'bg-gray-100 text-gray-700'
-                    }`}
-                  >
-                    🇺🇸 English
-                  </button>
-                  <button
-                    onClick={() => {
-                      setLanguage('sv');
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`px-4 py-2 rounded-lg transition-colors ${
-                      language === 'sv' 
-                        ? 'bg-cyan-50 text-cyan-600 font-medium' 
-                        : 'bg-gray-100 text-gray-700'
-                    }`}
-                  >
-                    🇸🇪 Svenska
-                  </button>
-                </div>
               </div>
 
               {/* Book Now Button */}
@@ -451,7 +202,7 @@ export default function Home() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="block w-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-white text-center py-3 px-6 rounded-lg font-semibold hover:from-cyan-600 hover:to-emerald-600 transition-all shadow-lg"
                 >
-                  {t.nav.bookNow}
+                  Book Now
                 </a>
               </div>
             </div>
@@ -479,29 +230,29 @@ export default function Home() {
             {/* Left Side - Content */}
             <div className="text-center lg:text-left">
               <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in text-white drop-shadow-lg">
-                {t.hero.title}
+                Professional Cleaning Services
               </h1>
               <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto lg:mx-0 animate-fade-in-delay text-white drop-shadow">
-                {t.hero.subtitle}
+                Transform your space with our reliable, efficient, and eco-friendly cleaning solutions. From homes to offices, we deliver exceptional results every time.
               </p>
             </div>
 
             {/* Right Side - Contact Form */}
             <div className="relative z-10">
-              <ContactForm t={t} />
+              <ContactForm />
             </div>
           </div>
         </div>
       </section>
 
       {/* Services Section */}
-      <ServicesSection t={t} />
+      <ServicesSection />
 
       {/* Contact Section */}
-      <ContactSection t={t} />
+      <ContactSection />
 
       {/* Footer */}
-      <Footer t={t} />
+      <Footer />
     </div>
   );
 }

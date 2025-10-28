@@ -2,65 +2,12 @@
 
 import { useState } from 'react';
 
-interface ContactFormProps {
-  t: {
-    hero: {
-      formTitle: string;
-      form: {
-        fullName: string;
-        companyName: string;
-        serviceType: string;
-        propertyType: string;
-        phone: string;
-        email: string;
-        area: string;
-        address: string;
-        date: string;
-        submit: string;
-        vatNumber: string;
-        private: string;
-        company: string;
-        placeholders: {
-          name: string;
-          company: string;
-          phone: string;
-          email: string;
-          area: string;
-          address: string;
-          vat: string;
-        };
-        services: {
-          select: string;
-          residential: string;
-          commercial: string;
-          deep: string;
-          move: string;
-          postConstruction: string;
-          carpet: string;
-          window: string;
-          other: string;
-        };
-        properties: {
-          select: string;
-          apartment: string;
-          house: string;
-          condo: string;
-          office: string;
-          retail: string;
-          warehouse: string;
-          other: string;
-        };
-      };
-    };
-  };
-}
-
-export default function ContactForm({ t }: ContactFormProps) {
+export default function ContactForm() {
   const [formType, setFormType] = useState<'private' | 'company'>('private');
 
   return (
     <div className="bg-white rounded-2xl shadow-2xl p-8 animate-slide-in">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">{t.hero.formTitle}</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Get Your Free Quote</h2>
       
       {/* Private/Company Radio Buttons */}
       <div className="mb-6">
@@ -75,7 +22,7 @@ export default function ContactForm({ t }: ContactFormProps) {
               className="h-5 w-5 text-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 cursor-pointer"
             />
             <span className="ml-3 text-sm font-medium text-gray-700">
-              {t.hero.form.private}
+              Private
             </span>
           </label>
           <label className="flex items-center cursor-pointer">
@@ -88,7 +35,7 @@ export default function ContactForm({ t }: ContactFormProps) {
               className="h-5 w-5 text-cyan-500 focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 cursor-pointer"
             />
             <span className="ml-3 text-sm font-medium text-gray-700">
-              {t.hero.form.company}
+              Company
             </span>
           </label>
         </div>
@@ -98,7 +45,7 @@ export default function ContactForm({ t }: ContactFormProps) {
         {/* Name Field */}
         <div className="form-group">
           <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-            {t.hero.form.fullName} *
+            Full Name *
           </label>
           <input
             type="text"
@@ -106,7 +53,7 @@ export default function ContactForm({ t }: ContactFormProps) {
             name="name"
             required
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 hover:border-cyan-400"
-            placeholder={t.hero.form.placeholders.name}
+            placeholder="Your full name"
           />
         </div>
 
@@ -115,7 +62,7 @@ export default function ContactForm({ t }: ContactFormProps) {
           <div className="grid md:grid-cols-2 gap-4">
             <div className="form-group">
               <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-2">
-                {t.hero.form.companyName} *
+                Company Name *
               </label>
               <input
                 type="text"
@@ -123,12 +70,12 @@ export default function ContactForm({ t }: ContactFormProps) {
                 name="company"
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 hover:border-cyan-400"
-                placeholder={t.hero.form.placeholders.company}
+                placeholder="Company name"
               />
             </div>
             <div className="form-group">
               <label htmlFor="vatNumber" className="block text-sm font-medium text-gray-700 mb-2">
-                {t.hero.form.vatNumber} *
+                VAT Number *
               </label>
               <input
                 type="text"
@@ -136,7 +83,7 @@ export default function ContactForm({ t }: ContactFormProps) {
                 name="vatNumber"
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 hover:border-cyan-400"
-                placeholder={t.hero.form.placeholders.vat}
+                placeholder="e.g., SE123456789001"
               />
             </div>
           </div>
@@ -145,7 +92,7 @@ export default function ContactForm({ t }: ContactFormProps) {
         {/* Service Type */}
         <div className="form-group">
           <label htmlFor="serviceType" className="block text-sm font-medium text-gray-700 mb-2">
-            {t.hero.form.serviceType} *
+            Type of Service *
           </label>
           <select
             id="serviceType"
@@ -153,22 +100,22 @@ export default function ContactForm({ t }: ContactFormProps) {
             required
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 hover:border-cyan-400"
           >
-            <option value="">{t.hero.form.services.select}</option>
-            <option value="residential">{t.hero.form.services.residential}</option>
-            <option value="commercial">{t.hero.form.services.commercial}</option>
-            <option value="deep">{t.hero.form.services.deep}</option>
-            <option value="move">{t.hero.form.services.move}</option>
-            <option value="post-construction">{t.hero.form.services.postConstruction}</option>
-            <option value="carpet">{t.hero.form.services.carpet}</option>
-            <option value="window">{t.hero.form.services.window}</option>
-            <option value="other">{t.hero.form.services.other}</option>
+            <option value="">Select a service</option>
+            <option value="residential">Residential Cleaning</option>
+            <option value="commercial">Commercial Cleaning</option>
+            <option value="deep">Deep Cleaning</option>
+            <option value="move">Move-in/Move-out</option>
+            <option value="post-construction">Post-Construction</option>
+            <option value="carpet">Carpet Cleaning</option>
+            <option value="window">Window Cleaning</option>
+            <option value="other">Other</option>
           </select>
         </div>
 
         {/* Housing Type */}
         <div className="form-group">
           <label htmlFor="housingType" className="block text-sm font-medium text-gray-700 mb-2">
-            {t.hero.form.propertyType} *
+            Type of Property *
           </label>
           <select
             id="housingType"
@@ -176,14 +123,14 @@ export default function ContactForm({ t }: ContactFormProps) {
             required
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 hover:border-cyan-400"
           >
-            <option value="">{t.hero.form.properties.select}</option>
-            <option value="apartment">{t.hero.form.properties.apartment}</option>
-            <option value="house">{t.hero.form.properties.house}</option>
-            <option value="condo">{t.hero.form.properties.condo}</option>
-            <option value="office">{t.hero.form.properties.office}</option>
-            <option value="retail">{t.hero.form.properties.retail}</option>
-            <option value="warehouse">{t.hero.form.properties.warehouse}</option>
-            <option value="other">{t.hero.form.properties.other}</option>
+            <option value="">Select property type</option>
+            <option value="apartment">Apartment</option>
+            <option value="house">House</option>
+            <option value="condo">Condominium</option>
+            <option value="office">Office</option>
+            <option value="retail">Retail Space</option>
+            <option value="warehouse">Warehouse</option>
+            <option value="other">Other</option>
           </select>
         </div>
 
@@ -191,7 +138,7 @@ export default function ContactForm({ t }: ContactFormProps) {
         <div className="grid md:grid-cols-2 gap-4">
           <div className="form-group">
             <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-              {t.hero.form.phone} *
+              Phone Number *
             </label>
             <input
               type="tel"
@@ -199,12 +146,12 @@ export default function ContactForm({ t }: ContactFormProps) {
               name="phone"
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 hover:border-cyan-400"
-              placeholder={t.hero.form.placeholders.phone}
+              placeholder="(555) 123-4567"
             />
           </div>
           <div className="form-group">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              {t.hero.form.email} *
+              Email Address *
             </label>
             <input
               type="email"
@@ -212,7 +159,7 @@ export default function ContactForm({ t }: ContactFormProps) {
               name="email"
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 hover:border-cyan-400"
-              placeholder={t.hero.form.placeholders.email}
+              placeholder="your@email.com"
             />
           </div>
         </div>
@@ -220,7 +167,7 @@ export default function ContactForm({ t }: ContactFormProps) {
         {/* Square Meter Area */}
         <div className="form-group">
           <label htmlFor="area" className="block text-sm font-medium text-gray-700 mb-2">
-            {t.hero.form.area} *
+            Property Area (Square Meters) *
           </label>
           <input
             type="number"
@@ -229,14 +176,14 @@ export default function ContactForm({ t }: ContactFormProps) {
             required
             min="1"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 hover:border-cyan-400"
-            placeholder={t.hero.form.placeholders.area}
+            placeholder="e.g., 150"
           />
         </div>
 
         {/* City/Address */}
         <div className="form-group">
           <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
-            {t.hero.form.address} *
+            City/Address *
           </label>
           <input
             type="text"
@@ -244,14 +191,14 @@ export default function ContactForm({ t }: ContactFormProps) {
             name="address"
             required
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 hover:border-cyan-400"
-            placeholder={t.hero.form.placeholders.address}
+            placeholder="City, State, ZIP Code"
           />
         </div>
 
         {/* Date Picker */}
         <div className="form-group">
           <label htmlFor="preferredDate" className="block text-sm font-medium text-gray-700 mb-2">
-            {t.hero.form.date}
+            Preferred Service Date
           </label>
           <input
             type="date"
@@ -267,7 +214,7 @@ export default function ContactForm({ t }: ContactFormProps) {
           className="w-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-4 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
         >
           <span className="flex items-center justify-center">
-            {t.hero.form.submit}
+            Get Free Quote
             <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
