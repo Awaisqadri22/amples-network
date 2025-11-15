@@ -5,22 +5,22 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 const services = [
-  { name: 'Move-out Cleaning', href: '/move-out-cleaning', icon: '🚚', active: true },
+  { name: 'Move-out Cleaning', href: '/move-out-cleaning', icon: '🚚' },
   { name: 'Home Cleaning', href: '/home-cleaning', icon: '🏠' },
   { name: 'Detail Cleaning', href: '/detail-cleaning', icon: '✨' },
   { name: 'Office Cleaning', href: '/office-cleaning', icon: '🏢' },
-  { name: 'Deep/Heavy-duty Cleaning', href: '/deep-cleaning', icon: '💪' },
+  { name: 'Deep/Heavy-duty Cleaning', href: '/deep-cleaning', icon: '💪', active: true },
   { name: 'Window Cleaning', href: '/window-cleaning', icon: '🪟' },
   { name: 'Stairwell Cleaning', href: '/stairwell-cleaning', icon: '🪜' },
   { name: 'Construction Cleaning', href: '/construction-cleaning', icon: '🔨' },
   { name: 'Gym Cleaning', href: '/gym-cleaning', icon: '💪' }
 ];
 
-export default function MoveOutCleaning() {
+export default function DeepCleaning() {
   const [formData, setFormData] = useState({
     name: '',
-    phone: '',
     email: '',
+    phone: '',
     message: ''
   });
 
@@ -28,8 +28,7 @@ export default function MoveOutCleaning() {
     e.preventDefault();
     // Handle form submission
     console.log('Form submitted:', formData);
-    alert('Thank you for your inquiry! We will contact you soon.');
-    setFormData({ name: '', phone: '', email: '', message: '' });
+    alert('Thank you! We will contact you soon.');
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -61,129 +60,78 @@ export default function MoveOutCleaning() {
         </div>
       </nav>
 
-      {/* Hero Banner */}
-      <section className="relative h-[500px] bg-gradient-to-br from-cyan-500 via-emerald-500 to-cyan-600 overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="absolute inset-0" style={{
-          backgroundImage: "url('/cleaningOne.jpg')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          opacity: 0.3
-        }}></div>
-        
-        <div className="relative z-10 h-full flex items-center justify-center text-center">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="inline-block px-4 py-2 bg-cyan-500/80 backdrop-blur-sm rounded-full mb-6">
-              <span className="text-white font-semibold">Professional Service</span>
-            </div>
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 drop-shadow-lg">
-              Move-out Cleaning
+      {/* Banner Section */}
+      <section className="relative h-[400px] md:h-[500px] overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-emerald-500 to-cyan-600">
+          <div className="absolute inset-0 bg-[url('/cleaningOne.jpg')] bg-cover bg-center mix-blend-overlay"></div>
+        </div>
+        <div className="absolute inset-0 bg-black/40"></div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
+          <div className="text-white">
+            <div className="text-sm uppercase tracking-wider text-cyan-200 mb-4">Our Service</div>
+            <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
+              Deep/Heavy-duty Cleaning
             </h1>
-            <p className="text-xl md:text-2xl text-white drop-shadow max-w-3xl mx-auto">
-              A comprehensive cleaning service to ensure you get your full security deposit back. 
-              We handle every detail so you don&apos;t have to.
+            <p className="text-xl md:text-2xl text-gray-100 max-w-2xl">
+              Intensive deep cleaning services for thorough sanitization and restoration of your space
             </p>
           </div>
         </div>
       </section>
 
-      {/* Page Details Section */}
+      {/* Details Section */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">
-                Complete Move-out Cleaning Service
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">
+                Professional Deep/Heavy-duty Cleaning Services
               </h2>
-              <div className="space-y-4 text-gray-700 text-lg">
-                <p>
-                  When you&apos;re moving out of a rental property, getting your security deposit back is crucial. 
-                  Our comprehensive move-out cleaning service ensures your property is spotless and meets all 
-                  landlord requirements.
-                </p>
-                <p>
-                  We understand the stress of moving. That&apos;s why we handle the deep cleaning so you can focus 
-                  on settling into your new home. Our experienced team follows a detailed checklist to ensure 
-                  every corner is cleaned to perfection.
-                </p>
-              </div>
-
-              <div className="mt-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">What We Clean:</h3>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  {[
-                    'All rooms and hallways',
-                    'Kitchen and appliances',
-                    'Bathrooms (deep clean)',
-                    'Windows and sills',
-                    'Baseboards and moldings',
-                    'Light fixtures',
-                    'Closets and cabinets',
-                    'Inside all drawers',
-                    'Floors (vacuum and mop)',
-                    'Carpet cleaning',
-                    'Oven and refrigerator',
-                    'Walls and doors',
-                    'Ceiling fans',
-                    'Ventilation grilles'
-                  ].map((item, index) => (
-                    <div key={index} className="flex items-start">
-                      <svg className="w-6 h-6 text-cyan-500 mr-3 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-gray-700">{item}</span>
-                    </div>
-                  ))}
+              <p className="text-lg text-gray-600 mb-4">
+                At Amples, we understand that sometimes your space needs more than regular cleaning. Our comprehensive deep and heavy-duty cleaning services are designed to tackle the toughest cleaning challenges, removing built-up grime, stains, and dirt that regular cleaning cannot address.
+              </p>
+              <p className="text-lg text-gray-600 mb-4">
+                Our experienced team uses industrial-grade equipment, specialized cleaning solutions, and proven techniques to restore your space to its original pristine condition, ensuring every surface is thoroughly sanitized and disinfected.
+              </p>
+              <div className="grid grid-cols-2 gap-4 mt-8">
+                <div className="bg-cyan-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-cyan-600 mb-2">✓ Intensive</h4>
+                  <p className="text-sm text-gray-600">Thorough deep cleaning</p>
                 </div>
-              </div>
-
-              <div className="mt-8 p-6 bg-gradient-to-br from-cyan-50 to-emerald-50 rounded-xl border border-cyan-200">
-                <div className="flex items-start">
-                  <svg className="w-8 h-8 text-cyan-600 mr-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <div>
-                    <h4 className="text-xl font-bold text-gray-900 mb-2">Why Choose Us?</h4>
-                    <ul className="space-y-2 text-gray-700">
-                      <li>• Satisfaction guaranteed or we&apos;ll return to reclean</li>
-                      <li>• Green cleaning products available</li>
-                      <li>• Insured and bonded professionals</li>
-                      <li>• Flexible scheduling to fit your move-out date</li>
-                      <li>• Competitive pricing with no hidden fees</li>
-                    </ul>
-                  </div>
+                <div className="bg-emerald-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-emerald-600 mb-2">✓ Eco-Friendly</h4>
+                  <p className="text-sm text-gray-600">Safe for your family</p>
+                </div>
+                <div className="bg-cyan-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-cyan-600 mb-2">✓ Experienced</h4>
+                  <p className="text-sm text-gray-600">Professional team</p>
+                </div>
+                <div className="bg-emerald-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-emerald-600 mb-2">✓ Affordable</h4>
+                  <p className="text-sm text-gray-600">Best value pricing</p>
                 </div>
               </div>
             </div>
-
             <div className="relative">
-              <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
-                <Image
-                  src="/cleaningThree.jpg"
-                  alt="Move-out Cleaning"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl"></div>
+              <Image
+                src="/cleaningTwoo.jpeg"
+                alt="Deep/Heavy-duty Cleaning Service"
+                width={600}
+                height={400}
+                className="rounded-lg shadow-2xl"
+              />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Quick Contact Form Section */}
-      <section className="py-16 bg-gradient-to-br from-gray-100 to-gray-200">
+      {/* Contact Form Section */}
+      <section className="py-16 bg-gradient-to-br from-gray-50 to-cyan-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12">
-            <div className="text-center mb-8">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">
-                Get Your Free Quote Today
-              </h2>
-              <p className="text-xl text-gray-600">
-                Fill out the form below and we&apos;ll contact you within 24 hours
-              </p>
-            </div>
-
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">
+              Get Your Free Quote
+            </h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
@@ -197,7 +145,7 @@ export default function MoveOutCleaning() {
                     required
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                     placeholder="Your full name"
                   />
                 </div>
@@ -212,8 +160,8 @@ export default function MoveOutCleaning() {
                     required
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
-                    placeholder="0764447563"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                    placeholder="(555) 123-4567"
                   />
                 </div>
               </div>
@@ -228,7 +176,7 @@ export default function MoveOutCleaning() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                   placeholder="your@email.com"
                 />
               </div>
@@ -242,15 +190,15 @@ export default function MoveOutCleaning() {
                   rows={4}
                   value={formData.message}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                   placeholder="Tell us about your cleaning needs..."
-                ></textarea>
+                />
               </div>
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-4 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="w-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-4 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl"
               >
-                Request Free Quote
+                Submit Quote Request
               </button>
             </form>
           </div>
@@ -305,7 +253,7 @@ export default function MoveOutCleaning() {
       <section className="py-16 bg-gradient-to-r from-cyan-500 to-emerald-500">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Ready to Get Started?
+            Ready for a Deep Clean?
           </h2>
           <p className="text-xl text-white/90 mb-8">
             Contact us today for a free quote and experience the Amples difference
