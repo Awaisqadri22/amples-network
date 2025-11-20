@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import QuoteForm from './QuoteForm';
 
 const services = [
   { name: 'Move-out Cleaning', href: '/move-out-cleaning', icon: '🚚', active: true },
@@ -17,28 +17,6 @@ const services = [
 ];
 
 export default function MoveOutCleaning() {
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    message: ''
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission
-    console.log('Form submitted:', formData);
-    alert('Thank you for your inquiry! We will contact you soon.');
-    setFormData({ name: '', phone: '', email: '', message: '' });
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
@@ -87,175 +65,68 @@ export default function MoveOutCleaning() {
         </div>
       </section>
 
-      {/* Page Details Section */}
-      <section className="py-16 bg-white">
+      {/* Form Section - 70/30 Split */}
+      <section id="contact-form" className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 lg:gap-12">
+            {/* Left side - 70% Text Content */}
+            <div className="lg:col-span-7">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
                 Complete Move-out Cleaning Service
               </h2>
-              <div className="space-y-4 text-gray-700 text-lg">
-                <p>
-                  When you&apos;re moving out of a rental property, getting your security deposit back is crucial. 
-                  Our comprehensive move-out cleaning service ensures your property is spotless and meets all 
-                  landlord requirements.
+              <div className="space-y-6 text-lg text-gray-700 leading-relaxed">
+                <p className="text-justify">
+                  Moving is a big and often stressful process, and one of the most time-consuming tasks is the move-out cleaning. Amples Städfirma offers professional move-out cleaning services in several cities to make your move smoother and worry-free. We ensure that your home is sparkling clean and meets all requirements for an approved inspection.
                 </p>
-                <p>
-                  We understand the stress of moving. That&apos;s why we handle the deep cleaning so you can focus 
-                  on settling into your new home. Our experienced team follows a detailed checklist to ensure 
-                  every corner is cleaned to perfection.
+                
+                <p className="text-justify">
+                  <a 
+                    href="/move-out-cleaning/details" 
+                    className="text-cyan-600 hover:text-cyan-700 underline font-semibold transition-colors"
+                  >
+                    We have collected everything you need to know about what is included in a moving out cleaning here.
+                  </a>
+                  {' '}We are a serious cleaning company that works with moving house cleaning on a daily basis. Something that we prioritize highly is that the customer can trust us. Unfortunately, it happens that cleaning companies give the customer a cheap price but with hidden fees that are added. With us, you will immediately know the total cost and will not have to worry about a lot of extra costs that you did not expect at the end.
                 </p>
-              </div>
-
-              <div className="mt-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">What We Clean:</h3>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  {[
-                    'All rooms and hallways',
-                    'Kitchen and appliances',
-                    'Bathrooms (deep clean)',
-                    'Windows and sills',
-                    'Baseboards and moldings',
-                    'Light fixtures',
-                    'Closets and cabinets',
-                    'Inside all drawers',
-                    'Floors (vacuum and mop)',
-                    'Carpet cleaning',
-                    'Oven and refrigerator',
-                    'Walls and doors',
-                    'Ceiling fans',
-                    'Ventilation grilles'
-                  ].map((item, index) => (
-                    <div key={index} className="flex items-start">
-                      <svg className="w-6 h-6 text-cyan-500 mr-3 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-gray-700">{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-8 p-6 bg-gradient-to-br from-cyan-50 to-emerald-50 rounded-xl border border-cyan-200">
-                <div className="flex items-start">
-                  <svg className="w-8 h-8 text-cyan-600 mr-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <div>
-                    <h4 className="text-xl font-bold text-gray-900 mb-2">Why Choose Us?</h4>
-                    <ul className="space-y-2 text-gray-700">
-                      <li>• Satisfaction guaranteed or we&apos;ll return to reclean</li>
-                      <li>• Green cleaning products available</li>
-                      <li>• Insured and bonded professionals</li>
-                      <li>• Flexible scheduling to fit your move-out date</li>
-                      <li>• Competitive pricing with no hidden fees</li>
-                    </ul>
-                  </div>
-                </div>
+                
+                <p className="text-justify">
+                  If you want to know more about what is included in a moving house cleaning and perhaps want to clean it yourself, 
+                  we at Qleano have developed a{' '}
+                  <a 
+                    href="/move-out-cleaning/checklist" 
+                    className="text-cyan-600 hover:text-cyan-700 underline font-semibold transition-colors"
+                  >
+                    comprehensive moving house cleaning checklist
+                  </a>
+                  . We provide the safest type of cleaning guarantee that can be given, you go through the cleaning together with the cleaning manager on the same day the cleaning is carried out. This way you get the cleaning done the way you want.
+                </p>
+                
+                <p className="text-justify">
+                  We of course also carry out cleaning on weekends and public holidays. If you want to know more about the{' '}
+                  <a 
+                    href="/move-out-cleaning/price" 
+                    className="text-cyan-600 hover:text-cyan-700 underline font-semibold transition-colors"
+                  >
+                    price of moving house cleaning
+                  </a>
+                  , you can read more about what moving house cleaning usually costs here!
+                </p>
+                
+                <p className="text-justify">
+                  Fill out the form on the page and you will shortly receive an email with detailed information about how a moving house cleaning is done and what is done. If you have any questions, just reply to the email. If you wish to book, you can also do this by replying to the email with the information needed to make a booking. Then we will come to you at the desired time and clean!
+                </p>
               </div>
             </div>
 
-            <div className="relative">
-              <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
-                <Image
-                  src="/cleaningThree.jpg"
-                  alt="Move-out Cleaning"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl"></div>
+            {/* Right side - 30% Form */}
+            <div className="lg:col-span-3">
+              <QuoteForm idPrefix="move-out" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Quick Contact Form Section */}
-      <section className="py-16 bg-gradient-to-br from-gray-100 to-gray-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12">
-            <div className="text-center mb-8">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">
-                Get Your Free Quote Today
-              </h2>
-              <p className="text-xl text-gray-600">
-                Fill out the form below and we&apos;ll contact you within 24 hours
-              </p>
-            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    required
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
-                    placeholder="Your full name"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone Number *
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    required
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
-                    placeholder="0764447563"
-                  />
-                </div>
-              </div>
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address *
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
-                  placeholder="your@email.com"
-                />
-              </div>
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                  Message (Optional)
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows={4}
-                  value={formData.message}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
-                  placeholder="Tell us about your cleaning needs..."
-                ></textarea>
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-4 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
-              >
-                Request Free Quote
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
 
       {/* Services Grid Section */}
       <section className="py-16 bg-white">
