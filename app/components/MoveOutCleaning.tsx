@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import QuoteForm from './QuoteForm';
+import Footer from './Footer';
 
 const services = [
   { name: 'Move-out Cleaning', href: '/move-out-cleaning', icon: '🚚', active: true },
@@ -48,7 +49,7 @@ export default function MoveOutCleaning() {
           backgroundPosition: 'center',
           opacity: 0.3
         }}></div>
-        
+
         <div className="relative z-10 h-full flex items-center justify-center text-center">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="inline-block px-4 py-2 bg-cyan-500/80 backdrop-blur-sm rounded-full mb-6">
@@ -58,7 +59,7 @@ export default function MoveOutCleaning() {
               Move-out Cleaning
             </h1>
             <p className="text-xl md:text-2xl text-white drop-shadow max-w-3xl mx-auto">
-              A comprehensive cleaning service to ensure you get your full security deposit back. 
+              A comprehensive cleaning service to ensure you get your full security deposit back.
               We handle every detail so you don&apos;t have to.
             </p>
           </div>
@@ -78,40 +79,40 @@ export default function MoveOutCleaning() {
                 <p className="text-justify">
                   Moving is a big and often stressful process, and one of the most time-consuming tasks is the move-out cleaning. Amples Städfirma offers professional move-out cleaning services in several cities to make your move smoother and worry-free. We ensure that your home is sparkling clean and meets all requirements for an approved inspection.
                 </p>
-                
+
                 <p className="text-justify">
-                  <a 
-                    href="/move-out-cleaning/details" 
+                  <a
+                    href="/move-out-cleaning/details"
                     className="text-cyan-600 hover:text-cyan-700 underline font-semibold transition-colors"
                   >
                     We have collected everything you need to know about what is included in a moving out cleaning here.
                   </a>
                   {' '}We are a serious cleaning company that works with moving house cleaning on a daily basis. Something that we prioritize highly is that the customer can trust us. Unfortunately, it happens that cleaning companies give the customer a cheap price but with hidden fees that are added. With us, you will immediately know the total cost and will not have to worry about a lot of extra costs that you did not expect at the end.
                 </p>
-                
+
                 <p className="text-justify">
-                  If you want to know more about what is included in a moving house cleaning and perhaps want to clean it yourself, 
+                  If you want to know more about what is included in a moving house cleaning and perhaps want to clean it yourself,
                   we at Qleano have developed a{' '}
-                  <a 
-                    href="/move-out-cleaning/checklist" 
+                  <a
+                    href="/move-out-cleaning/checklist"
                     className="text-cyan-600 hover:text-cyan-700 underline font-semibold transition-colors"
                   >
                     comprehensive moving house cleaning checklist
                   </a>
                   . We provide the safest type of cleaning guarantee that can be given, you go through the cleaning together with the cleaning manager on the same day the cleaning is carried out. This way you get the cleaning done the way you want.
                 </p>
-                
+
                 <p className="text-justify">
                   We of course also carry out cleaning on weekends and public holidays. If you want to know more about the{' '}
-                  <a 
-                    href="/move-out-cleaning/price" 
+                  <a
+                    href="/move-out-cleaning/price"
                     className="text-cyan-600 hover:text-cyan-700 underline font-semibold transition-colors"
                   >
                     price of moving house cleaning
                   </a>
                   , you can read more about what moving house cleaning usually costs here!
                 </p>
-                
+
                 <p className="text-justify">
                   Fill out the form on the page and you will shortly receive an email with detailed information about how a moving house cleaning is done and what is done. If you have any questions, just reply to the email. If you wish to book, you can also do this by replying to the email with the information needed to make a booking. Then we will come to you at the desired time and clean!
                 </p>
@@ -142,9 +143,8 @@ export default function MoveOutCleaning() {
               <Link
                 key={service.name}
                 href={service.href}
-                className={`group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 ${
-                  service.active ? 'ring-2 ring-cyan-500' : ''
-                }`}
+                className={`group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 ${service.active ? 'ring-2 ring-cyan-500' : ''
+                  }`}
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 to-emerald-500 opacity-90"></div>
                 {service.active && (
@@ -197,7 +197,10 @@ export default function MoveOutCleaning() {
           </div>
         </div>
       </section>
-    </div>
+
+      {/* Footer */}
+      <Footer />
+    </div >
   );
 }
 
