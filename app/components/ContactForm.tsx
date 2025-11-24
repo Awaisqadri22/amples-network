@@ -75,9 +75,16 @@ export default function ContactForm() {
               key={service}
               type="button"
               onClick={() => setSelectedService(service)}
-              className="w-full text-left py-3 px-4 rounded-xl transition-all duration-200 border-2 flex items-center justify-between group border-gray-100 bg-white text-gray-600 hover:border-cyan-200 hover:bg-gray-50 hover:shadow-md"
+              className="w-full text-left py-2.5 px-4 rounded-xl transition-all duration-200 border-2 flex items-center justify-between group border-gray-100 bg-white text-gray-600 hover:border-cyan-200 hover:bg-gray-50 hover:shadow-md"
             >
-              <span className="font-semibold text-lg group-hover:text-cyan-700 transition-colors">{service}</span>
+              <div className="flex items-center">
+                <div className="w-5 h-5 rounded-full border-2 border-gray-300 group-hover:border-cyan-500 group-hover:bg-cyan-50 mr-3 flex items-center justify-center transition-all">
+                  <svg className="w-3 h-3 text-cyan-600 opacity-0 group-hover:opacity-100 transform scale-50 group-hover:scale-100 transition-all duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <span className="font-medium text-lg group-hover:text-cyan-700 transition-colors">{service}</span>
+              </div>
               <div className="h-8 w-8 rounded-full bg-gray-50 group-hover:bg-cyan-100 flex items-center justify-center transition-colors">
                 <svg className="w-5 h-5 text-gray-400 group-hover:text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -209,6 +216,12 @@ export default function ContactForm() {
 
           {/* Common Contact Fields */}
           <div className="space-y-3">
+            <h3 className="font-semibold text-gray-900 flex items-center mb-2">
+              <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h-10a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v12a2 2 0 01-2 2zM12 5v14" />
+              </svg>
+              Your Details
+            </h3>
             <div className="form-group">
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
               <input
