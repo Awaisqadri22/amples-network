@@ -64,18 +64,18 @@ export default function ContactForm() {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-2xl p-8 animate-slide-in">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Get Your Free Quote</h2>
+    <div className="bg-white rounded-2xl shadow-2xl p-6 animate-slide-in">
+      <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">Get Your Free Quote</h2>
 
       {/* Service Selection - Vertical List */}
       {!selectedService ? (
-        <div className="space-y-3 mb-8">
+        <div className="space-y-2 mb-6">
           {(['Move-out Cleaning', 'Home Cleaning', 'Detail Cleaning', 'Office Cleaning', 'Deep/Heavy-duty Cleaning', 'Window Cleaning', 'Stairwell Cleaning', 'Construction Cleaning', 'Gym Cleaning'] as ServiceType[]).map((service) => (
             <button
               key={service}
               type="button"
               onClick={() => setSelectedService(service)}
-              className="w-full text-left py-4 px-6 rounded-xl transition-all duration-200 border-2 flex items-center justify-between group border-gray-100 bg-white text-gray-600 hover:border-cyan-200 hover:bg-gray-50 hover:shadow-md"
+              className="w-full text-left py-3 px-4 rounded-xl transition-all duration-200 border-2 flex items-center justify-between group border-gray-100 bg-white text-gray-600 hover:border-cyan-200 hover:bg-gray-50 hover:shadow-md"
             >
               <span className="font-semibold text-lg group-hover:text-cyan-700 transition-colors">{service}</span>
               <div className="h-8 w-8 rounded-full bg-gray-50 group-hover:bg-cyan-100 flex items-center justify-center transition-colors">
@@ -87,24 +87,24 @@ export default function ContactForm() {
           ))}
         </div>
       ) : (
-        <div className="mb-8 animate-fade-in">
-          <div className="flex items-center justify-between bg-cyan-50 p-4 rounded-xl border border-cyan-100 mb-6">
+        <div className="mb-6 animate-fade-in">
+          <div className="flex items-center justify-between bg-cyan-50 p-3 rounded-xl border border-cyan-100 mb-4">
             <div className="flex items-center">
-              <div className="h-10 w-10 bg-cyan-500 rounded-full flex items-center justify-center mr-4 shadow-sm">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="h-8 w-8 bg-cyan-500 rounded-full flex items-center justify-center mr-3 shadow-sm">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-cyan-600 font-medium">Selected Service</p>
-                <h3 className="text-xl font-bold text-gray-900">{selectedService}</h3>
+                <p className="text-xs text-cyan-600 font-medium">Selected Service</p>
+                <h3 className="text-lg font-bold text-gray-900">{selectedService}</h3>
               </div>
             </div>
             <button
               onClick={() => setSelectedService(null)}
               className="text-sm text-gray-500 hover:text-cyan-600 font-medium underline decoration-2 decoration-transparent hover:decoration-cyan-600 transition-all"
             >
-              Change Service
+              Change
             </button>
           </div>
         </div>
@@ -112,11 +112,11 @@ export default function ContactForm() {
 
       {/* Form - Only shows when a service is selected */}
       {selectedService && (
-        <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in-up">
+        <form onSubmit={handleSubmit} className="space-y-4 animate-fade-in-up">
 
           {/* Dynamic Fields based on Service */}
           {selectedService === 'Home Cleaning' && (
-            <div className="space-y-6 bg-gray-50 p-6 rounded-xl border border-gray-100 animate-fade-in">
+            <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
               <h3 className="font-semibold text-gray-900 flex items-center">
                 <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -126,7 +126,7 @@ export default function ContactForm() {
 
               {/* Home Type Dropdown */}
               <div className="form-group">
-                <label htmlFor="homeType" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="homeType" className="block text-sm font-medium text-gray-700 mb-1">
                   What type of home should be cleaned?
                 </label>
                 <select
@@ -134,7 +134,7 @@ export default function ContactForm() {
                   name="homeType"
                   value={formData.homeType}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
                 >
                   <option value="">Select home type</option>
                   <option value="Villa">Villa</option>
@@ -146,7 +146,7 @@ export default function ContactForm() {
 
               {/* Clean All Radio */}
               <div className="form-group">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Should the entire home be cleaned?
                 </label>
                 <div className="flex gap-6">
@@ -182,7 +182,7 @@ export default function ContactForm() {
           )}
 
           {/* Private/Company Toggle */}
-          <div className="flex gap-6 pt-4 border-t border-gray-100">
+          <div className="flex gap-6 pt-2 border-t border-gray-100">
             <label className="flex items-center cursor-pointer group">
               <input
                 type="radio"
@@ -208,7 +208,7 @@ export default function ContactForm() {
           </div>
 
           {/* Common Contact Fields */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="form-group">
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
               <input
@@ -218,12 +218,12 @@ export default function ContactForm() {
                 required
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
                 placeholder="Your name"
               />
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-2 gap-3">
               <div className="form-group">
                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
                 <input
@@ -233,7 +233,7 @@ export default function ContactForm() {
                   required
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
                   placeholder="Phone number"
                 />
               </div>
@@ -246,14 +246,14 @@ export default function ContactForm() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
                   placeholder="Email address"
                 />
               </div>
             </div>
 
             {formType === 'company' && (
-              <div className="grid md:grid-cols-2 gap-4 animate-fade-in">
+              <div className="grid md:grid-cols-2 gap-3 animate-fade-in">
                 <div className="form-group">
                   <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-1">Company Name *</label>
                   <input
@@ -263,7 +263,7 @@ export default function ContactForm() {
                     required
                     value={formData.company}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
                     placeholder="Company name"
                   />
                 </div>
@@ -276,7 +276,7 @@ export default function ContactForm() {
                     required
                     value={formData.vatNumber}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
                     placeholder="VAT Number"
                   />
                 </div>
@@ -288,10 +288,10 @@ export default function ContactForm() {
               <textarea
                 id="message"
                 name="message"
-                rows={3}
+                rows={2}
                 value={formData.message}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all resize-none"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all resize-none"
                 placeholder="Any specific details..."
               ></textarea>
             </div>
@@ -300,7 +300,7 @@ export default function ContactForm() {
           <button
             type="submit"
             disabled={status === 'loading'}
-            className="w-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-4 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+            className="w-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
           >
             {status === 'loading' ? (
               <>
