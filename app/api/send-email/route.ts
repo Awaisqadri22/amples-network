@@ -6,7 +6,9 @@ export async function POST(request: Request) {
         const {
             name, phone, email, message,
             formType, company, vatNumber,
-            selectedService, homeType, cleanAll
+            selectedService, homeType, cleanAll,
+            areaSize, frequency, preferredDateTime,
+            bedrooms, kitchens, bathrooms, livingRooms, floors, extras
         } = await request.json();
 
         if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
@@ -34,43 +36,59 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Failed to connect to email service', details: (verifyError as Error).message }, { status: 500 });
         }
 
+        // Construct Email Content
+        let serviceDetails = '';
+        if (selectedService === 'Home Cleaning') {
+            serviceDetails = `
+                <h3>Home Cleaning Details:</h3>
+                <p><strong>Home Type:</strong> ${homeType || 'Not specified'}</p>
+                <p><strong>Area Size:</strong> ${areaSize ? areaSize + ' sq m' : 'Not specified'}</p>
+                <p><strong>Frequency:</strong> ${frequency || 'Not specified'}</p>
+                ${preferredDateTime ? `<p><strong>Preferred Date & Time:</strong> ${new Date(preferredDateTime).toLocaleString()}</p>` : ''}
+                <p><strong>Rooms:</strong></p>
+                <ul>
+                  <li>Bedrooms: ${bedrooms}</li>
+                  <li>Kitchens: ${kitchens}</li>
+                  <li>Bathrooms: ${bathrooms}</li>
+                  <li>Living Rooms: ${livingRooms}</li>
+                </ul>
+                <p><strong>Floors:</strong> ${floors}</p>
+                <p><strong>Extras:</strong> ${extras && extras.length > 0 ? extras.join(', ') : 'None'}</p>
+                <p><strong>Clean Entire Home:</strong> ${cleanAll || 'Not specified'}</p>
+            `;
+        } else if (selectedService) {
+            serviceDetails = `<h3>Service: ${selectedService}</h3>`;
+        }
+
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: 'awaisiqbalqadri22@gmail.com',
-            subject: `New ${selectedService || 'Quote'} Request from ${name}`,
+            subject: `New Quote Request from ${name} - ${selectedService || 'General Inquiry'}`,
             html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
-          <h2 style="color: #0891b2; text-align: center;">New Quote Request</h2>
-          <p style="color: #555;">You have received a new quote request from your website.</p>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #0891b2;">New Quote Request</h2>
           
-          <div style="background-color: #f9fafb; padding: 15px; border-radius: 8px; margin-top: 20px;">
-            <h3 style="color: #0e7490; margin-bottom: 10px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">Service Information</h3>
-            <p><strong>Service Requested:</strong> ${selectedService || 'Not specified'}</p>
-            
-            ${selectedService === 'Home Cleaning' ? `
-            <p><strong>Home Type:</strong> ${homeType || 'N/A'}</p>
-            <p><strong>Clean Entire Home:</strong> ${cleanAll || 'N/A'}</p>
-            ` : ''}
-
-            <h3 style="color: #0e7490; margin-top: 20px; margin-bottom: 10px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">Contact Details</h3>
+          <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="margin-top: 0;">Contact Information</h3>
             <p><strong>Name:</strong> ${name}</p>
             <p><strong>Phone:</strong> ${phone}</p>
             <p><strong>Email:</strong> ${email}</p>
-            
+            <p><strong>Type:</strong> ${formType === 'company' ? 'Company' : 'Private'}</p>
             ${formType === 'company' ? `
-            <h3 style="color: #0e7490; margin-top: 20px; margin-bottom: 10px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">Company Details</h3>
-            <p><strong>Company Name:</strong> ${company}</p>
-            <p><strong>VAT Number:</strong> ${vatNumber}</p>
-            ` : ''}
-
-            ${message ? `
-            <h3 style="color: #0e7490; margin-top: 20px; margin-bottom: 10px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">Message</h3>
-            <p style="background-color: #fff; padding: 10px; border-radius: 4px; border: 1px solid #e5e7eb;">${message}</p>
+              <p><strong>Company:</strong> ${company}</p>
+              <p><strong>VAT Number:</strong> ${vatNumber}</p>
             ` : ''}
           </div>
 
-          <p style="text-align: center; margin-top: 30px; color: #9ca3af; font-size: 12px;">
-            This email was sent from the Amples Quote Form.
+          <div style="background-color: #ecfeff; padding: 20px; border-radius: 8px; border: 1px solid #cffafe;">
+            ${serviceDetails}
+            
+            <h3>Message:</h3>
+            <p style="white-space: pre-wrap;">${message || 'No message provided.'}</p>
+          </div>
+          
+          <p style="color: #6b7280; font-size: 12px; margin-top: 20px; text-align: center;">
+            Sent from Amples Network Website
           </p>
         </div>
       `,

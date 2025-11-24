@@ -18,6 +18,9 @@ export default function ContactForm() {
     vatNumber: '',
     homeType: '',
     cleanAll: '',
+    areaSize: '',
+    frequency: '',
+    preferredDateTime: '',
     message: ''
   });
 
@@ -49,7 +52,7 @@ export default function ContactForm() {
         setStatus('success');
         setFormData({
           name: '', phone: '', email: '', company: '', vatNumber: '',
-          homeType: '', cleanAll: '', message: ''
+          homeType: '', cleanAll: '', areaSize: '', frequency: '', preferredDateTime: '', message: ''
         });
         setTimeout(() => setStatus('idle'), 5000);
       } else {
@@ -146,10 +149,67 @@ export default function ContactForm() {
                   <option value="">Select home type</option>
                   <option value="Villa">Villa</option>
                   <option value="Apartment">Apartment</option>
+                  <option value="Townhouse">Townhouse</option>
                   <option value="Holiday Home">Holiday Home</option>
                   <option value="Terraced House">Terraced House</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
+
+              {/* Area Size Input */}
+              <div className="form-group">
+                <label htmlFor="areaSize" className="block text-sm font-medium text-gray-700 mb-1">
+                  Approximately how large an area should be cleaned? (sq m)
+                </label>
+                <input
+                  type="text"
+                  id="areaSize"
+                  name="areaSize"
+                  value={formData.areaSize}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                  placeholder="e.g. 120"
+                />
+              </div>
+
+              {/* Frequency Dropdown */}
+              <div className="form-group">
+                <label htmlFor="frequency" className="block text-sm font-medium text-gray-700 mb-1">
+                  How often do you want cleaning help?
+                </label>
+                <select
+                  id="frequency"
+                  name="frequency"
+                  value={formData.frequency}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                >
+                  <option value="">Select frequency</option>
+                  <option value="An opportunity">An opportunity (One-time)</option>
+                  <option value="Several times a week">Several times a week</option>
+                  <option value="Weekly">Weekly</option>
+                  <option value="Every other week">Every other week</option>
+                  <option value="Every month">Every month</option>
+                  <option value="Specific Date & Time">Specific Date & Time</option>
+                </select>
+              </div>
+
+              {/* Conditional Date/Time Picker */}
+              {formData.frequency === 'Specific Date & Time' && (
+                <div className="form-group animate-fade-in">
+                  <label htmlFor="preferredDateTime" className="block text-sm font-medium text-gray-700 mb-1">
+                    Select Date & Time
+                  </label>
+                  <input
+                    type="datetime-local"
+                    id="preferredDateTime"
+                    name="preferredDateTime"
+                    value={formData.preferredDateTime}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                  />
+                </div>
+              )}
 
               {/* Clean All Radio */}
               <div className="form-group">
@@ -185,130 +245,25 @@ export default function ContactForm() {
                   </label>
                 </div>
               </div>
+              {/* Conditional Date/Time Picker - Shows after Clean All is selected */}
+              {formData.cleanAll && (
+                <div className="form-group animate-fade-in border-t border-gray-100 pt-4 mt-4">
+                  <label htmlFor="preferredDateTime" className="block text-sm font-medium text-gray-700 mb-1 uppercase tracking-wide">
+                    Preferred Date Time
+                  </label>
+                  <input
+                    type="datetime-local"
+                    id="preferredDateTime"
+                    name="preferredDateTime"
+                    value={formData.preferredDateTime}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                  />
+                </div>
+              )}
             </div>
           )}
 
-          {/* Private/Company Toggle */}
-          <div className="flex gap-6 pt-2 border-t border-gray-100">
-            <label className="flex items-center cursor-pointer group">
-              <input
-                type="radio"
-                name="formType"
-                value="private"
-                checked={formType === 'private'}
-                onChange={(e) => setFormType(e.target.value as 'private' | 'company')}
-                className="h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
-              />
-              <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-cyan-600 transition-colors">Private</span>
-            </label>
-            <label className="flex items-center cursor-pointer group">
-              <input
-                type="radio"
-                name="formType"
-                value="company"
-                checked={formType === 'company'}
-                onChange={(e) => setFormType(e.target.value as 'private' | 'company')}
-                className="h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
-              />
-              <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-cyan-600 transition-colors">Company</span>
-            </label>
-          </div>
-
-          {/* Common Contact Fields */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-gray-900 flex items-center mb-2">
-              <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h-10a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v12a2 2 0 01-2 2zM12 5v14" />
-              </svg>
-              Your Details
-            </h3>
-            <div className="form-group">
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                required
-                value={formData.name}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
-                placeholder="Your name"
-              />
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-3">
-              <div className="form-group">
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  required
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
-                  placeholder="Phone number"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
-                  placeholder="Email address"
-                />
-              </div>
-            </div>
-
-            {formType === 'company' && (
-              <div className="grid md:grid-cols-2 gap-3 animate-fade-in">
-                <div className="form-group">
-                  <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-1">Company Name *</label>
-                  <input
-                    type="text"
-                    id="company"
-                    name="company"
-                    required
-                    value={formData.company}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
-                    placeholder="Company name"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="vatNumber" className="block text-sm font-medium text-gray-700 mb-1">VAT Number *</label>
-                  <input
-                    type="text"
-                    id="vatNumber"
-                    name="vatNumber"
-                    required
-                    value={formData.vatNumber}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
-                    placeholder="VAT Number"
-                  />
-                </div>
-              </div>
-            )}
-
-            <div className="form-group">
-              <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Message (Optional)</label>
-              <textarea
-                id="message"
-                name="message"
-                rows={2}
-                value={formData.message}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all resize-none"
-                placeholder="Any specific details..."
-              ></textarea>
-            </div>
-          </div>
 
           <button
             type="submit"
