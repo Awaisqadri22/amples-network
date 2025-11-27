@@ -15,6 +15,7 @@ export default function ContactForm() {
     name: '',
     phone: '',
     email: '',
+    address: '',
     company: '',
     vatNumber: '',
     homeType: '',
@@ -68,6 +69,83 @@ export default function ContactForm() {
     }
   };
 
+  // Validation function to check if contact info is valid
+  const isContactInfoValid = () => {
+    return formData.name.trim() !== '' && 
+           formData.phone.trim() !== '' && 
+           formData.email.trim() !== '' &&
+           formData.address.trim() !== '';
+  };
+
+  // Validation function to check if current step is valid
+  const isCurrentStepValid = () => {
+    if (!selectedService || selectedService !== 'Home Cleaning') return true;
+    
+    // Always require contact info
+    if (!isContactInfoValid()) return false;
+    
+    if (currentStep === 1) {
+      // Step 1 validation
+      const basicFields = 
+        formData.homeType !== '' &&
+        formData.areaSize !== '' &&
+        formData.frequency !== '' &&
+        formData.cleanAll !== '';
+      
+      // preferredDateTime is required if frequency is "Specific Date & Time" OR if cleanAll is selected
+      const dateTimeValid = 
+        (formData.frequency === 'Specific Date & Time' ? formData.preferredDateTime !== '' : true) &&
+        (formData.cleanAll !== '' ? formData.preferredDateTime !== '' : true);
+      
+      return basicFields && dateTimeValid;
+    }
+    
+    if (currentStep === 2) {
+      // Step 2 validation - room fields are always filled (default '0')
+      return true; // All room fields have default values
+    }
+    
+    if (currentStep === 3) {
+      // Step 3 validation
+      return formData.floors !== '' && formData.hasPets !== '';
+    }
+    
+    return true;
+  };
+
+  // Validation function to check if all required fields are filled (for final submission)
+  const isFormValid = () => {
+    if (!selectedService) return false;
+    
+    // Always require contact info
+    if (!isContactInfoValid()) return false;
+    
+    if (selectedService === 'Home Cleaning') {
+      // Step 1 validation
+      const step1Valid = 
+        formData.homeType !== '' &&
+        formData.areaSize !== '' &&
+        formData.frequency !== '' &&
+        formData.cleanAll !== '' &&
+        // preferredDateTime is required if frequency is "Specific Date & Time" OR if cleanAll is selected
+        (formData.frequency === 'Specific Date & Time' ? formData.preferredDateTime !== '' : true) &&
+        (formData.cleanAll !== '' ? formData.preferredDateTime !== '' : true);
+      
+      // Step 2 validation - room fields are always filled (default '0')
+      const step2Valid = true; // All room fields have default values
+      
+      // Step 3 validation
+      const step3Valid = 
+        formData.floors !== '' &&
+        formData.hasPets !== '';
+      
+      return step1Valid && step2Valid && step3Valid;
+    }
+    
+    // For other services, return true (they might have different validation)
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
@@ -88,7 +166,7 @@ export default function ContactForm() {
       if (response.ok) {
         setStatus('success');
         setFormData({
-          name: '', phone: '', email: '', company: '', vatNumber: '',
+          name: '', phone: '', email: '', address: '', company: '', vatNumber: '',
           homeType: '', cleanAll: '', areaSize: '', frequency: '', preferredDateTime: '', 
           numberOfRooms: '0', bedroom: '0', kitchen: '0', livingRoom: '0', 
           floors: '', hasPets: '', comments: '', message: ''
@@ -164,6 +242,78 @@ export default function ContactForm() {
       {selectedService && (
         <form onSubmit={handleSubmit} className="space-y-4 animate-fade-in-up">
 
+          {/* Contact Information Fields - Always shown */}
+          <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 mb-6">
+            <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+              <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              Contact Information
+            </h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                  placeholder="Your name"
+                />
+              </div>
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone Number *
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  required
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                  placeholder="0764447563"
+                />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                Email Address *
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                placeholder="your@email.com"
+              />
+            </div>
+            <div>
+              <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+                Address *
+              </label>
+              <input
+                type="text"
+                id="address"
+                name="address"
+                required
+                value={formData.address}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                placeholder="Street address, City, Postal code"
+              />
+            </div>
+          </div>
+
           {/* Dynamic Fields based on Service */}
           {selectedService === 'Home Cleaning' && (
             <>
@@ -186,145 +336,145 @@ export default function ContactForm() {
 
               {/* Step 1: Basic Information */}
               {currentStep === 1 && (
-                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+            <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
                   <h3 className="font-semibold text-gray-900 flex items-center mb-4">
-                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
+                <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
                     Step 1: Basic Information
-                  </h3>
+              </h3>
 
-                  {/* Home Type Dropdown */}
-                  <div className="form-group">
-                    <label htmlFor="homeType" className="block text-sm font-medium text-gray-700 mb-1">
-                      What type of home should be cleaned?
-                    </label>
-                    <select
-                      id="homeType"
-                      name="homeType"
-                      value={formData.homeType}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
-                    >
-                      <option value="">Select home type</option>
-                      <option value="Villa">Villa</option>
-                      <option value="Apartment">Apartment</option>
-                      <option value="Townhouse">Townhouse</option>
-                      <option value="Holiday Home">Holiday Home</option>
-                      <option value="Terraced House">Terraced House</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
+              {/* Home Type Dropdown */}
+              <div className="form-group">
+                <label htmlFor="homeType" className="block text-sm font-medium text-gray-700 mb-1">
+                  What type of home should be cleaned?
+                </label>
+                <select
+                  id="homeType"
+                  name="homeType"
+                  value={formData.homeType}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                >
+                  <option value="">Select home type</option>
+                  <option value="Villa">Villa</option>
+                  <option value="Apartment">Apartment</option>
+                  <option value="Townhouse">Townhouse</option>
+                  <option value="Holiday Home">Holiday Home</option>
+                  <option value="Terraced House">Terraced House</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
 
-                  {/* Area Size Input */}
-                  <div className="form-group">
-                    <label htmlFor="areaSize" className="block text-sm font-medium text-gray-700 mb-1">
-                      Approximately how large an area should be cleaned? (sq m)
-                    </label>
-                    <input
+              {/* Area Size Input */}
+              <div className="form-group">
+                <label htmlFor="areaSize" className="block text-sm font-medium text-gray-700 mb-1">
+                  Approximately how large an area should be cleaned? (sq m)
+                </label>
+                <input
                       type="number"
-                      id="areaSize"
-                      name="areaSize"
-                      value={formData.areaSize}
-                      onChange={handleChange}
+                  id="areaSize"
+                  name="areaSize"
+                  value={formData.areaSize}
+                  onChange={handleChange}
                       min="0"
                       step="1"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
-                      placeholder="e.g. 120"
-                    />
-                  </div>
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                  placeholder="e.g. 120"
+                />
+              </div>
 
-                  {/* Frequency Dropdown */}
-                  <div className="form-group">
-                    <label htmlFor="frequency" className="block text-sm font-medium text-gray-700 mb-1">
-                      How often do you want cleaning help?
-                    </label>
-                    <select
-                      id="frequency"
-                      name="frequency"
-                      value={formData.frequency}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
-                    >
-                      <option value="">Select frequency</option>
-                      <option value="An opportunity">An opportunity (One-time)</option>
-                      <option value="Several times a week">Several times a week</option>
-                      <option value="Weekly">Weekly</option>
-                      <option value="Every other week">Every other week</option>
-                      <option value="Every month">Every month</option>
-                      <option value="Specific Date & Time">Specific Date & Time</option>
-                    </select>
-                  </div>
+              {/* Frequency Dropdown */}
+              <div className="form-group">
+                <label htmlFor="frequency" className="block text-sm font-medium text-gray-700 mb-1">
+                  How often do you want cleaning help?
+                </label>
+                <select
+                  id="frequency"
+                  name="frequency"
+                  value={formData.frequency}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                >
+                  <option value="">Select frequency</option>
+                  <option value="An opportunity">An opportunity (One-time)</option>
+                  <option value="Several times a week">Several times a week</option>
+                  <option value="Weekly">Weekly</option>
+                  <option value="Every other week">Every other week</option>
+                  <option value="Every month">Every month</option>
+                  <option value="Specific Date & Time">Specific Date & Time</option>
+                </select>
+              </div>
 
-                  {/* Conditional Date/Time Picker */}
-                  {formData.frequency === 'Specific Date & Time' && (
-                    <div className="form-group animate-fade-in">
-                      <label htmlFor="preferredDateTime" className="block text-sm font-medium text-gray-700 mb-1">
-                        Select Date & Time
-                      </label>
-                      <input
-                        type="datetime-local"
-                        id="preferredDateTime"
-                        name="preferredDateTime"
-                        value={formData.preferredDateTime}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
-                      />
-                    </div>
-                  )}
-
-                  {/* Clean All Radio */}
-                  <div className="form-group">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Should the entire home be cleaned?
-                    </label>
-                    <div className="flex gap-6">
-                      <label className="flex items-center cursor-pointer group">
-                        <div className="relative flex items-center">
-                          <input
-                            type="radio"
-                            name="cleanAll"
-                            value="Yes"
-                            checked={formData.cleanAll === 'Yes'}
-                            onChange={handleChange}
-                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
-                          />
-                        </div>
-                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Yes</span>
-                      </label>
-                      <label className="flex items-center cursor-pointer group">
-                        <div className="relative flex items-center">
-                          <input
-                            type="radio"
-                            name="cleanAll"
-                            value="No"
-                            checked={formData.cleanAll === 'No'}
-                            onChange={handleChange}
-                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
-                          />
-                        </div>
-                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">No</span>
-                      </label>
-                    </div>
-                  </div>
-                  {/* Conditional Date/Time Picker - Shows after Clean All is selected */}
-                  {formData.cleanAll && (
-                    <div className="form-group animate-fade-in border-t border-gray-100 pt-4 mt-4">
-                      <label htmlFor="preferredDateTime" className="block text-sm font-medium text-gray-700 mb-1 uppercase tracking-wide">
-                        Preferred Date Time
-                      </label>
-                      <input
-                        type="datetime-local"
-                        id="preferredDateTime"
-                        name="preferredDateTime"
-                        value={formData.preferredDateTime}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
-                      />
-                    </div>
-                  )}
+              {/* Conditional Date/Time Picker */}
+              {formData.frequency === 'Specific Date & Time' && (
+                <div className="form-group animate-fade-in">
+                  <label htmlFor="preferredDateTime" className="block text-sm font-medium text-gray-700 mb-1">
+                    Select Date & Time
+                  </label>
+                  <input
+                    type="datetime-local"
+                    id="preferredDateTime"
+                    name="preferredDateTime"
+                    value={formData.preferredDateTime}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                  />
                 </div>
               )}
+
+              {/* Clean All Radio */}
+              <div className="form-group">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Should the entire home be cleaned?
+                </label>
+                <div className="flex gap-6">
+                  <label className="flex items-center cursor-pointer group">
+                    <div className="relative flex items-center">
+                      <input
+                        type="radio"
+                        name="cleanAll"
+                        value="Yes"
+                        checked={formData.cleanAll === 'Yes'}
+                        onChange={handleChange}
+                        className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                      />
+                    </div>
+                    <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Yes</span>
+                  </label>
+                  <label className="flex items-center cursor-pointer group">
+                    <div className="relative flex items-center">
+                      <input
+                        type="radio"
+                        name="cleanAll"
+                        value="No"
+                        checked={formData.cleanAll === 'No'}
+                        onChange={handleChange}
+                        className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                      />
+                    </div>
+                    <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">No</span>
+                  </label>
+                </div>
+              </div>
+              {/* Conditional Date/Time Picker - Shows after Clean All is selected */}
+              {formData.cleanAll && (
+                <div className="form-group animate-fade-in border-t border-gray-100 pt-4 mt-4">
+                  <label htmlFor="preferredDateTime" className="block text-sm font-medium text-gray-700 mb-1 uppercase tracking-wide">
+                    Preferred Date Time
+                  </label>
+                  <input
+                    type="datetime-local"
+                    id="preferredDateTime"
+                    name="preferredDateTime"
+                    value={formData.preferredDateTime}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                  />
+                </div>
+              )}
+            </div>
+          )}
 
               {/* Step 2: Room Details */}
               {currentStep === 2 && (
@@ -589,16 +739,19 @@ export default function ContactForm() {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      setCurrentStep(currentStep + 1);
+                      if (isCurrentStepValid()) {
+                        setCurrentStep(currentStep + 1);
+                      }
                     }}
-                    className="flex-1 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl"
+                    disabled={!isCurrentStepValid()}
+                    className="flex-1 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
                   >
                     Next
                   </button>
                 ) : (
                   <button
                     type="submit"
-                    disabled={status === 'loading'}
+                    disabled={status === 'loading' || !isFormValid()}
                     className="flex-1 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
                   >
                     {status === 'loading' ? (
@@ -624,27 +777,27 @@ export default function ContactForm() {
 
           {/* Submit button for other services (non-Home Cleaning) */}
           {selectedService && selectedService !== 'Home Cleaning' && (
-            <button
-              type="submit"
-              disabled={status === 'loading'}
-              className="w-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
-            >
-              {status === 'loading' ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Sending...
-                </>
-              ) : status === 'success' ? (
-                'Request Sent Successfully! ✓'
-              ) : status === 'error' ? (
-                'Failed to Send. Try Again ✕'
-              ) : (
-                'Get Free Quote'
-              )}
-            </button>
+          <button
+            type="submit"
+            disabled={status === 'loading'}
+            className="w-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+          >
+            {status === 'loading' ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Sending...
+              </>
+            ) : status === 'success' ? (
+              'Request Sent Successfully! ✓'
+            ) : status === 'error' ? (
+              'Failed to Send. Try Again ✕'
+            ) : (
+              'Get Free Quote'
+            )}
+          </button>
           )}
         </form>
       )}
