@@ -30,7 +30,21 @@ export default function ContactForm() {
     floors: '',
     hasPets: '',
     comments: '',
-    message: ''
+    message: '',
+    // Move-out Cleaning fields
+    moveOutCleaningDate: '',
+    isDateFlexible: '',
+    dateFlexibilityRange: '',
+    // Window Cleaning fields
+    windowCleaningDate: '',
+    windowsWithBars: '0',
+    windowsWithoutBars: '0',
+    topHungWindows: '0',
+    windowType: [] as string[],
+    hasGlazedBalcony: '',
+    windowHomeType: '',
+    windowFloors: '',
+    needsLadder: ''
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -38,6 +52,21 @@ export default function ContactForm() {
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const handleCheckboxChange = (name: string, value: string, checked: boolean) => {
+    const currentValues = formData[name as keyof typeof formData] as string[];
+    if (checked) {
+      setFormData({
+        ...formData,
+        [name]: [...currentValues, value]
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: currentValues.filter(item => item !== value)
+      });
+    }
   };
 
   const handleNumberChange = (name: string, value: string) => {
@@ -79,35 +108,76 @@ export default function ContactForm() {
 
   // Validation function to check if current step is valid
   const isCurrentStepValid = () => {
-    if (!selectedService || selectedService !== 'Home Cleaning') return true;
+    if (!selectedService) return true;
     
     // Always require contact info
     if (!isContactInfoValid()) return false;
     
-    if (currentStep === 1) {
-      // Step 1 validation
-      const basicFields = 
-        formData.homeType !== '' &&
-        formData.areaSize !== '' &&
-        formData.frequency !== '' &&
-        formData.cleanAll !== '';
+    if (selectedService === 'Home Cleaning') {
+      if (currentStep === 1) {
+        // Step 1 validation
+        const basicFields = 
+          formData.homeType !== '' &&
+          formData.areaSize !== '' &&
+          formData.frequency !== '' &&
+          formData.cleanAll !== '';
+        
+        // preferredDateTime is required if frequency is "Specific Date & Time" OR if cleanAll is selected
+        const dateTimeValid = 
+          (formData.frequency === 'Specific Date & Time' ? formData.preferredDateTime !== '' : true) &&
+          (formData.cleanAll !== '' ? formData.preferredDateTime !== '' : true);
+        
+        return basicFields && dateTimeValid;
+      }
       
-      // preferredDateTime is required if frequency is "Specific Date & Time" OR if cleanAll is selected
-      const dateTimeValid = 
-        (formData.frequency === 'Specific Date & Time' ? formData.preferredDateTime !== '' : true) &&
-        (formData.cleanAll !== '' ? formData.preferredDateTime !== '' : true);
+      if (currentStep === 2) {
+        // Step 2 validation - room fields are always filled (default '0')
+        return true; // All room fields have default values
+      }
       
-      return basicFields && dateTimeValid;
+      if (currentStep === 3) {
+        // Step 3 validation
+        return formData.floors !== '' && formData.hasPets !== '';
+      }
     }
     
-    if (currentStep === 2) {
-      // Step 2 validation - room fields are always filled (default '0')
-      return true; // All room fields have default values
+    if (selectedService === 'Move-out Cleaning') {
+      if (currentStep === 1) {
+        // Step 1 validation for Move-out Cleaning
+        return formData.moveOutCleaningDate !== '' && 
+               formData.isDateFlexible !== '' &&
+               (formData.isDateFlexible === 'No' || formData.dateFlexibilityRange !== '');
+      }
+      
+      if (currentStep === 2) {
+        // Step 2 validation - room fields are always filled (default '0')
+        return true;
+      }
+      
+      if (currentStep === 3) {
+        // Step 3 validation
+        return formData.floors !== '' && formData.hasPets !== '';
+      }
     }
     
-    if (currentStep === 3) {
-      // Step 3 validation
-      return formData.floors !== '' && formData.hasPets !== '';
+    if (selectedService === 'Window Cleaning') {
+      if (currentStep === 1) {
+        // Step 1 validation for Window Cleaning
+        return formData.windowCleaningDate !== '';
+      }
+      
+      if (currentStep === 2) {
+        // Step 2 validation for Window Cleaning
+        return (formData.windowType as string[]).length > 0 && formData.hasGlazedBalcony !== '';
+      }
+      
+      if (currentStep === 3) {
+        // Step 3 validation for Window Cleaning
+        return formData.floors !== '' && 
+               formData.hasPets !== '' &&
+               formData.windowFloors !== '' &&
+               formData.needsLadder !== '';
+      }
     }
     
     return true;
@@ -142,6 +212,41 @@ export default function ContactForm() {
       return step1Valid && step2Valid && step3Valid;
     }
     
+    if (selectedService === 'Move-out Cleaning') {
+      // Step 1 validation
+      const step1Valid = 
+        formData.moveOutCleaningDate !== '' &&
+        formData.isDateFlexible !== '' &&
+        (formData.isDateFlexible === 'No' || formData.dateFlexibilityRange !== '');
+      
+      // Step 2 validation - room fields are always filled (default '0')
+      const step2Valid = true;
+      
+      // Step 3 validation
+      const step3Valid = 
+        formData.floors !== '' &&
+        formData.hasPets !== '';
+      
+      return step1Valid && step2Valid && step3Valid;
+    }
+    
+    if (selectedService === 'Window Cleaning') {
+      // Step 1 validation
+      const step1Valid = formData.windowCleaningDate !== '';
+      
+      // Step 2 validation
+      const step2Valid = (formData.windowType as string[]).length > 0 && formData.hasGlazedBalcony !== '';
+      
+      // Step 3 validation
+      const step3Valid = 
+        formData.floors !== '' &&
+        formData.hasPets !== '' &&
+        formData.windowFloors !== '' &&
+        formData.needsLadder !== '';
+      
+      return step1Valid && step2Valid && step3Valid;
+    }
+    
     // For other services, return true (they might have different validation)
     return true;
   };
@@ -169,7 +274,10 @@ export default function ContactForm() {
           name: '', phone: '', email: '', address: '', company: '', vatNumber: '',
           homeType: '', cleanAll: '', areaSize: '', frequency: '', preferredDateTime: '', 
           numberOfRooms: '0', bedroom: '0', kitchen: '0', livingRoom: '0', 
-          floors: '', hasPets: '', comments: '', message: ''
+          floors: '', hasPets: '', comments: '', message: '',
+          moveOutCleaningDate: '', isDateFlexible: '', dateFlexibilityRange: '',
+          windowCleaningDate: '', windowsWithBars: '0', windowsWithoutBars: '0', topHungWindows: '0',
+          windowType: [], hasGlazedBalcony: '', windowHomeType: '', windowFloors: '', needsLadder: ''
         });
         setCurrentStep(1);
         setTimeout(() => setStatus('idle'), 5000);
@@ -775,8 +883,863 @@ export default function ContactForm() {
             </>
           )}
 
-          {/* Submit button for other services (non-Home Cleaning) */}
-          {selectedService && selectedService !== 'Home Cleaning' && (
+          {/* Move-out Cleaning Form */}
+          {selectedService === 'Move-out Cleaning' && (
+            <>
+              {/* Step Indicator */}
+              <div className="flex items-center justify-center mb-6">
+                <div className="flex items-center space-x-2">
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 1 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    <span className="text-sm font-semibold">1</span>
+                  </div>
+                  <div className={`w-12 h-1 ${currentStep >= 2 ? 'bg-cyan-500' : 'bg-gray-200'}`}></div>
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 2 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    <span className="text-sm font-semibold">2</span>
+                  </div>
+                  <div className={`w-12 h-1 ${currentStep >= 3 ? 'bg-cyan-500' : 'bg-gray-200'}`}></div>
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 3 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    <span className="text-sm font-semibold">3</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 1: Move-out Cleaning Details */}
+              {currentStep === 1 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Step 1: Move-out Cleaning Details
+                  </h3>
+
+                  {/* Move-out Cleaning Date/Time Picker */}
+                  <div className="form-group">
+                    <label htmlFor="moveOutCleaningDate" className="block text-sm font-medium text-gray-700 mb-1">
+                      When will the moving-out cleaning take place? *
+                    </label>
+                    <input
+                      type="datetime-local"
+                      id="moveOutCleaningDate"
+                      name="moveOutCleaningDate"
+                      value={formData.moveOutCleaningDate}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                    />
+                  </div>
+
+                  {/* Is Date Flexible Radio */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Is the cleaning date flexible? Can the cleaning take place on dates other than the selected cleaning date above? *
+                    </label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="isDateFlexible"
+                            value="Yes"
+                            checked={formData.isDateFlexible === 'Yes'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Yes</span>
+                      </label>
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="isDateFlexible"
+                            value="No"
+                            checked={formData.isDateFlexible === 'No'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">No</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Conditional Date Flexibility Range Dropdown */}
+                  {formData.isDateFlexible === 'Yes' && (
+                    <div className="form-group animate-fade-in border-t border-gray-200 pt-4">
+                      <label htmlFor="dateFlexibilityRange" className="block text-sm font-medium text-gray-700 mb-1">
+                        Date Flexibility Range *
+                      </label>
+                      <select
+                        id="dateFlexibilityRange"
+                        name="dateFlexibilityRange"
+                        value={formData.dateFlexibilityRange}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                      >
+                        <option value="">Select flexibility range</option>
+                        <option value="+- 1 day">+- 1 day</option>
+                        <option value="+- 2 days">+- 2 days</option>
+                        <option value="+- 3 days">+- 3 days</option>
+                        <option value="+- 1 week">+- 1 week</option>
+                        <option value="+- 2 weeks">+- 2 weeks</option>
+                        <option value="+- 1 month">+- 1 month</option>
+                        <option value="+- more than a month">+- more than a month</option>
+                      </select>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Step 2: Room Details (Same as Home Cleaning) */}
+              {currentStep === 2 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                    </svg>
+                    Step 2: Room Details
+                  </h3>
+
+                  {/* Number of Rooms Input - Increment/Decrement */}
+                  <div className="form-group">
+                    <label htmlFor="numberOfRooms" className="block text-sm font-medium text-gray-700 mb-1">
+                      Enter number of rooms to be cleaned
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleDecrement('numberOfRooms')}
+                        className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={parseInt(formData.numberOfRooms) <= 0}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                        </svg>
+                      </button>
+                      <input
+                        type="number"
+                        id="numberOfRooms"
+                        name="numberOfRooms"
+                        value={formData.numberOfRooms}
+                        onChange={(e) => handleNumberChange('numberOfRooms', e.target.value)}
+                        min="0"
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-center text-lg font-semibold"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleIncrement('numberOfRooms')}
+                        className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Bedroom Input - Increment/Decrement */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label htmlFor="bedroom" className="block text-sm font-medium text-gray-700 mb-1">
+                      Bedroom
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleDecrement('bedroom')}
+                        className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={parseInt(formData.bedroom) <= 0}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                        </svg>
+                      </button>
+                      <input
+                        type="number"
+                        id="bedroom"
+                        name="bedroom"
+                        value={formData.bedroom}
+                        onChange={(e) => handleNumberChange('bedroom', e.target.value)}
+                        min="0"
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-center text-lg font-semibold"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleIncrement('bedroom')}
+                        className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Kitchen Input - Increment/Decrement */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label htmlFor="kitchen" className="block text-sm font-medium text-gray-700 mb-1">
+                      Kitchen
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleDecrement('kitchen')}
+                        className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={parseInt(formData.kitchen) <= 0}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                        </svg>
+                      </button>
+                      <input
+                        type="number"
+                        id="kitchen"
+                        name="kitchen"
+                        value={formData.kitchen}
+                        onChange={(e) => handleNumberChange('kitchen', e.target.value)}
+                        min="0"
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-center text-lg font-semibold"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleIncrement('kitchen')}
+                        className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Living Room Input - Increment/Decrement */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label htmlFor="livingRoom" className="block text-sm font-medium text-gray-700 mb-1">
+                      Living Room
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleDecrement('livingRoom')}
+                        className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={parseInt(formData.livingRoom) <= 0}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                        </svg>
+                      </button>
+                      <input
+                        type="number"
+                        id="livingRoom"
+                        name="livingRoom"
+                        value={formData.livingRoom}
+                        onChange={(e) => handleNumberChange('livingRoom', e.target.value)}
+                        min="0"
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-center text-lg font-semibold"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleIncrement('livingRoom')}
+                        className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Additional Information (Same as Home Cleaning) */}
+              {currentStep === 3 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Step 3: Additional Information
+                  </h3>
+
+                  {/* Floors Dropdown */}
+                  <div className="form-group">
+                    <label htmlFor="floors" className="block text-sm font-medium text-gray-700 mb-1">
+                      How many floors need to be cleaned?
+                    </label>
+                    <select
+                      id="floors"
+                      name="floors"
+                      value={formData.floors}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">Select number of floors</option>
+                      <option value="1 floor">1 floor</option>
+                      <option value="2 floors">2 floors</option>
+                      <option value="3 or more floors">3 or more floors</option>
+                    </select>
+                  </div>
+
+                  {/* Has Pets Radio */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Does the household have pets?
+                    </label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="hasPets"
+                            value="Yes"
+                            checked={formData.hasPets === 'Yes'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Yes</span>
+                      </label>
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="hasPets"
+                            value="No"
+                            checked={formData.hasPets === 'No'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">No</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Comments Textarea */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label htmlFor="comments" className="block text-sm font-medium text-gray-700 mb-1">
+                      Comments/Optional
+                    </label>
+                    <textarea
+                      id="comments"
+                      name="comments"
+                      value={formData.comments}
+                      onChange={handleChange}
+                      rows={4}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all resize-none"
+                      placeholder="Any additional information or special requests..."
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Navigation Buttons */}
+              <div className="flex gap-3 mt-6">
+                {currentStep > 1 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setCurrentStep(currentStep - 1);
+                    }}
+                    className="flex-1 bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-300 transform hover:scale-[1.02] transition-all duration-300 shadow-md hover:shadow-lg"
+                  >
+                    Previous
+                  </button>
+                )}
+                {currentStep < 3 ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (isCurrentStepValid()) {
+                        setCurrentStep(currentStep + 1);
+                      }
+                    }}
+                    disabled={!isCurrentStepValid()}
+                    className="flex-1 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={status === 'loading' || !isFormValid()}
+                    className="flex-1 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+                  >
+                    {status === 'loading' ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Sending...
+                      </>
+                    ) : status === 'success' ? (
+                      'Request Sent Successfully! ✓'
+                    ) : status === 'error' ? (
+                      'Failed to Send. Try Again ✕'
+                    ) : (
+                      'Get Free Quote'
+                    )}
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Window Cleaning Form */}
+          {selectedService === 'Window Cleaning' && (
+            <>
+              {/* Step Indicator */}
+              <div className="flex items-center justify-center mb-6">
+                <div className="flex items-center space-x-2">
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 1 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    <span className="text-sm font-semibold">1</span>
+                  </div>
+                  <div className={`w-12 h-1 ${currentStep >= 2 ? 'bg-cyan-500' : 'bg-gray-200'}`}></div>
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 2 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    <span className="text-sm font-semibold">2</span>
+                  </div>
+                  <div className={`w-12 h-1 ${currentStep >= 3 ? 'bg-cyan-500' : 'bg-gray-200'}`}></div>
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 3 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    <span className="text-sm font-semibold">3</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 1: Window Cleaning Details */}
+              {currentStep === 1 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Step 1: Window Cleaning Details
+                  </h3>
+
+                  {/* Window Cleaning Date/Time Picker */}
+                  <div className="form-group">
+                    <label htmlFor="windowCleaningDate" className="block text-sm font-medium text-gray-700 mb-1">
+                      When should the window cleaning take place? *
+                    </label>
+                    <input
+                      type="datetime-local"
+                      id="windowCleaningDate"
+                      name="windowCleaningDate"
+                      value={formData.windowCleaningDate}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                    />
+                  </div>
+
+                  {/* How many windows need to be cleaned? */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      How many windows need to be cleaned? *
+                    </label>
+                    
+                    {/* Windows with bars */}
+                    <div className="mb-4">
+                      <label htmlFor="windowsWithBars" className="block text-sm font-medium text-gray-700 mb-2">
+                        Windows with bars
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleDecrement('windowsWithBars')}
+                          className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={parseInt(formData.windowsWithBars) <= 0}
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                          </svg>
+                        </button>
+                        <input
+                          type="number"
+                          id="windowsWithBars"
+                          name="windowsWithBars"
+                          value={formData.windowsWithBars}
+                          onChange={(e) => handleNumberChange('windowsWithBars', e.target.value)}
+                          min="0"
+                          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-center text-lg font-semibold"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleIncrement('windowsWithBars')}
+                          className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Windows without bars */}
+                    <div className="mb-4">
+                      <label htmlFor="windowsWithoutBars" className="block text-sm font-medium text-gray-700 mb-2">
+                        Windows without bars
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleDecrement('windowsWithoutBars')}
+                          className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={parseInt(formData.windowsWithoutBars) <= 0}
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                          </svg>
+                        </button>
+                        <input
+                          type="number"
+                          id="windowsWithoutBars"
+                          name="windowsWithoutBars"
+                          value={formData.windowsWithoutBars}
+                          onChange={(e) => handleNumberChange('windowsWithoutBars', e.target.value)}
+                          min="0"
+                          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-center text-lg font-semibold"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleIncrement('windowsWithoutBars')}
+                          className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Top-hung windows */}
+                    <div>
+                      <label htmlFor="topHungWindows" className="block text-sm font-medium text-gray-700 mb-2">
+                        Top-hung windows
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleDecrement('topHungWindows')}
+                          className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={parseInt(formData.topHungWindows) <= 0}
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                          </svg>
+                        </button>
+                        <input
+                          type="number"
+                          id="topHungWindows"
+                          name="topHungWindows"
+                          value={formData.topHungWindows}
+                          onChange={(e) => handleNumberChange('topHungWindows', e.target.value)}
+                          min="0"
+                          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-center text-lg font-semibold"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleIncrement('topHungWindows')}
+                          className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Window Type Details (Window Cleaning specific) */}
+              {currentStep === 2 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Step 2: Window Details
+                  </h3>
+
+                  {/* Window Type Checkboxes */}
+                  <div className="form-group">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      What type of windows do you have? *
+                    </label>
+                    <div className="space-y-3">
+                      {[
+                        { value: 'Single-glazed window (2 sides)', label: 'Single-glazed window (2 sides)' },
+                        { value: 'Double-glazed windows (4 sides)', label: 'Double-glazed windows (4 sides)' },
+                        { value: 'Triple-glazed window (6 sides)', label: 'Triple-glazed window (6 sides)' },
+                        { value: "Don't know", label: "Don't know" }
+                      ].map((option) => (
+                        <label key={option.value} className="flex items-center cursor-pointer group p-3 rounded-lg border-2 border-gray-200 hover:border-cyan-300 hover:bg-cyan-50 transition-all">
+                          <input
+                            type="checkbox"
+                            name="windowType"
+                            value={option.value}
+                            checked={(formData.windowType as string[]).includes(option.value)}
+                            onChange={(e) => handleCheckboxChange('windowType', option.value, e.target.checked)}
+                            className="h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                          <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-700 transition-colors">{option.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Glazed Balcony/Patio Radio */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Do you have a glazed balcony or patio that needs window cleaning? *
+                    </label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="hasGlazedBalcony"
+                            value="Yes"
+                            checked={formData.hasGlazedBalcony === 'Yes'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Yes</span>
+                      </label>
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="hasGlazedBalcony"
+                            value="No"
+                            checked={formData.hasGlazedBalcony === 'No'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">No</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Additional Information (Window Cleaning specific) */}
+              {currentStep === 3 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Step 3: Additional Information
+                  </h3>
+
+                  {/* Floors Dropdown */}
+                  <div className="form-group">
+                    <label htmlFor="floors" className="block text-sm font-medium text-gray-700 mb-1">
+                      How many floors need to be cleaned?
+                    </label>
+                    <select
+                      id="floors"
+                      name="floors"
+                      value={formData.floors}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">Select number of floors</option>
+                      <option value="1 floor">1 floor</option>
+                      <option value="2 floors">2 floors</option>
+                      <option value="3 or more floors">3 or more floors</option>
+                    </select>
+                  </div>
+
+                  {/* Has Pets Radio */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Does the household have pets?
+                    </label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="hasPets"
+                            value="Yes"
+                            checked={formData.hasPets === 'Yes'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Yes</span>
+                      </label>
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="hasPets"
+                            value="No"
+                            checked={formData.hasPets === 'No'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">No</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Window Floors Dropdown */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label htmlFor="windowFloors" className="block text-sm font-medium text-gray-700 mb-1">
+                      How many floors does your home have? *
+                    </label>
+                    <select
+                      id="windowFloors"
+                      name="windowFloors"
+                      value={formData.windowFloors}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">Select number of floors</option>
+                      <option value="1 floor">1 floor</option>
+                      <option value="2 floors">2 floors</option>
+                      <option value="3 or more floors">3 or more floors</option>
+                    </select>
+                  </div>
+
+                  {/* Needs Ladder Radio */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Does the cleaning company need to bring a ladder to reach all the windows? *
+                    </label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="needsLadder"
+                            value="Yes"
+                            checked={formData.needsLadder === 'Yes'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Yes</span>
+                      </label>
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="needsLadder"
+                            value="No"
+                            checked={formData.needsLadder === 'No'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">No</span>
+                      </label>
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="needsLadder"
+                            value="Don't know"
+                            checked={formData.needsLadder === "Don't know"}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Don&apos;t know</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Comments Textarea */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label htmlFor="comments" className="block text-sm font-medium text-gray-700 mb-1">
+                      Comments/Optional
+                    </label>
+                    <textarea
+                      id="comments"
+                      name="comments"
+                      value={formData.comments}
+                      onChange={handleChange}
+                      rows={4}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all resize-none"
+                      placeholder="Any additional information or special requests..."
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Navigation Buttons */}
+              <div className="flex gap-3 mt-6">
+                {currentStep > 1 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setCurrentStep(currentStep - 1);
+                    }}
+                    className="flex-1 bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-300 transform hover:scale-[1.02] transition-all duration-300 shadow-md hover:shadow-lg"
+                  >
+                    Previous
+                  </button>
+                )}
+                {currentStep < 3 ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (isCurrentStepValid()) {
+                        setCurrentStep(currentStep + 1);
+                      }
+                    }}
+                    disabled={!isCurrentStepValid()}
+                    className="flex-1 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={status === 'loading' || !isFormValid()}
+                    className="flex-1 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+                  >
+                    {status === 'loading' ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Sending...
+                      </>
+                    ) : status === 'success' ? (
+                      'Request Sent Successfully! ✓'
+                    ) : status === 'error' ? (
+                      'Failed to Send. Try Again ✕'
+                    ) : (
+                      'Get Free Quote'
+                    )}
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Submit button for other services (non-Home Cleaning, non-Move-out Cleaning, and non-Window Cleaning) */}
+          {selectedService && selectedService !== 'Home Cleaning' && selectedService !== 'Move-out Cleaning' && selectedService !== 'Window Cleaning' && (
           <button
             type="submit"
             disabled={status === 'loading'}

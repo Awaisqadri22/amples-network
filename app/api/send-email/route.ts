@@ -10,7 +10,10 @@ export async function POST(request: Request) {
             selectedService, homeType, cleanAll,
             areaSize, frequency, preferredDateTime,
             numberOfRooms, bedroom, kitchen, livingRoom,
-            floors, hasPets, comments
+            floors, hasPets, comments,
+            moveOutCleaningDate, isDateFlexible, dateFlexibilityRange,
+            windowCleaningDate, windowsWithBars, windowsWithoutBars, topHungWindows,
+            windowType, hasGlazedBalcony, windowHomeType, windowFloors, needsLadder
         } = requestData;
         
         // Log all received data for debugging
@@ -60,6 +63,49 @@ export async function POST(request: Request) {
                 </ul>
                 <h4>Additional Information:</h4>
                 <p><strong>Floors:</strong> ${floors || 'Not specified'}</p>
+                <p><strong>Has Pets:</strong> ${hasPets || 'Not specified'}</p>
+                ${comments ? `<p><strong>Comments:</strong> ${comments}</p>` : ''}
+            `;
+        } else if (selectedService === 'Move-out Cleaning') {
+            serviceDetails = `
+                <h3>Move-out Cleaning Details:</h3>
+                ${moveOutCleaningDate ? `<p><strong>Moving-out Cleaning Date:</strong> ${new Date(moveOutCleaningDate).toLocaleString()}</p>` : ''}
+                <p><strong>Is Date Flexible:</strong> ${isDateFlexible || 'Not specified'}</p>
+                ${isDateFlexible === 'Yes' && dateFlexibilityRange ? `<p><strong>Date Flexibility Range:</strong> ${dateFlexibilityRange}</p>` : ''}
+                <h4>Room Details:</h4>
+                <ul>
+                  <li><strong>Number of Rooms:</strong> ${numberOfRooms || '0'}</li>
+                  <li><strong>Bedrooms:</strong> ${bedroom || '0'}</li>
+                  <li><strong>Kitchens:</strong> ${kitchen || '0'}</li>
+                  <li><strong>Living Rooms:</strong> ${livingRoom || '0'}</li>
+                </ul>
+                <h4>Additional Information:</h4>
+                <p><strong>Floors:</strong> ${floors || 'Not specified'}</p>
+                <p><strong>Has Pets:</strong> ${hasPets || 'Not specified'}</p>
+                ${comments ? `<p><strong>Comments:</strong> ${comments}</p>` : ''}
+            `;
+        } else if (selectedService === 'Window Cleaning') {
+            serviceDetails = `
+                <h3>Window Cleaning Details:</h3>
+                ${windowCleaningDate ? `<p><strong>Window Cleaning Date:</strong> ${new Date(windowCleaningDate).toLocaleString()}</p>` : ''}
+                <h4>Window Details:</h4>
+                <ul>
+                  <li><strong>Windows with bars:</strong> ${windowsWithBars || '0'}</li>
+                  <li><strong>Windows without bars:</strong> ${windowsWithoutBars || '0'}</li>
+                  <li><strong>Top-hung windows:</strong> ${topHungWindows || '0'}</li>
+                </ul>
+                <h4>Window Type:</h4>
+                <ul>
+                  ${Array.isArray(windowType) && windowType.length > 0 
+                    ? windowType.map((type: string) => `<li>${type}</li>`).join('')
+                    : '<li>Not specified</li>'}
+                </ul>
+                <p><strong>Has Glazed Balcony/Patio:</strong> ${hasGlazedBalcony || 'Not specified'}</p>
+                <h4>Additional Information:</h4>
+                <p><strong>Home Type:</strong> ${windowHomeType || 'Not specified'}</p>
+                <p><strong>Number of Floors:</strong> ${windowFloors || 'Not specified'}</p>
+                <p><strong>Needs Ladder:</strong> ${needsLadder || 'Not specified'}</p>
+                <p><strong>Floors to Clean:</strong> ${floors || 'Not specified'}</p>
                 <p><strong>Has Pets:</strong> ${hasPets || 'Not specified'}</p>
                 ${comments ? `<p><strong>Comments:</strong> ${comments}</p>` : ''}
             `;
