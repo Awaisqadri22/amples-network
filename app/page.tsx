@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState } from 'react';
 import ServicesSection from './components/ServicesSection';
 import ContactSection from './components/ContactSection';
@@ -16,7 +17,15 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <a href="#home" className="cursor-pointer hover:opacity-80 transition-opacity">
+              <Link 
+                href="/" 
+                onClick={() => {
+                  if (window.location.pathname === '/') {
+                    window.location.reload();
+                  }
+                }}
+                className="cursor-pointer hover:opacity-80 transition-opacity"
+              >
                 <Image
                   src="/amples logo.png"
                   alt="Amples Logo"
@@ -24,7 +33,7 @@ export default function Home() {
                   height={40}
                   className="h-10 w-auto"
                 />
-              </a>
+              </Link>
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <div className="relative group">
@@ -115,7 +124,16 @@ export default function Home() {
         <div className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40" onClick={() => setMobileMenuOpen(false)}>
           <div className="bg-white w-80 h-full shadow-2xl overflow-y-auto animate-slide-in-right" onClick={(e) => e.stopPropagation()}>
             <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-              <a href="#home" className="cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setMobileMenuOpen(false)}>
+              <Link 
+                href="/" 
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  if (window.location.pathname === '/') {
+                    window.location.reload();
+                  }
+                }}
+                className="cursor-pointer hover:opacity-80 transition-opacity"
+              >
                 <Image
                   src="/amples logo.png"
                   alt="Amples Logo"
@@ -123,7 +141,7 @@ export default function Home() {
                   height={40}
                   className="h-8 w-auto"
                 />
-              </a>
+              </Link>
               <button 
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-gray-700 hover:text-cyan-500"

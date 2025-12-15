@@ -13,7 +13,9 @@ export async function POST(request: Request) {
             floors, hasPets, comments,
             moveOutCleaningDate, isDateFlexible, dateFlexibilityRange,
             windowCleaningDate, windowsWithBars, windowsWithoutBars, topHungWindows,
-            windowType, hasGlazedBalcony, windowHomeType, windowFloors, needsLadder
+            windowType, hasGlazedBalcony, windowHomeType, windowFloors, needsLadder,
+            constructionWorkType, constructionCleaningIncludes, constructionCleaningDate,
+            constructionHomeType, constructionAreaSize, constructionFloors
         } = requestData;
         
         // Log all received data for debugging
@@ -107,6 +109,28 @@ export async function POST(request: Request) {
                 <p><strong>Needs Ladder:</strong> ${needsLadder || 'Not specified'}</p>
                 <p><strong>Floors to Clean:</strong> ${floors || 'Not specified'}</p>
                 <p><strong>Has Pets:</strong> ${hasPets || 'Not specified'}</p>
+                ${comments ? `<p><strong>Comments:</strong> ${comments}</p>` : ''}
+            `;
+        } else if (selectedService === 'Construction Cleaning') {
+            serviceDetails = `
+                <h3>Construction Cleaning Details:</h3>
+                <h4>Work Type:</h4>
+                <ul>
+                  ${Array.isArray(constructionWorkType) && constructionWorkType.length > 0 
+                    ? constructionWorkType.map((type: string) => `<li>${type}</li>`).join('')
+                    : '<li>Not specified</li>'}
+                </ul>
+                <h4>What should be included in the cleaning:</h4>
+                <ul>
+                  ${Array.isArray(constructionCleaningIncludes) && constructionCleaningIncludes.length > 0 
+                    ? constructionCleaningIncludes.map((item: string) => `<li>${item}</li>`).join('')
+                    : '<li>Not specified</li>'}
+                </ul>
+                <h4>Additional Information:</h4>
+                ${constructionCleaningDate ? `<p><strong>Cleaning Date:</strong> ${new Date(constructionCleaningDate).toLocaleString()}</p>` : ''}
+                <p><strong>Home Type:</strong> ${constructionHomeType || 'Not specified'}</p>
+                <p><strong>Area Size:</strong> ${constructionAreaSize ? constructionAreaSize + ' sq m' : 'Not specified'}</p>
+                <p><strong>Floors:</strong> ${constructionFloors || 'Not specified'}</p>
                 ${comments ? `<p><strong>Comments:</strong> ${comments}</p>` : ''}
             `;
         } else if (selectedService) {

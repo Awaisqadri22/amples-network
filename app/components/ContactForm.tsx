@@ -1,14 +1,17 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 type ServiceType = 'Move-out Cleaning' | 'Home Cleaning' | 'Detail Cleaning' | 'Office Cleaning' | 'Deep/Heavy-duty Cleaning' | 'Window Cleaning' | 'Stairwell Cleaning' | 'Construction Cleaning' | 'Gym Cleaning';
 
 export default function ContactForm() {
+  const router = useRouter();
   const [formType, setFormType] = useState<'private' | 'company'>('private');
   const [selectedService, setSelectedService] = useState<ServiceType | null>(null);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [currentStep, setCurrentStep] = useState(1);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -44,7 +47,14 @@ export default function ContactForm() {
     hasGlazedBalcony: '',
     windowHomeType: '',
     windowFloors: '',
-    needsLadder: ''
+    needsLadder: '',
+    // Construction Cleaning fields
+    constructionWorkType: [] as string[],
+    constructionCleaningIncludes: [] as string[],
+    constructionCleaningDate: '',
+    constructionHomeType: '',
+    constructionAreaSize: '',
+    constructionFloors: ''
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -155,8 +165,8 @@ export default function ContactForm() {
       }
       
       if (currentStep === 3) {
-        // Step 3 validation
-        return formData.floors !== '' && formData.hasPets !== '';
+        // Step 3 validation for Construction Cleaning - no fields required
+        return true;
       }
     }
     
@@ -177,6 +187,23 @@ export default function ContactForm() {
                formData.hasPets !== '' &&
                formData.windowFloors !== '' &&
                formData.needsLadder !== '';
+      }
+    }
+    
+    if (selectedService === 'Construction Cleaning') {
+      if (currentStep === 1) {
+        // Step 1 validation for Construction Cleaning
+        return (formData.constructionWorkType as string[]).length > 0;
+      }
+      
+      if (currentStep === 2) {
+        // Step 2 validation - room fields are always filled (default '0')
+        return true;
+      }
+      
+      if (currentStep === 3) {
+        // Step 3 validation
+        return formData.floors !== '' && formData.hasPets !== '';
       }
     }
     
@@ -247,6 +274,23 @@ export default function ContactForm() {
       return step1Valid && step2Valid && step3Valid;
     }
     
+    if (selectedService === 'Construction Cleaning') {
+      // Step 1 validation
+      const step1Valid = (formData.constructionWorkType as string[]).length > 0;
+      
+      // Step 2 validation
+      const step2Valid = (formData.constructionCleaningIncludes as string[]).length > 0;
+      
+      // Step 3 validation
+      const step3Valid = 
+        formData.constructionCleaningDate !== '' &&
+        formData.constructionHomeType !== '' &&
+        formData.constructionAreaSize !== '' &&
+        formData.constructionFloors !== '';
+      
+      return step1Valid && step2Valid && step3Valid;
+    }
+    
     // For other services, return true (they might have different validation)
     return true;
   };
@@ -270,6 +314,7 @@ export default function ContactForm() {
 
       if (response.ok) {
         setStatus('success');
+        setShowSuccessModal(true);
         setFormData({
           name: '', phone: '', email: '', address: '', company: '', vatNumber: '',
           homeType: '', cleanAll: '', areaSize: '', frequency: '', preferredDateTime: '', 
@@ -277,10 +322,20 @@ export default function ContactForm() {
           floors: '', hasPets: '', comments: '', message: '',
           moveOutCleaningDate: '', isDateFlexible: '', dateFlexibilityRange: '',
           windowCleaningDate: '', windowsWithBars: '0', windowsWithoutBars: '0', topHungWindows: '0',
-          windowType: [], hasGlazedBalcony: '', windowHomeType: '', windowFloors: '', needsLadder: ''
+          windowType: [], hasGlazedBalcony: '', windowHomeType: '', windowFloors: '', needsLadder: '',
+          constructionWorkType: [], constructionCleaningIncludes: [],
+          constructionCleaningDate: '', constructionHomeType: '', constructionAreaSize: '', constructionFloors: ''
         });
         setCurrentStep(1);
-        setTimeout(() => setStatus('idle'), 5000);
+        setSelectedService(null);
+        
+        // Hide modal after 3 seconds, then redirect to home page
+        setTimeout(() => {
+          setShowSuccessModal(false);
+          setTimeout(() => {
+            router.push('/');
+          }, 300); // Small delay for fade-out animation
+        }, 3000);
       } else {
         setStatus('error');
         setTimeout(() => setStatus('idle'), 5000);
@@ -293,8 +348,34 @@ export default function ContactForm() {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-2xl p-6 animate-slide-in">
-      <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">Get Your Free Quote</h2>
+    <>
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 transform animate-fade-in-up">
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                <svg className="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Thank You!</h3>
+              <p className="text-gray-600 mb-6">
+                Your quote request has been submitted successfully. We&apos;ll get back to you soon!
+              </p>
+              <p className="text-sm text-gray-500 mb-4">
+                You will be redirected to the home page in a few seconds...
+              </p>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-gradient-to-r from-cyan-500 to-emerald-500 h-2 rounded-full" style={{ animation: 'progress 3s linear forwards', width: '0%' }}></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="bg-white rounded-2xl shadow-2xl p-6 animate-slide-in">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">Get Your Free Quote</h2>
 
       {/* Service Selection - Vertical List */}
       {!selectedService ? (
@@ -1738,8 +1819,257 @@ export default function ContactForm() {
             </>
           )}
 
-          {/* Submit button for other services (non-Home Cleaning, non-Move-out Cleaning, and non-Window Cleaning) */}
-          {selectedService && selectedService !== 'Home Cleaning' && selectedService !== 'Move-out Cleaning' && selectedService !== 'Window Cleaning' && (
+          {/* Construction Cleaning Form */}
+          {selectedService === 'Construction Cleaning' && (
+            <>
+              {/* Step Indicator */}
+              <div className="flex items-center justify-center mb-6">
+                <div className="flex items-center space-x-2">
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 1 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    <span className="text-sm font-semibold">1</span>
+                  </div>
+                  <div className={`w-12 h-1 ${currentStep >= 2 ? 'bg-cyan-500' : 'bg-gray-200'}`}></div>
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 2 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    <span className="text-sm font-semibold">2</span>
+                  </div>
+                  <div className={`w-12 h-1 ${currentStep >= 3 ? 'bg-cyan-500' : 'bg-gray-200'}`}></div>
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 3 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    <span className="text-sm font-semibold">3</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 1: Construction Work Details */}
+              {currentStep === 1 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    Step 1: Construction Work Details
+                  </h3>
+
+                  {/* Construction Work Type Checkboxes */}
+                  <div className="form-group">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      What kind of work have you done? *
+                    </label>
+                    <div className="space-y-3">
+                      {[
+                        { value: 'Renovation/Remodeling', label: 'Renovation/Remodeling' },
+                        { value: 'Extension/Expansion', label: 'Extension/Expansion' },
+                        { value: 'Painting/Sanding', label: 'Painting/Sanding' },
+                        { value: 'Flooring/Floor sanding', label: 'Flooring/Floor sanding' },
+                        { value: 'Other', label: 'Other' }
+                      ].map((option) => (
+                        <label key={option.value} className="flex items-center cursor-pointer group p-3 rounded-lg border-2 border-gray-200 hover:border-cyan-300 hover:bg-cyan-50 transition-all">
+                          <input
+                            type="checkbox"
+                            name="constructionWorkType"
+                            value={option.value}
+                            checked={(formData.constructionWorkType as string[]).includes(option.value)}
+                            onChange={(e) => handleCheckboxChange('constructionWorkType', option.value, e.target.checked)}
+                            className="h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                          <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-700 transition-colors">{option.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Cleaning Includes */}
+              {currentStep === 2 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    Step 2: Cleaning Includes
+                  </h3>
+
+                  {/* Construction Cleaning Includes Checkboxes */}
+                  <div className="form-group">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      What should be included in the cleaning? *
+                    </label>
+                    <div className="space-y-3">
+                      {[
+                        { value: 'Dust Drying', label: 'Dust Drying' },
+                        { value: 'Vacuuming', label: 'Vacuuming' },
+                        { value: 'Floor Cleaning', label: 'Floor Cleaning' },
+                        { value: 'Window Cleaning', label: 'Window Cleaning' },
+                        { value: 'Kitchen cleaning', label: 'Kitchen cleaning' },
+                        { value: 'Bathroom cleaning', label: 'Bathroom cleaning' },
+                        { value: 'Cleaning of walls and ceiling', label: 'Cleaning of walls and ceiling' },
+                        { value: 'Throw away trash and waste', label: 'Throw away trash and waste' },
+                        { value: 'Other', label: 'Other' }
+                      ].map((option) => (
+                        <label key={option.value} className="flex items-center cursor-pointer group p-3 rounded-lg border-2 border-gray-200 hover:border-cyan-300 hover:bg-cyan-50 transition-all">
+                          <input
+                            type="checkbox"
+                            name="constructionCleaningIncludes"
+                            value={option.value}
+                            checked={(formData.constructionCleaningIncludes as string[]).includes(option.value)}
+                            onChange={(e) => handleCheckboxChange('constructionCleaningIncludes', option.value, e.target.checked)}
+                            className="h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                          <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-700 transition-colors">{option.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Additional Information */}
+              {currentStep === 3 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Step 3: Additional Information
+                  </h3>
+
+                  {/* Construction Cleaning Date */}
+                  <div className="form-group">
+                    <label htmlFor="constructionCleaningDate" className="block text-sm font-medium text-gray-700 mb-1">
+                      When will the cleaning take place? *
+                    </label>
+                    <input
+                      type="datetime-local"
+                      id="constructionCleaningDate"
+                      name="constructionCleaningDate"
+                      value={formData.constructionCleaningDate}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    />
+                  </div>
+
+                  {/* Construction Home Type Dropdown */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label htmlFor="constructionHomeType" className="block text-sm font-medium text-gray-700 mb-1">
+                      What type of home should be cleaned? *
+                    </label>
+                    <select
+                      id="constructionHomeType"
+                      name="constructionHomeType"
+                      value={formData.constructionHomeType}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">Select home type</option>
+                      <option value="Villa">Villa</option>
+                      <option value="Apartment">Apartment</option>
+                      <option value="Townhouse">Townhouse</option>
+                      <option value="Holiday Home">Holiday Home</option>
+                    </select>
+                  </div>
+
+                  {/* Construction Area Size Input */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label htmlFor="constructionAreaSize" className="block text-sm font-medium text-gray-700 mb-1">
+                      Approximately how large an area should be cleaned? (sq m) *
+                    </label>
+                    <input
+                      type="number"
+                      id="constructionAreaSize"
+                      name="constructionAreaSize"
+                      value={formData.constructionAreaSize}
+                      onChange={handleChange}
+                      min="0"
+                      step="1"
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                      placeholder="Enter area in square meters"
+                    />
+                  </div>
+
+                  {/* Construction Floors Dropdown */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label htmlFor="constructionFloors" className="block text-sm font-medium text-gray-700 mb-1">
+                      How many floors need to be cleaned? *
+                    </label>
+                    <select
+                      id="constructionFloors"
+                      name="constructionFloors"
+                      value={formData.constructionFloors}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">Select number of floors</option>
+                      <option value="1 floor">1 floor</option>
+                      <option value="2 floors">2 floors</option>
+                      <option value="3 or more floors">3 or more floors</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {/* Navigation Buttons */}
+              <div className="flex gap-3 mt-6">
+                {currentStep > 1 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setCurrentStep(currentStep - 1);
+                    }}
+                    className="flex-1 bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-300 transform hover:scale-[1.02] transition-all duration-300 shadow-md hover:shadow-lg"
+                  >
+                    Previous
+                  </button>
+                )}
+                {currentStep < 3 ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (isCurrentStepValid()) {
+                        setCurrentStep(currentStep + 1);
+                      }
+                    }}
+                    disabled={!isCurrentStepValid()}
+                    className="flex-1 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={status === 'loading' || !isFormValid()}
+                    className="flex-1 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+                  >
+                    {status === 'loading' ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Sending...
+                      </>
+                    ) : status === 'success' ? (
+                      'Request Sent Successfully! ✓'
+                    ) : status === 'error' ? (
+                      'Failed to Send. Try Again ✕'
+                    ) : (
+                      'Get Free Quote'
+                    )}
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Submit button for other services (non-Home Cleaning, non-Move-out Cleaning, non-Window Cleaning, and non-Construction Cleaning) */}
+          {selectedService && selectedService !== 'Home Cleaning' && selectedService !== 'Move-out Cleaning' && selectedService !== 'Window Cleaning' && selectedService !== 'Construction Cleaning' && (
           <button
             type="submit"
             disabled={status === 'loading'}
@@ -1764,6 +2094,18 @@ export default function ContactForm() {
           )}
         </form>
       )}
-    </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes progress {
+          from {
+            width: 0%;
+          }
+          to {
+            width: 100%;
+          }
+        }
+      `}</style>
+    </>
   );
 }
