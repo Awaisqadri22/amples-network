@@ -24,7 +24,7 @@ export async function POST(request: Request) {
 
         if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
             console.error('Missing email credentials. Make sure EMAIL_USER and EMAIL_PASS are set in .env.local');
-            return NextResponse.json({ error: 'Server configuration error: Missing email credentials' }, { status: 500 });
+            return NextResponse.json({ error: 'Server new configuration error: Missing email credentials' }, { status: 500 });
         }
 
         const transporter = nodemailer.createTransport({
