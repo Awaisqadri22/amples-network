@@ -51,149 +51,269 @@ export async function POST(request: Request) {
         let serviceDetails = '';
         if (selectedService === 'Home Cleaning') {
             serviceDetails = `
-                <h3>Home Cleaning Details:</h3>
-                <p><strong>Home Type:</strong> ${homeType || 'Not specified'}</p>
-                <p><strong>Area Size:</strong> ${areaSize ? areaSize + ' sq m' : 'Not specified'}</p>
-                <p><strong>Frequency:</strong> ${frequency || 'Not specified'}</p>
-                ${preferredDateTime ? `<p><strong>Preferred Date & Time:</strong> ${new Date(preferredDateTime).toLocaleString()}</p>` : ''}
-                <p><strong>Clean Entire Home:</strong> ${cleanAll || 'Not specified'}</p>
-                <h4>Room Details:</h4>
-                <ul>
-                  <li><strong>Number of Rooms:</strong> ${numberOfRooms || '0'}</li>
-                  <li><strong>Bedrooms:</strong> ${bedroom || '0'}</li>
-                  <li><strong>Kitchens:</strong> ${kitchen || '0'}</li>
-                  <li><strong>Living Rooms:</strong> ${livingRoom || '0'}</li>
-                </ul>
-                <h4>Additional Information:</h4>
-                <p><strong>Floors:</strong> ${floors || 'Not specified'}</p>
-                <p><strong>Has Pets:</strong> ${hasPets || 'Not specified'}</p>
-                ${comments ? `<p><strong>Comments:</strong> ${comments}</p>` : ''}
+                <div style="margin-bottom: 20px;">
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Home Type:</strong> <span style="color: #475569;">${homeType || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Area Size:</strong> <span style="color: #475569;">${areaSize ? areaSize + ' sq m' : 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Frequency:</strong> <span style="color: #475569;">${frequency || 'Not specified'}</span></p>
+                  ${preferredDateTime ? `<p style="margin: 8px 0;"><strong style="color: #1e293b;">Preferred Date & Time:</strong> <span style="color: #475569;">${new Date(preferredDateTime).toLocaleString()}</span></p>` : ''}
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Clean Entire Home:</strong> <span style="color: #475569;">${cleanAll || 'Not specified'}</span></p>
+                </div>
+                <div style="background-color: #ffffff; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                  <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Room Details</h4>
+                  <ul style="margin: 0; padding-left: 20px; color: #475569;">
+                    <li style="margin: 6px 0;"><strong>Number of Rooms:</strong> ${numberOfRooms || '0'}</li>
+                    <li style="margin: 6px 0;"><strong>Bedrooms:</strong> ${bedroom || '0'}</li>
+                    <li style="margin: 6px 0;"><strong>Kitchens:</strong> ${kitchen || '0'}</li>
+                    <li style="margin: 6px 0;"><strong>Living Rooms:</strong> ${livingRoom || '0'}</li>
+                  </ul>
+                </div>
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #cbd5e1;">
+                  <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Additional Information</h4>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Floors:</strong> <span style="color: #475569;">${floors || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Has Pets:</strong> <span style="color: #475569;">${hasPets || 'Not specified'}</span></p>
+                  ${comments ? `<div style="margin-top: 12px; padding: 12px; background-color: #f8fafc; border-left: 3px solid #06b6d4; border-radius: 4px;"><strong style="color: #1e293b;">Comments:</strong> <span style="color: #475569;">${comments}</span></div>` : ''}
+                </div>
             `;
         } else if (selectedService === 'Move-out Cleaning') {
             serviceDetails = `
-                <h3>Move-out Cleaning Details:</h3>
-                ${moveOutCleaningDate ? `<p><strong>Moving-out Cleaning Date:</strong> ${new Date(moveOutCleaningDate).toLocaleString()}</p>` : ''}
-                <p><strong>Is Date Flexible:</strong> ${isDateFlexible || 'Not specified'}</p>
-                ${isDateFlexible === 'Yes' && dateFlexibilityRange ? `<p><strong>Date Flexibility Range:</strong> ${dateFlexibilityRange}</p>` : ''}
-                <h4>Room Details:</h4>
-                <ul>
-                  <li><strong>Number of Rooms:</strong> ${numberOfRooms || '0'}</li>
-                  <li><strong>Bedrooms:</strong> ${bedroom || '0'}</li>
-                  <li><strong>Kitchens:</strong> ${kitchen || '0'}</li>
-                  <li><strong>Living Rooms:</strong> ${livingRoom || '0'}</li>
-                </ul>
-                <h4>Additional Information:</h4>
-                <p><strong>Floors:</strong> ${floors || 'Not specified'}</p>
-                <p><strong>Has Pets:</strong> ${hasPets || 'Not specified'}</p>
-                ${comments ? `<p><strong>Comments:</strong> ${comments}</p>` : ''}
+                <div style="margin-bottom: 20px;">
+                  ${moveOutCleaningDate ? `<p style="margin: 8px 0;"><strong style="color: #1e293b;">Moving-out Cleaning Date:</strong> <span style="color: #475569;">${new Date(moveOutCleaningDate).toLocaleString()}</span></p>` : ''}
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Is Date Flexible:</strong> <span style="color: #475569;">${isDateFlexible || 'Not specified'}</span></p>
+                  ${isDateFlexible === 'Yes' && dateFlexibilityRange ? `<p style="margin: 8px 0;"><strong style="color: #1e293b;">Date Flexibility Range:</strong> <span style="color: #475569;">${dateFlexibilityRange}</span></p>` : ''}
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Home Type:</strong> <span style="color: #475569;">${homeType || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Should Entire Home be Cleaned:</strong> <span style="color: #475569;">${cleanAll || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Area Size:</strong> <span style="color: #475569;">${areaSize ? areaSize + ' sq m' : 'Not specified'}</span></p>
+                </div>
+                <div style="background-color: #ffffff; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                  <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Room Details</h4>
+                  <ul style="margin: 0; padding-left: 20px; color: #475569;">
+                    <li style="margin: 6px 0;"><strong>Number of Rooms:</strong> ${numberOfRooms || '0'}</li>
+                    <li style="margin: 6px 0;"><strong>Bedrooms:</strong> ${bedroom || '0'}</li>
+                    <li style="margin: 6px 0;"><strong>Kitchens:</strong> ${kitchen || '0'}</li>
+                    <li style="margin: 6px 0;"><strong>Living Rooms:</strong> ${livingRoom || '0'}</li>
+                  </ul>
+                </div>
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #cbd5e1;">
+                  <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Additional Information</h4>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Floors:</strong> <span style="color: #475569;">${floors || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Has Pets:</strong> <span style="color: #475569;">${hasPets || 'Not specified'}</span></p>
+                  ${comments ? `<div style="margin-top: 12px; padding: 12px; background-color: #f8fafc; border-left: 3px solid #06b6d4; border-radius: 4px;"><strong style="color: #1e293b;">Comments:</strong> <span style="color: #475569;">${comments}</span></div>` : ''}
+                </div>
             `;
         } else if (selectedService === 'Window Cleaning') {
             serviceDetails = `
-                <h3>Window Cleaning Details:</h3>
-                ${windowCleaningDate ? `<p><strong>Window Cleaning Date:</strong> ${new Date(windowCleaningDate).toLocaleString()}</p>` : ''}
-                <h4>Window Details:</h4>
-                <ul>
-                  <li><strong>Windows with bars:</strong> ${windowsWithBars || '0'}</li>
-                  <li><strong>Windows without bars:</strong> ${windowsWithoutBars || '0'}</li>
-                  <li><strong>Top-hung windows:</strong> ${topHungWindows || '0'}</li>
-                </ul>
-                <h4>Window Type:</h4>
-                <ul>
-                  ${Array.isArray(windowType) && windowType.length > 0 
-                    ? windowType.map((type: string) => `<li>${type}</li>`).join('')
-                    : '<li>Not specified</li>'}
-                </ul>
-                <p><strong>Has Glazed Balcony/Patio:</strong> ${hasGlazedBalcony || 'Not specified'}</p>
-                <h4>Additional Information:</h4>
-                <p><strong>Home Type:</strong> ${windowHomeType || 'Not specified'}</p>
-                <p><strong>Number of Floors:</strong> ${windowFloors || 'Not specified'}</p>
-                <p><strong>Needs Ladder:</strong> ${needsLadder || 'Not specified'}</p>
-                <p><strong>Floors to Clean:</strong> ${floors || 'Not specified'}</p>
-                <p><strong>Has Pets:</strong> ${hasPets || 'Not specified'}</p>
-                ${comments ? `<p><strong>Comments:</strong> ${comments}</p>` : ''}
+                <div style="margin-bottom: 20px;">
+                  ${windowCleaningDate ? `<p style="margin: 8px 0;"><strong style="color: #1e293b;">Window Cleaning Date:</strong> <span style="color: #475569;">${new Date(windowCleaningDate).toLocaleString()}</span></p>` : ''}
+                </div>
+                <div style="background-color: #ffffff; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                  <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Window Details</h4>
+                  <ul style="margin: 0; padding-left: 20px; color: #475569;">
+                    <li style="margin: 6px 0;"><strong>Windows with bars:</strong> ${windowsWithBars || '0'}</li>
+                    <li style="margin: 6px 0;"><strong>Windows without bars:</strong> ${windowsWithoutBars || '0'}</li>
+                    <li style="margin: 6px 0;"><strong>Top-hung windows:</strong> ${topHungWindows || '0'}</li>
+                  </ul>
+                </div>
+                <div style="background-color: #ffffff; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                  <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Window Type</h4>
+                  <ul style="margin: 0; padding-left: 20px; color: #475569;">
+                    ${Array.isArray(windowType) && windowType.length > 0 
+                      ? windowType.map((type: string) => `<li style="margin: 6px 0;">${type}</li>`).join('')
+                      : '<li style="margin: 6px 0;">Not specified</li>'}
+                  </ul>
+                </div>
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #cbd5e1;">
+                  <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Additional Information</h4>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Has Glazed Balcony/Patio:</strong> <span style="color: #475569;">${hasGlazedBalcony || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Number of Floors:</strong> <span style="color: #475569;">${windowFloors || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Needs Ladder:</strong> <span style="color: #475569;">${needsLadder || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Floors to Clean:</strong> <span style="color: #475569;">${floors || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Has Pets:</strong> <span style="color: #475569;">${hasPets || 'Not specified'}</span></p>
+                  ${comments ? `<div style="margin-top: 12px; padding: 12px; background-color: #f8fafc; border-left: 3px solid #06b6d4; border-radius: 4px;"><strong style="color: #1e293b;">Comments:</strong> <span style="color: #475569;">${comments}</span></div>` : ''}
+                </div>
             `;
         } else if (selectedService === 'Construction Cleaning') {
             serviceDetails = `
-                <h3>Construction Cleaning Details:</h3>
-                <h4>Work Type:</h4>
-                <ul>
-                  ${Array.isArray(constructionWorkType) && constructionWorkType.length > 0 
-                    ? constructionWorkType.map((type: string) => `<li>${type}</li>`).join('')
-                    : '<li>Not specified</li>'}
-                </ul>
-                <h4>What should be included in the cleaning:</h4>
-                <ul>
-                  ${Array.isArray(constructionCleaningIncludes) && constructionCleaningIncludes.length > 0 
-                    ? constructionCleaningIncludes.map((item: string) => `<li>${item}</li>`).join('')
-                    : '<li>Not specified</li>'}
-                </ul>
-                <h4>Additional Information:</h4>
-                ${constructionCleaningDate ? `<p><strong>Cleaning Date:</strong> ${new Date(constructionCleaningDate).toLocaleString()}</p>` : ''}
-                <p><strong>Home Type:</strong> ${constructionHomeType || 'Not specified'}</p>
-                <p><strong>Area Size:</strong> ${constructionAreaSize ? constructionAreaSize + ' sq m' : 'Not specified'}</p>
-                <p><strong>Floors:</strong> ${constructionFloors || 'Not specified'}</p>
-                ${comments ? `<p><strong>Comments:</strong> ${comments}</p>` : ''}
+                <div style="background-color: #ffffff; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                  <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Work Type</h4>
+                  <ul style="margin: 0; padding-left: 20px; color: #475569;">
+                    ${Array.isArray(constructionWorkType) && constructionWorkType.length > 0 
+                      ? constructionWorkType.map((type: string) => `<li style="margin: 6px 0;">${type}</li>`).join('')
+                      : '<li style="margin: 6px 0;">Not specified</li>'}
+                  </ul>
+                </div>
+                <div style="background-color: #ffffff; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                  <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">What should be included in the cleaning</h4>
+                  <ul style="margin: 0; padding-left: 20px; color: #475569;">
+                    ${Array.isArray(constructionCleaningIncludes) && constructionCleaningIncludes.length > 0 
+                      ? constructionCleaningIncludes.map((item: string) => `<li style="margin: 6px 0;">${item}</li>`).join('')
+                      : '<li style="margin: 6px 0;">Not specified</li>'}
+                  </ul>
+                </div>
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #cbd5e1;">
+                  <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Additional Information</h4>
+                  ${constructionCleaningDate ? `<p style="margin: 8px 0;"><strong style="color: #1e293b;">Cleaning Date:</strong> <span style="color: #475569;">${new Date(constructionCleaningDate).toLocaleString()}</span></p>` : ''}
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Home Type:</strong> <span style="color: #475569;">${constructionHomeType || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Area Size:</strong> <span style="color: #475569;">${constructionAreaSize ? constructionAreaSize + ' sq m' : 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Floors:</strong> <span style="color: #475569;">${constructionFloors || 'Not specified'}</span></p>
+                  ${comments ? `<div style="margin-top: 12px; padding: 12px; background-color: #f8fafc; border-left: 3px solid #06b6d4; border-radius: 4px;"><strong style="color: #1e293b;">Comments:</strong> <span style="color: #475569;">${comments}</span></div>` : ''}
+                </div>
             `;
         } else if (selectedService === 'Floor Cleaning') {
             serviceDetails = `
-                <h3>Floor Cleaning Details:</h3>
-                ${floorCleaningDate ? `<p><strong>Service Date:</strong> ${new Date(floorCleaningDate).toLocaleDateString()}</p>` : ''}
-                <p><strong>Is Date Flexible:</strong> ${floorCleaningIsDateFlexible || 'Not specified'}</p>
-                <h4>Services Requested:</h4>
-                <ul>
-                  ${Array.isArray(floorCleaningServices) && floorCleaningServices.length > 0 
-                    ? floorCleaningServices.map((service: string) => `<li>${service}</li>`).join('')
-                    : '<li>Not specified</li>'}
-                </ul>
-                <h4>Floor Types:</h4>
-                <ul>
-                  ${Array.isArray(floorCleaningTypes) && floorCleaningTypes.length > 0 
-                    ? floorCleaningTypes.map((type: string) => `<li>${type}</li>`).join('')
-                    : '<li>Not specified</li>'}
-                </ul>
-                <h4>Additional Information:</h4>
-                <p><strong>Floors:</strong> ${floors || 'Not specified'}</p>
-                <p><strong>Has Pets:</strong> ${hasPets || 'Not specified'}</p>
-                ${comments ? `<p><strong>Comments:</strong> ${comments}</p>` : ''}
+                <div style="margin-bottom: 20px;">
+                  ${floorCleaningDate ? `<p style="margin: 8px 0;"><strong style="color: #1e293b;">Service Date:</strong> <span style="color: #475569;">${new Date(floorCleaningDate).toLocaleDateString()}</span></p>` : ''}
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Is Date Flexible:</strong> <span style="color: #475569;">${floorCleaningIsDateFlexible || 'Not specified'}</span></p>
+                </div>
+                <div style="background-color: #ffffff; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                  <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Services Requested</h4>
+                  <ul style="margin: 0; padding-left: 20px; color: #475569;">
+                    ${Array.isArray(floorCleaningServices) && floorCleaningServices.length > 0 
+                      ? floorCleaningServices.map((service: string) => `<li style="margin: 6px 0;">${service}</li>`).join('')
+                      : '<li style="margin: 6px 0;">Not specified</li>'}
+                  </ul>
+                </div>
+                <div style="background-color: #ffffff; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                  <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Floor Types</h4>
+                  <ul style="margin: 0; padding-left: 20px; color: #475569;">
+                    ${Array.isArray(floorCleaningTypes) && floorCleaningTypes.length > 0 
+                      ? floorCleaningTypes.map((type: string) => `<li style="margin: 6px 0;">${type}</li>`).join('')
+                      : '<li style="margin: 6px 0;">Not specified</li>'}
+                  </ul>
+                </div>
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #cbd5e1;">
+                  <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Additional Information</h4>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Type of Residence:</strong> <span style="color: #475569;">${floors || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Has Pets:</strong> <span style="color: #475569;">${hasPets || 'Not specified'}</span></p>
+                  ${comments ? `<div style="margin-top: 12px; padding: 12px; background-color: #f8fafc; border-left: 3px solid #06b6d4; border-radius: 4px;"><strong style="color: #1e293b;">Comments:</strong> <span style="color: #475569;">${comments}</span></div>` : ''}
+                </div>
             `;
         } else if (selectedService) {
-            serviceDetails = `<h3>Service: ${selectedService}</h3>`;
+            serviceDetails = `<div style="margin-bottom: 20px;"><h3 style="margin: 0; color: #1e293b; font-size: 18px; font-weight: 600;">Service: ${selectedService}</h3></div>`;
         }
 
         const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: 'awaisiqbalqadri22@gmail.com',
-            subject: `New Quote Request from ${name} - ${selectedService || 'General Inquiry'}`,
+            from: `"${name}" <${process.env.EMAIL_USER}>`, // Use authenticated email as sender, but display user's name
+            replyTo: email, // Set reply-to to user's email so replies go to them
+            to: 'awaisiqbalqadri22@gmail.com', // Send to your email address
+            subject: `New Job from ${name} - ${selectedService || 'General Inquiry'}`,
             html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #0891b2;">New Quote Request</h2>
-          
-          <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-            <h3 style="margin-top: 0;">Contact Information</h3>
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Phone:</strong> ${phone}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Address:</strong> ${address || 'Not provided'}</p>
-            <p><strong>Type:</strong> ${formType === 'company' ? 'Company' : 'Private'}</p>
-            ${formType === 'company' ? `
-              <p><strong>Company:</strong> ${company}</p>
-              <p><strong>VAT Number:</strong> ${vatNumber}</p>
-            ` : ''}
-          </div>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>New Job Request</title>
+        </head>
+        <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f7fa; line-height: 1.6;">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f5f7fa; padding: 40px 20px;">
+            <tr>
+              <td align="center">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                  
+                  <!-- Header -->
+                  <tr>
+                    <td style="background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); padding: 40px 30px; text-align: center;">
+                      <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">New Job Request</h1>
+                      <p style="margin: 10px 0 0 0; color: #e0f2fe; font-size: 16px; font-weight: 400;">${selectedService || 'General Inquiry'}</p>
+                    </td>
+                  </tr>
 
-          <div style="background-color: #ecfeff; padding: 20px; border-radius: 8px; border: 1px solid #cffafe;">
-            ${serviceDetails}
-            
-            ${message ? `
-            <h3>Message:</h3>
-              <p style="white-space: pre-wrap;">${message}</p>
-            ` : ''}
-          </div>
-          
-          <p style="color: #6b7280; font-size: 12px; margin-top: 20px; text-align: center;">
-            Sent from Amples Network Website
-          </p>
-        </div>
+                  <!-- Contact Information Section -->
+                  <tr>
+                    <td style="padding: 30px;">
+                      <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #06b6d4; padding: 25px; border-radius: 8px; margin-bottom: 25px;">
+                        <h2 style="margin: 0 0 20px 0; color: #1e293b; font-size: 20px; font-weight: 600; display: flex; align-items: center;">
+                          <span style="display: inline-block; width: 8px; height: 8px; background-color: #06b6d4; border-radius: 50%; margin-right: 12px;"></span>
+                          Contact Information
+                        </h2>
+                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                          <tr>
+                            <td style="padding: 8px 0; color: #475569; font-size: 15px;">
+                              <strong style="color: #1e293b; display: inline-block; min-width: 100px;">Name:</strong> ${name}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 8px 0; color: #475569; font-size: 15px;">
+                              <strong style="color: #1e293b; display: inline-block; min-width: 100px;">Phone:</strong> 
+                              <a href="tel:${phone}" style="color: #06b6d4; text-decoration: none;">${phone}</a>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 8px 0; color: #475569; font-size: 15px;">
+                              <strong style="color: #1e293b; display: inline-block; min-width: 100px;">Email:</strong> 
+                              <a href="mailto:${email}" style="color: #06b6d4; text-decoration: none;">${email}</a>
+                            </td>
+                          </tr>
+                          ${address ? `
+                          <tr>
+                            <td style="padding: 8px 0; color: #475569; font-size: 15px;">
+                              <strong style="color: #1e293b; display: inline-block; min-width: 100px;">Address:</strong> ${address}
+                            </td>
+                          </tr>
+                          ` : ''}
+                          <tr>
+                            <td style="padding: 8px 0; color: #475569; font-size: 15px;">
+                              <strong style="color: #1e293b; display: inline-block; min-width: 100px;">Type:</strong> 
+                              <span style="display: inline-block; background-color: ${formType === 'company' ? '#dbeafe' : '#dcfce7'}; color: ${formType === 'company' ? '#1e40af' : '#166534'}; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600;">
+                                ${formType === 'company' ? 'Company' : 'Private'}
+                              </span>
+                            </td>
+                          </tr>
+                          ${formType === 'company' ? `
+                          <tr>
+                            <td style="padding: 8px 0; color: #475569; font-size: 15px;">
+                              <strong style="color: #1e293b; display: inline-block; min-width: 100px;">Company:</strong> ${company}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 8px 0; color: #475569; font-size: 15px;">
+                              <strong style="color: #1e293b; display: inline-block; min-width: 100px;">VAT Number:</strong> ${vatNumber}
+                            </td>
+                          </tr>
+                          ` : ''}
+                        </table>
+                      </div>
+
+                      <!-- Service Details Section -->
+                      <div style="background: linear-gradient(135deg, #ecfeff 0%, #e0f2fe 100%); border-left: 4px solid #10b981; padding: 25px; border-radius: 8px; margin-bottom: ${message ? '25px' : '0'};">
+                        <h2 style="margin: 0 0 20px 0; color: #1e293b; font-size: 20px; font-weight: 600; display: flex; align-items: center;">
+                          <span style="display: inline-block; width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; margin-right: 12px;"></span>
+                          Service Details
+                        </h2>
+                        <div style="color: #334155; font-size: 15px; line-height: 1.8;">
+                          ${serviceDetails}
+                        </div>
+                        ${message ? `
+                        <div style="margin-top: 25px; padding-top: 25px; border-top: 2px solid #cbd5e1;">
+                          <h3 style="margin: 0 0 12px 0; color: #1e293b; font-size: 18px; font-weight: 600;">Additional Message</h3>
+                          <p style="margin: 0; color: #475569; font-size: 15px; white-space: pre-wrap; background-color: #ffffff; padding: 15px; border-radius: 6px; border-left: 3px solid #06b6d4;">${message}</p>
+                        </div>
+                        ` : ''}
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Footer -->
+                  <tr>
+                    <td style="background-color: #f8fafc; padding: 25px 30px; text-align: center; border-top: 1px solid #e2e8f0;">
+                      <p style="margin: 0; color: #64748b; font-size: 13px; line-height: 1.6;">
+                        This email was sent from the <strong style="color: #1e293b;">Amples Network Website</strong><br>
+                        <span style="color: #94a3b8; font-size: 12px;">Please reply directly to this email to contact the customer.</span>
+                      </p>
+                      <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                        <p style="margin: 0; color: #94a3b8; font-size: 11px;">
+                          © ${new Date().getFullYear()} Amples Network. All rights reserved.
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
       `,
         };
 
