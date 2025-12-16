@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-type ServiceType = 'Move-out Cleaning' | 'Home Cleaning' | 'Detail Cleaning' | 'Office Cleaning' | 'Deep/Heavy-duty Cleaning' | 'Window Cleaning' | 'Stairwell Cleaning' | 'Construction Cleaning' | 'Gym Cleaning';
+type ServiceType = 'Move-out Cleaning' | 'Home Cleaning' | 'Detail Cleaning' | 'Office Cleaning' | 'Floor Cleaning' | 'Window Cleaning' | 'Stairwell Cleaning' | 'Construction Cleaning' | 'Gym Cleaning';
 
 export default function ContactForm() {
   const router = useRouter();
@@ -54,7 +54,12 @@ export default function ContactForm() {
     constructionCleaningDate: '',
     constructionHomeType: '',
     constructionAreaSize: '',
-    constructionFloors: ''
+    constructionFloors: '',
+    // Floor Cleaning fields
+    floorCleaningDate: '',
+    floorCleaningIsDateFlexible: '',
+    floorCleaningServices: [] as string[],
+    floorCleaningTypes: [] as string[]
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -202,8 +207,8 @@ export default function ContactForm() {
       }
       
       if (currentStep === 3) {
-        // Step 3 validation
-        return formData.floors !== '' && formData.hasPets !== '';
+        // Step 3 validation for Floor Cleaning
+        return (formData.floorCleaningTypes as string[]).length > 0 && formData.floors !== '' && formData.hasPets !== '';
       }
     }
     
@@ -291,6 +296,22 @@ export default function ContactForm() {
       return step1Valid && step2Valid && step3Valid;
     }
     
+    if (selectedService === 'Floor Cleaning') {
+      // Step 1 validation
+      const step1Valid = formData.floorCleaningDate !== '' && formData.floorCleaningIsDateFlexible !== '';
+      
+      // Step 2 validation
+      const step2Valid = (formData.floorCleaningServices as string[]).length > 0;
+      
+      // Step 3 validation
+      const step3Valid = 
+        (formData.floorCleaningTypes as string[]).length > 0 &&
+        formData.floors !== '' &&
+        formData.hasPets !== '';
+      
+      return step1Valid && step2Valid && step3Valid;
+    }
+    
     // For other services, return true (they might have different validation)
     return true;
   };
@@ -324,7 +345,8 @@ export default function ContactForm() {
           windowCleaningDate: '', windowsWithBars: '0', windowsWithoutBars: '0', topHungWindows: '0',
           windowType: [], hasGlazedBalcony: '', windowHomeType: '', windowFloors: '', needsLadder: '',
           constructionWorkType: [], constructionCleaningIncludes: [],
-          constructionCleaningDate: '', constructionHomeType: '', constructionAreaSize: '', constructionFloors: ''
+          constructionCleaningDate: '', constructionHomeType: '', constructionAreaSize: '', constructionFloors: '',
+          floorCleaningDate: '', floorCleaningIsDateFlexible: '', floorCleaningServices: [], floorCleaningTypes: []
         });
         setCurrentStep(1);
         setSelectedService(null);
@@ -374,13 +396,13 @@ export default function ContactForm() {
         </div>
       )}
 
-      <div className="bg-white rounded-2xl shadow-2xl p-6 animate-slide-in">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">Get Your Free Quote</h2>
+    <div className="bg-white rounded-2xl shadow-2xl p-6 animate-slide-in">
+      <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">Get Your Free Quote</h2>
 
       {/* Service Selection - Vertical List */}
       {!selectedService ? (
         <div className="space-y-2 mb-6">
-          {(['Move-out Cleaning', 'Home Cleaning', 'Detail Cleaning', 'Office Cleaning', 'Deep/Heavy-duty Cleaning', 'Window Cleaning', 'Stairwell Cleaning', 'Construction Cleaning', 'Gym Cleaning'] as ServiceType[]).map((service) => (
+          {(['Move-out Cleaning', 'Home Cleaning', 'Detail Cleaning', 'Office Cleaning', 'Floor Cleaning', 'Window Cleaning', 'Stairwell Cleaning', 'Construction Cleaning', 'Gym Cleaning'] as ServiceType[]).map((service) => (
             <button
               key={service}
               type="button"
@@ -2068,8 +2090,308 @@ export default function ContactForm() {
             </>
           )}
 
-          {/* Submit button for other services (non-Home Cleaning, non-Move-out Cleaning, non-Window Cleaning, and non-Construction Cleaning) */}
-          {selectedService && selectedService !== 'Home Cleaning' && selectedService !== 'Move-out Cleaning' && selectedService !== 'Window Cleaning' && selectedService !== 'Construction Cleaning' && (
+          {/* Floor Cleaning Form */}
+          {selectedService === 'Floor Cleaning' && (
+            <>
+              {/* Step Indicator */}
+              <div className="flex items-center justify-center mb-6">
+                <div className="flex items-center space-x-2">
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 1 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    <span className="text-sm font-semibold">1</span>
+                  </div>
+                  <div className={`w-12 h-1 ${currentStep >= 2 ? 'bg-cyan-500' : 'bg-gray-200'}`}></div>
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 2 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    <span className="text-sm font-semibold">2</span>
+                  </div>
+                  <div className={`w-12 h-1 ${currentStep >= 3 ? 'bg-cyan-500' : 'bg-gray-200'}`}></div>
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 3 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    <span className="text-sm font-semibold">3</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 1: Service Date */}
+              {currentStep === 1 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Step 1: Service Date
+                  </h3>
+
+                  {/* Floor Cleaning Date */}
+                  <div className="form-group">
+                    <label htmlFor="floorCleaningDate" className="block text-sm font-medium text-gray-700 mb-1">
+                      When should the service be performed? *
+                    </label>
+                    <input
+                      type="date"
+                      id="floorCleaningDate"
+                      name="floorCleaningDate"
+                      value={formData.floorCleaningDate}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    />
+                  </div>
+
+                  {/* Is Date Flexible Radio */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Is the date flexible? Can the work be done on dates other than the selected date above? *
+                    </label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="floorCleaningIsDateFlexible"
+                            value="Yes"
+                            checked={formData.floorCleaningIsDateFlexible === 'Yes'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Yes</span>
+                      </label>
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="floorCleaningIsDateFlexible"
+                            value="No"
+                            checked={formData.floorCleaningIsDateFlexible === 'No'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">No</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Services */}
+              {currentStep === 2 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    Step 2: Services
+                  </h3>
+
+                  {/* Floor Cleaning Services Checkboxes */}
+                  <div className="form-group">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      What services do you want? *
+                    </label>
+                    <div className="space-y-3">
+                      {[
+                        { value: 'abode', label: 'abode' },
+                        { value: 'vacuuming', label: 'vacuuming' },
+                        { value: 'painting/oil/polish/waxing', label: 'painting/oil/polish/waxing' },
+                        { value: 'carpet cleaning', label: 'carpet cleaning' },
+                        { value: 'grinding and honing', label: 'grinding and honing' },
+                        { value: 'sealing', label: 'sealing' },
+                        { value: 'wet drying', label: 'wet drying' },
+                        { value: 'other', label: 'other' }
+                      ].map((option) => (
+                        <label key={option.value} className="flex items-center cursor-pointer group p-3 rounded-lg border-2 border-gray-200 hover:border-cyan-300 hover:bg-cyan-50 transition-all">
+                          <input
+                            type="checkbox"
+                            name="floorCleaningServices"
+                            value={option.value}
+                            checked={(formData.floorCleaningServices as string[]).includes(option.value)}
+                            onChange={(e) => handleCheckboxChange('floorCleaningServices', option.value, e.target.checked)}
+                            className="h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                          <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-700 transition-colors">{option.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Additional Information (Floor Cleaning) */}
+              {currentStep === 3 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Step 3: Additional Information
+                  </h3>
+
+                  {/* Floor Types Checkboxes */}
+                  <div className="form-group">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      What types of floors should be treated? *
+                    </label>
+                    <div className="space-y-3">
+                      {[
+                        { value: 'carpet/textile flooring', label: 'carpet/textile flooring' },
+                        { value: 'tiled floor', label: 'tiled floor' },
+                        { value: 'laminate flooring', label: 'laminate flooring' },
+                        { value: 'linoleum flooring', label: 'linoleum flooring' },
+                        { value: 'marble floor', label: 'marble floor' },
+                        { value: 'solid wood floor', label: 'solid wood floor' },
+                        { value: 'parquet floor', label: 'parquet floor' },
+                        { value: 'plastic, vinyl and PVC floors', label: 'plastic, vinyl and PVC floors' },
+                        { value: 'stone floor', label: 'stone floor' },
+                        { value: 'other', label: 'other' }
+                      ].map((option) => (
+                        <label key={option.value} className="flex items-center cursor-pointer group p-3 rounded-lg border-2 border-gray-200 hover:border-cyan-300 hover:bg-cyan-50 transition-all">
+                          <input
+                            type="checkbox"
+                            name="floorCleaningTypes"
+                            value={option.value}
+                            checked={(formData.floorCleaningTypes as string[]).includes(option.value)}
+                            onChange={(e) => handleCheckboxChange('floorCleaningTypes', option.value, e.target.checked)}
+                            className="h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                          <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-700 transition-colors">{option.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Type of Residence Dropdown */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label htmlFor="floors" className="block text-sm font-medium text-gray-700 mb-1">
+                      Type of residence
+                    </label>
+                    <select
+                      id="floors"
+                      name="floors"
+                      value={formData.floors}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">Select type of residence</option>
+                      <option value="villa">villa</option>
+                      <option value="apartment">apartment</option>
+                      <option value="townhouse">townhouse</option>
+                      <option value="semi-detached house">semi-detached house</option>
+                      <option value="holiday-home">holiday-home</option>
+                    </select>
+                  </div>
+
+                  {/* Has Pets Radio */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Does the household have pets?
+                    </label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="hasPets"
+                            value="Yes"
+                            checked={formData.hasPets === 'Yes'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Yes</span>
+                      </label>
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="hasPets"
+                            value="No"
+                            checked={formData.hasPets === 'No'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">No</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Comments Textarea */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label htmlFor="comments" className="block text-sm font-medium text-gray-700 mb-1">
+                      Comments/Optional
+                    </label>
+                    <textarea
+                      id="comments"
+                      name="comments"
+                      value={formData.comments}
+                      onChange={handleChange}
+                      rows={4}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all resize-none"
+                      placeholder="Any additional information or special requests..."
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Navigation Buttons */}
+              <div className="flex gap-3 mt-6">
+                {currentStep > 1 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setCurrentStep(currentStep - 1);
+                    }}
+                    className="flex-1 bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-300 transform hover:scale-[1.02] transition-all duration-300 shadow-md hover:shadow-lg"
+                  >
+                    Previous
+                  </button>
+                )}
+                {currentStep < 3 ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (isCurrentStepValid()) {
+                        setCurrentStep(currentStep + 1);
+                      }
+                    }}
+                    disabled={!isCurrentStepValid()}
+                    className="flex-1 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={status === 'loading' || !isFormValid()}
+                    className="flex-1 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+                  >
+                    {status === 'loading' ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Sending...
+                      </>
+                    ) : status === 'success' ? (
+                      'Request Sent Successfully! ✓'
+                    ) : status === 'error' ? (
+                      'Failed to Send. Try Again ✕'
+                    ) : (
+                      'Get Free Quote'
+                    )}
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Submit button for other services (non-Home Cleaning, non-Move-out Cleaning, non-Window Cleaning, non-Construction Cleaning, and non-Floor Cleaning) */}
+          {selectedService && selectedService !== 'Home Cleaning' && selectedService !== 'Move-out Cleaning' && selectedService !== 'Window Cleaning' && selectedService !== 'Construction Cleaning' && selectedService !== 'Floor Cleaning' && (
           <button
             type="submit"
             disabled={status === 'loading'}
@@ -2094,7 +2416,7 @@ export default function ContactForm() {
           )}
         </form>
       )}
-      </div>
+    </div>
 
       <style jsx>{`
         @keyframes progress {

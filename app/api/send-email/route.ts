@@ -15,7 +15,8 @@ export async function POST(request: Request) {
             windowCleaningDate, windowsWithBars, windowsWithoutBars, topHungWindows,
             windowType, hasGlazedBalcony, windowHomeType, windowFloors, needsLadder,
             constructionWorkType, constructionCleaningIncludes, constructionCleaningDate,
-            constructionHomeType, constructionAreaSize, constructionFloors
+            constructionHomeType, constructionAreaSize, constructionFloors,
+            floorCleaningDate, floorCleaningIsDateFlexible, floorCleaningServices, floorCleaningTypes
         } = requestData;
         
         // Log all received data for debugging
@@ -133,6 +134,28 @@ export async function POST(request: Request) {
                 <p><strong>Floors:</strong> ${constructionFloors || 'Not specified'}</p>
                 ${comments ? `<p><strong>Comments:</strong> ${comments}</p>` : ''}
             `;
+        } else if (selectedService === 'Floor Cleaning') {
+            serviceDetails = `
+                <h3>Floor Cleaning Details:</h3>
+                ${floorCleaningDate ? `<p><strong>Service Date:</strong> ${new Date(floorCleaningDate).toLocaleDateString()}</p>` : ''}
+                <p><strong>Is Date Flexible:</strong> ${floorCleaningIsDateFlexible || 'Not specified'}</p>
+                <h4>Services Requested:</h4>
+                <ul>
+                  ${Array.isArray(floorCleaningServices) && floorCleaningServices.length > 0 
+                    ? floorCleaningServices.map((service: string) => `<li>${service}</li>`).join('')
+                    : '<li>Not specified</li>'}
+                </ul>
+                <h4>Floor Types:</h4>
+                <ul>
+                  ${Array.isArray(floorCleaningTypes) && floorCleaningTypes.length > 0 
+                    ? floorCleaningTypes.map((type: string) => `<li>${type}</li>`).join('')
+                    : '<li>Not specified</li>'}
+                </ul>
+                <h4>Additional Information:</h4>
+                <p><strong>Floors:</strong> ${floors || 'Not specified'}</p>
+                <p><strong>Has Pets:</strong> ${hasPets || 'Not specified'}</p>
+                ${comments ? `<p><strong>Comments:</strong> ${comments}</p>` : ''}
+            `;
         } else if (selectedService) {
             serviceDetails = `<h3>Service: ${selectedService}</h3>`;
         }
@@ -162,7 +185,7 @@ export async function POST(request: Request) {
             ${serviceDetails}
             
             ${message ? `
-              <h3>Message:</h3>
+            <h3>Message:</h3>
               <p style="white-space: pre-wrap;">${message}</p>
             ` : ''}
           </div>

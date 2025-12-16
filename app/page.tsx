@@ -53,7 +53,7 @@ export default function Home() {
                       { name: 'Home Cleaning', href: '/home-cleaning' },
                       { name: 'Detail Cleaning', href: '/detail-cleaning' },
                       { name: 'Office Cleaning', href: '/office-cleaning' },
-                      { name: 'Deep/Heavy-duty Cleaning', href: '/deep-cleaning' },
+                      { name: 'Floor Cleaning', href: '/deep-cleaning' },
                       { name: 'Window Cleaning', href: '/window-cleaning' },
                       { name: 'Stairwell Cleaning', href: '/stairwell-cleaning' },
                       { name: 'Construction Cleaning', href: '/construction-cleaning' },
