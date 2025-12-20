@@ -16,7 +16,8 @@ export async function POST(request: Request) {
             windowType, hasGlazedBalcony, windowHomeType, windowFloors, needsLadder,
             constructionWorkType, constructionCleaningIncludes, constructionCleaningDate,
             constructionHomeType, constructionAreaSize, constructionFloors,
-            floorCleaningDate, floorCleaningIsDateFlexible, floorCleaningServices, floorCleaningTypes
+            floorCleaningDate, floorCleaningIsDateFlexible, floorCleaningServices, floorCleaningTypes,
+            officePremisesType, officeCleanAll, officeAreaSize
         } = requestData;
         
         // Log all received data for debugging
@@ -185,6 +186,14 @@ export async function POST(request: Request) {
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Type of Residence:</strong> <span style="color: #475569;">${floors || 'Not specified'}</span></p>
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Has Pets:</strong> <span style="color: #475569;">${hasPets || 'Not specified'}</span></p>
                   ${comments ? `<div style="margin-top: 12px; padding: 12px; background-color: #f8fafc; border-left: 3px solid #06b6d4; border-radius: 4px;"><strong style="color: #1e293b;">Comments:</strong> <span style="color: #475569;">${comments}</span></div>` : ''}
+                </div>
+            `;
+        } else if (selectedService === 'Office Cleaning') {
+            serviceDetails = `
+                <div style="margin-bottom: 20px;">
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Type of Premises:</strong> <span style="color: #475569;">${officePremisesType || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Should Entire Premises be Cleaned:</strong> <span style="color: #475569;">${officeCleanAll || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Area Size:</strong> <span style="color: #475569;">${officeAreaSize ? officeAreaSize + ' sq m' : 'Not specified'}</span></p>
                 </div>
             `;
         } else if (selectedService) {

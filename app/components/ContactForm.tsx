@@ -59,7 +59,11 @@ export default function ContactForm() {
     floorCleaningDate: '',
     floorCleaningIsDateFlexible: '',
     floorCleaningServices: [] as string[],
-    floorCleaningTypes: [] as string[]
+    floorCleaningTypes: [] as string[],
+    // Office Cleaning fields
+    officePremisesType: '',
+    officeCleanAll: '',
+    officeAreaSize: ''
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -312,6 +316,15 @@ export default function ContactForm() {
       return step1Valid && step2Valid && step3Valid;
     }
     
+    if (selectedService === 'Office Cleaning') {
+      // Step 1 validation
+      const step1Valid = formData.officePremisesType !== '' && 
+                         formData.officeCleanAll !== '' && 
+                         formData.officeAreaSize !== '';
+      
+      return step1Valid;
+    }
+    
     // For other services, return true (they might have different validation)
     return true;
   };
@@ -346,7 +359,8 @@ export default function ContactForm() {
           windowType: [], hasGlazedBalcony: '', windowHomeType: '', windowFloors: '', needsLadder: '',
           constructionWorkType: [], constructionCleaningIncludes: [],
           constructionCleaningDate: '', constructionHomeType: '', constructionAreaSize: '', constructionFloors: '',
-          floorCleaningDate: '', floorCleaningIsDateFlexible: '', floorCleaningServices: [], floorCleaningTypes: []
+          floorCleaningDate: '', floorCleaningIsDateFlexible: '', floorCleaningServices: [], floorCleaningTypes: [],
+          officePremisesType: '', officeCleanAll: '', officeAreaSize: ''
         });
         setCurrentStep(1);
         setSelectedService(null);
@@ -2390,8 +2404,164 @@ export default function ContactForm() {
             </>
           )}
 
-          {/* Submit button for other services (non-Home Cleaning, non-Move-out Cleaning, non-Window Cleaning, non-Construction Cleaning, and non-Floor Cleaning) */}
-          {selectedService && selectedService !== 'Home Cleaning' && selectedService !== 'Move-out Cleaning' && selectedService !== 'Window Cleaning' && selectedService !== 'Construction Cleaning' && selectedService !== 'Floor Cleaning' && (
+          {/* Office Cleaning Form */}
+          {selectedService === 'Office Cleaning' && (
+            <>
+              {/* Step Indicator */}
+              <div className="flex justify-center items-center space-x-2 mb-6">
+                <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 1 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                  <span className="text-sm font-semibold">1</span>
+                </div>
+              </div>
+
+              {/* Step 1: Premises Type */}
+              {currentStep === 1 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    Step 1: Premises Information
+                  </h3>
+
+                  {/* Premises Type Dropdown */}
+                  <div className="form-group">
+                    <label htmlFor="officePremisesType" className="block text-sm font-medium text-gray-700 mb-1">
+                      TYPE OF PREMISES *
+                    </label>
+                    <select
+                      id="officePremisesType"
+                      name="officePremisesType"
+                      value={formData.officePremisesType}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">Select type of premises</option>
+                      <option value="office">office</option>
+                      <option value="shop/trade">shop/trade</option>
+                      <option value="warehouse/industry">warehouse/industry</option>
+                      <option value="restaurant/serving">restaurant/serving</option>
+                      <option value="teaching">teaching</option>
+                      <option value="hotel">hotel</option>
+                    </select>
+                  </div>
+
+                  {/* Should Entire Premises be Cleaned Radio */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Should the entire premises be cleaned? *
+                    </label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="officeCleanAll"
+                            value="Yes"
+                            checked={formData.officeCleanAll === 'Yes'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Yes</span>
+                      </label>
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="officeCleanAll"
+                            value="No"
+                            checked={formData.officeCleanAll === 'No'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">No</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Area Size Numeric Input */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label htmlFor="officeAreaSize" className="block text-sm font-medium text-gray-700 mb-1">
+                      Approximately how large an area should be cleaned? *
+                    </label>
+                    <input
+                      type="number"
+                      id="officeAreaSize"
+                      name="officeAreaSize"
+                      value={formData.officeAreaSize}
+                      onChange={handleChange}
+                      min="0"
+                      step="1"
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                      placeholder="Enter area in sq m"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Navigation Buttons */}
+              <div className="flex gap-3 mt-6">
+                {currentStep > 1 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setCurrentStep(currentStep - 1);
+                    }}
+                    className="flex-1 bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-300 transform hover:scale-[1.02] transition-all duration-300 shadow-md hover:shadow-lg"
+                  >
+                    Previous
+                  </button>
+                )}
+                {currentStep < 1 ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (isCurrentStepValid()) {
+                        setCurrentStep(currentStep + 1);
+                      }
+                    }}
+                    disabled={!isCurrentStepValid()}
+                    className="flex-1 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={status === 'loading' || !isFormValid()}
+                    className="flex-1 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+                  >
+                    {status === 'loading' ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Sending...
+                      </>
+                    ) : status === 'success' ? (
+                      'Request Sent Successfully! ✓'
+                    ) : status === 'error' ? (
+                      'Failed to Send. Try Again ✕'
+                    ) : (
+                      'Get Free Quote'
+                    )}
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Submit button for other services (non-Home Cleaning, non-Move-out Cleaning, non-Window Cleaning, non-Construction Cleaning, non-Floor Cleaning, and non-Office Cleaning) */}
+          {selectedService && selectedService !== 'Home Cleaning' && selectedService !== 'Move-out Cleaning' && selectedService !== 'Window Cleaning' && selectedService !== 'Construction Cleaning' && selectedService !== 'Floor Cleaning' && selectedService !== 'Office Cleaning' && (
           <button
             type="submit"
             disabled={status === 'loading'}
