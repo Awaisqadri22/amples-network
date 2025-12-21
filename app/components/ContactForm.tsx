@@ -63,7 +63,20 @@ export default function ContactForm() {
     // Office Cleaning fields
     officePremisesType: '',
     officeCleanAll: '',
-    officeAreaSize: ''
+    officeAreaSize: '',
+    officeFrequency: '',
+    officePreferredDateTime: '',
+    officeSpace: '0',
+    kitchenSpace: '0',
+    diningRoom: '0',
+    meetingRoom: '0',
+    dressingRoom: '0',
+    toilet: '0',
+    otherRooms: '0',
+    officeFloors: '',
+    officeEntranceFloor: '',
+    officeHasElevator: '',
+    officeAdditionalServices: [] as string[]
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -117,12 +130,41 @@ export default function ContactForm() {
     }
   };
 
+  // Helper function to validate postal code (5 digits)
+  const hasValidPostalCode = (address: string) => {
+    // Check if address contains a 5-digit postal code
+    // Matches 5 consecutive digits (with optional spaces/dashes before or after)
+    const postalCodeRegex = /\b\d{5}\b/;
+    return postalCodeRegex.test(address);
+  };
+
+  // Helper function to get current date-time in format for datetime-local input
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
+  // Helper function to get current date in format for date input
+  const getCurrentDate = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   // Validation function to check if contact info is valid
   const isContactInfoValid = () => {
     return formData.name.trim() !== '' && 
            formData.phone.trim() !== '' && 
            formData.email.trim() !== '' &&
-           formData.address.trim() !== '';
+           formData.address.trim() !== '' &&
+           hasValidPostalCode(formData.address);
   };
 
   // Validation function to check if current step is valid
@@ -317,12 +359,18 @@ export default function ContactForm() {
     }
     
     if (selectedService === 'Office Cleaning') {
-      // Step 1 validation
-      const step1Valid = formData.officePremisesType !== '' && 
-                         formData.officeCleanAll !== '' && 
-                         formData.officeAreaSize !== '';
-      
-      return step1Valid;
+      if (currentStep === 1) {
+        // Step 1 validation
+        return formData.officePremisesType !== '' && 
+               formData.officeCleanAll !== '' && 
+               formData.officeAreaSize !== '';
+      }
+      if (currentStep === 2) {
+        // Step 2 validation
+        return formData.officeFrequency !== '' && 
+               formData.officePreferredDateTime !== '';
+      }
+      return true;
     }
     
     // For other services, return true (they might have different validation)
@@ -360,7 +408,9 @@ export default function ContactForm() {
           constructionWorkType: [], constructionCleaningIncludes: [],
           constructionCleaningDate: '', constructionHomeType: '', constructionAreaSize: '', constructionFloors: '',
           floorCleaningDate: '', floorCleaningIsDateFlexible: '', floorCleaningServices: [], floorCleaningTypes: [],
-          officePremisesType: '', officeCleanAll: '', officeAreaSize: ''
+          officePremisesType: '', officeCleanAll: '', officeAreaSize: '', officeFrequency: '', officePreferredDateTime: '',
+          officeSpace: '0', kitchenSpace: '0', diningRoom: '0', meetingRoom: '0', dressingRoom: '0', toilet: '0', otherRooms: '0',
+          officeFloors: '', officeEntranceFloor: '', officeHasElevator: '', officeAdditionalServices: []
         });
         setCurrentStep(1);
         setSelectedService(null);
@@ -524,7 +574,7 @@ export default function ContactForm() {
             </div>
             <div>
               <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-                Address *
+                Address * (Must include 5-digit postal code)
               </label>
               <input
                 type="text"
@@ -533,9 +583,18 @@ export default function ContactForm() {
                 required
                 value={formData.address}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
-                placeholder="Street address, City, Postal code"
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all ${
+                  formData.address.trim() !== '' && !hasValidPostalCode(formData.address)
+                    ? 'border-red-500 focus:ring-red-500'
+                    : 'border-gray-300'
+                }`}
+                placeholder="Street address, City, 12345"
               />
+              {formData.address.trim() !== '' && !hasValidPostalCode(formData.address) && (
+                <p className="mt-1 text-sm text-red-600">
+                  Please include a 5-digit postal code in your address
+                </p>
+              )}
             </div>
           </div>
 
@@ -643,6 +702,7 @@ export default function ContactForm() {
                     name="preferredDateTime"
                     value={formData.preferredDateTime}
                     onChange={handleChange}
+                    min={getCurrentDateTime()}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
                   />
                 </div>
@@ -694,6 +754,7 @@ export default function ContactForm() {
                     name="preferredDateTime"
                     value={formData.preferredDateTime}
                     onChange={handleChange}
+                    min={getCurrentDateTime()}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
                   />
                 </div>
@@ -1041,6 +1102,7 @@ export default function ContactForm() {
                       name="moveOutCleaningDate"
                       value={formData.moveOutCleaningDate}
                       onChange={handleChange}
+                      min={getCurrentDateTime()}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
                     />
@@ -1449,6 +1511,7 @@ export default function ContactForm() {
                       name="windowCleaningDate"
                       value={formData.windowCleaningDate}
                       onChange={handleChange}
+                      min={getCurrentDateTime()}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
                     />
@@ -1980,6 +2043,7 @@ export default function ContactForm() {
                       name="constructionCleaningDate"
                       value={formData.constructionCleaningDate}
                       onChange={handleChange}
+                      min={getCurrentDateTime()}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
                     />
@@ -2145,6 +2209,7 @@ export default function ContactForm() {
                       name="floorCleaningDate"
                       value={formData.floorCleaningDate}
                       onChange={handleChange}
+                      min={getCurrentDate()}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
                     />
@@ -2412,6 +2477,18 @@ export default function ContactForm() {
                 <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 1 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
                   <span className="text-sm font-semibold">1</span>
                 </div>
+                <div className={`w-12 h-1 ${currentStep >= 2 ? 'bg-cyan-500' : 'bg-gray-200'}`}></div>
+                <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 2 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                  <span className="text-sm font-semibold">2</span>
+                </div>
+                <div className={`w-12 h-1 ${currentStep >= 3 ? 'bg-cyan-500' : 'bg-gray-200'}`}></div>
+                <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 3 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                  <span className="text-sm font-semibold">3</span>
+                </div>
+                <div className={`w-12 h-1 ${currentStep >= 4 ? 'bg-cyan-500' : 'bg-gray-200'}`}></div>
+                <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 4 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                  <span className="text-sm font-semibold">4</span>
+                </div>
               </div>
 
               {/* Step 1: Premises Type */}
@@ -2503,6 +2580,462 @@ export default function ContactForm() {
                 </div>
               )}
 
+              {/* Step 2: Cleaning Schedule */}
+              {currentStep === 2 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Step 2: Cleaning Schedule
+                  </h3>
+
+                  {/* Frequency Dropdown */}
+                  <div className="form-group">
+                    <label htmlFor="officeFrequency" className="block text-sm font-medium text-gray-700 mb-1">
+                      How often do you want cleaning help? *
+                    </label>
+                    <select
+                      id="officeFrequency"
+                      name="officeFrequency"
+                      value={formData.officeFrequency}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">Select frequency</option>
+                      <option value="an opportunity">an opportunity</option>
+                      <option value="several times a week">several times a week</option>
+                      <option value="weekly">weekly</option>
+                      <option value="every month">every month</option>
+                      <option value="other">other</option>
+                    </select>
+                  </div>
+
+                  {/* Day and Time Picker */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label htmlFor="officePreferredDateTime" className="block text-sm font-medium text-gray-700 mb-1">
+                      Add at least one suitable cleaning day and time *
+                    </label>
+                    <input
+                      type="datetime-local"
+                      id="officePreferredDateTime"
+                      name="officePreferredDateTime"
+                      value={formData.officePreferredDateTime}
+                      onChange={handleChange}
+                      min={getCurrentDateTime()}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Room Details */}
+              {currentStep === 3 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                    </svg>
+                    Step 3: Room Details
+                  </h3>
+
+                  <div className="form-group">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      Enter the number of rooms to be cleaned
+                    </label>
+                    <div className="space-y-4">
+                      {/* Office Space */}
+                      <div className="form-group">
+                        <label htmlFor="officeSpace" className="block text-sm font-medium text-gray-700 mb-1">
+                          office space
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleDecrement('officeSpace')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={parseInt(formData.officeSpace) <= 0}
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                            </svg>
+                          </button>
+                          <input
+                            type="number"
+                            id="officeSpace"
+                            name="officeSpace"
+                            value={formData.officeSpace}
+                            onChange={(e) => handleNumberChange('officeSpace', e.target.value)}
+                            min="0"
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-center text-lg font-semibold"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleIncrement('officeSpace')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Kitchen Space */}
+                      <div className="form-group border-t border-gray-200 pt-4">
+                        <label htmlFor="kitchenSpace" className="block text-sm font-medium text-gray-700 mb-1">
+                          Kitchen space
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleDecrement('kitchenSpace')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={parseInt(formData.kitchenSpace) <= 0}
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                            </svg>
+                          </button>
+                          <input
+                            type="number"
+                            id="kitchenSpace"
+                            name="kitchenSpace"
+                            value={formData.kitchenSpace}
+                            onChange={(e) => handleNumberChange('kitchenSpace', e.target.value)}
+                            min="0"
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-center text-lg font-semibold"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleIncrement('kitchenSpace')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Dining Room */}
+                      <div className="form-group border-t border-gray-200 pt-4">
+                        <label htmlFor="diningRoom" className="block text-sm font-medium text-gray-700 mb-1">
+                          dining room
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleDecrement('diningRoom')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={parseInt(formData.diningRoom) <= 0}
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                            </svg>
+                          </button>
+                          <input
+                            type="number"
+                            id="diningRoom"
+                            name="diningRoom"
+                            value={formData.diningRoom}
+                            onChange={(e) => handleNumberChange('diningRoom', e.target.value)}
+                            min="0"
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-center text-lg font-semibold"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleIncrement('diningRoom')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Meeting Room */}
+                      <div className="form-group border-t border-gray-200 pt-4">
+                        <label htmlFor="meetingRoom" className="block text-sm font-medium text-gray-700 mb-1">
+                          meeting room
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleDecrement('meetingRoom')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={parseInt(formData.meetingRoom) <= 0}
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                            </svg>
+                          </button>
+                          <input
+                            type="number"
+                            id="meetingRoom"
+                            name="meetingRoom"
+                            value={formData.meetingRoom}
+                            onChange={(e) => handleNumberChange('meetingRoom', e.target.value)}
+                            min="0"
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-center text-lg font-semibold"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleIncrement('meetingRoom')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Dressing Room */}
+                      <div className="form-group border-t border-gray-200 pt-4">
+                        <label htmlFor="dressingRoom" className="block text-sm font-medium text-gray-700 mb-1">
+                          dressing room
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleDecrement('dressingRoom')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={parseInt(formData.dressingRoom) <= 0}
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                            </svg>
+                          </button>
+                          <input
+                            type="number"
+                            id="dressingRoom"
+                            name="dressingRoom"
+                            value={formData.dressingRoom}
+                            onChange={(e) => handleNumberChange('dressingRoom', e.target.value)}
+                            min="0"
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-center text-lg font-semibold"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleIncrement('dressingRoom')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Toilet */}
+                      <div className="form-group border-t border-gray-200 pt-4">
+                        <label htmlFor="toilet" className="block text-sm font-medium text-gray-700 mb-1">
+                          toilet
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleDecrement('toilet')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={parseInt(formData.toilet) <= 0}
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                            </svg>
+                          </button>
+                          <input
+                            type="number"
+                            id="toilet"
+                            name="toilet"
+                            value={formData.toilet}
+                            onChange={(e) => handleNumberChange('toilet', e.target.value)}
+                            min="0"
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-center text-lg font-semibold"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleIncrement('toilet')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Other Rooms */}
+                      <div className="form-group border-t border-gray-200 pt-4">
+                        <label htmlFor="otherRooms" className="block text-sm font-medium text-gray-700 mb-1">
+                          other rooms
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleDecrement('otherRooms')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={parseInt(formData.otherRooms) <= 0}
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                            </svg>
+                          </button>
+                          <input
+                            type="number"
+                            id="otherRooms"
+                            name="otherRooms"
+                            value={formData.otherRooms}
+                            onChange={(e) => handleNumberChange('otherRooms', e.target.value)}
+                            min="0"
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-center text-lg font-semibold"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleIncrement('otherRooms')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 4: Additional Information */}
+              {currentStep === 4 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Step 4: Additional Information
+                  </h3>
+
+                  {/* Floors Dropdown */}
+                  <div className="form-group">
+                    <label htmlFor="officeFloors" className="block text-sm font-medium text-gray-700 mb-1">
+                      How many floors need to be cleaned? *
+                    </label>
+                    <select
+                      id="officeFloors"
+                      name="officeFloors"
+                      value={formData.officeFloors}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">Select number of floors</option>
+                      <option value="1 floor">1 floor</option>
+                      <option value="2 floors">2 floors</option>
+                      <option value="3 floors">3 floors</option>
+                      <option value="4 floors">4 floors</option>
+                      <option value="5 floors">5 floors</option>
+                      <option value="6 floors">6 floors</option>
+                      <option value="7 floors">7 floors</option>
+                      <option value="8 floors">8 floors</option>
+                      <option value="9 floors">9 floors</option>
+                      <option value="10 or more floors">10 or more floors</option>
+                    </select>
+                  </div>
+
+                  {/* Entrance Floor Dropdown */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label htmlFor="officeEntranceFloor" className="block text-sm font-medium text-gray-700 mb-1">
+                      What floor is the entrance to the venue on? *
+                    </label>
+                    <select
+                      id="officeEntranceFloor"
+                      name="officeEntranceFloor"
+                      value={formData.officeEntranceFloor}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">Select entrance floor</option>
+                      <option value="all floors have entrances">all floors have entrances</option>
+                      <option value="basement">basement</option>
+                      <option value="entrance floor">entrance floor</option>
+                      <option value="floor 1">floor 1</option>
+                      <option value="floor 2">floor 2</option>
+                      <option value="floor 3">floor 3</option>
+                      <option value="any other higher floor">any other higher floor</option>
+                    </select>
+                  </div>
+
+                  {/* Has Elevator Radio */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Is there an elevator in the building? *
+                    </label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="officeHasElevator"
+                            value="Yes"
+                            checked={formData.officeHasElevator === 'Yes'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Yes</span>
+                      </label>
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="officeHasElevator"
+                            value="No"
+                            checked={formData.officeHasElevator === 'No'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">No</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Additional Services Checkboxes */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      Additional services
+                    </label>
+                    <div className="space-y-3">
+                      {[
+                        { value: 'want washing up', label: 'want washing up' },
+                        { value: 'want window cleaning', label: 'want window cleaning' },
+                        { value: 'request a refill of paper towels', label: 'request a refill of paper towels' },
+                        { value: 'request a refill of toilet paper', label: 'request a refill of toilet paper' },
+                        { value: 'want a garbage disposal', label: 'want a garbage disposal' },
+                        { value: 'want plant service', label: 'want plant service' }
+                      ].map((option) => (
+                        <label key={option.value} className="flex items-center cursor-pointer group p-3 rounded-lg border-2 border-gray-200 hover:border-cyan-300 hover:bg-cyan-50 transition-all">
+                          <input
+                            type="checkbox"
+                            name="officeAdditionalServices"
+                            value={option.value}
+                            checked={(formData.officeAdditionalServices as string[]).includes(option.value)}
+                            onChange={(e) => handleCheckboxChange('officeAdditionalServices', option.value, e.target.checked)}
+                            className="h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                          <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-700 transition-colors">{option.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Navigation Buttons */}
               <div className="flex gap-3 mt-6">
                 {currentStep > 1 && (
@@ -2518,7 +3051,7 @@ export default function ContactForm() {
                     Previous
                   </button>
                 )}
-                {currentStep < 1 ? (
+                {currentStep < 4 ? (
                   <button
                     type="button"
                     onClick={(e) => {

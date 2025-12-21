@@ -17,7 +17,9 @@ export async function POST(request: Request) {
             constructionWorkType, constructionCleaningIncludes, constructionCleaningDate,
             constructionHomeType, constructionAreaSize, constructionFloors,
             floorCleaningDate, floorCleaningIsDateFlexible, floorCleaningServices, floorCleaningTypes,
-            officePremisesType, officeCleanAll, officeAreaSize
+            officePremisesType, officeCleanAll, officeAreaSize, officeFrequency, officePreferredDateTime,
+            officeSpace, kitchenSpace, diningRoom, meetingRoom, dressingRoom, toilet, otherRooms,
+            officeFloors, officeEntranceFloor, officeHasElevator, officeAdditionalServices
         } = requestData;
         
         // Log all received data for debugging
@@ -179,7 +181,7 @@ export async function POST(request: Request) {
                     ${Array.isArray(floorCleaningTypes) && floorCleaningTypes.length > 0 
                       ? floorCleaningTypes.map((type: string) => `<li style="margin: 6px 0;">${type}</li>`).join('')
                       : '<li style="margin: 6px 0;">Not specified</li>'}
-                  </ul>
+                </ul>
                 </div>
                 <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #cbd5e1;">
                   <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Additional Information</h4>
@@ -194,7 +196,35 @@ export async function POST(request: Request) {
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Type of Premises:</strong> <span style="color: #475569;">${officePremisesType || 'Not specified'}</span></p>
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Should Entire Premises be Cleaned:</strong> <span style="color: #475569;">${officeCleanAll || 'Not specified'}</span></p>
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Area Size:</strong> <span style="color: #475569;">${officeAreaSize ? officeAreaSize + ' sq m' : 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Frequency:</strong> <span style="color: #475569;">${officeFrequency || 'Not specified'}</span></p>
+                  ${officePreferredDateTime ? `<p style="margin: 8px 0;"><strong style="color: #1e293b;">Preferred Date & Time:</strong> <span style="color: #475569;">${new Date(officePreferredDateTime).toLocaleString()}</span></p>` : ''}
                 </div>
+                <div style="background-color: #ffffff; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                  <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Room Details</h4>
+                  <ul style="margin: 0; padding-left: 20px; color: #475569;">
+                    <li style="margin: 6px 0;"><strong>Office Space:</strong> ${officeSpace || '0'}</li>
+                    <li style="margin: 6px 0;"><strong>Kitchen Space:</strong> ${kitchenSpace || '0'}</li>
+                    <li style="margin: 6px 0;"><strong>Dining Room:</strong> ${diningRoom || '0'}</li>
+                    <li style="margin: 6px 0;"><strong>Meeting Room:</strong> ${meetingRoom || '0'}</li>
+                    <li style="margin: 6px 0;"><strong>Dressing Room:</strong> ${dressingRoom || '0'}</li>
+                    <li style="margin: 6px 0;"><strong>Toilet:</strong> ${toilet || '0'}</li>
+                    <li style="margin: 6px 0;"><strong>Other Rooms:</strong> ${otherRooms || '0'}</li>
+                  </ul>
+                </div>
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #cbd5e1;">
+                  <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Building Information</h4>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Number of Floors:</strong> <span style="color: #475569;">${officeFloors || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Entrance Floor:</strong> <span style="color: #475569;">${officeEntranceFloor || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Has Elevator:</strong> <span style="color: #475569;">${officeHasElevator || 'Not specified'}</span></p>
+                </div>
+                ${Array.isArray(officeAdditionalServices) && officeAdditionalServices.length > 0 ? `
+                <div style="background-color: #ffffff; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                  <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Additional Services</h4>
+                  <ul style="margin: 0; padding-left: 20px; color: #475569;">
+                    ${officeAdditionalServices.map((service: string) => `<li style="margin: 6px 0;">${service}</li>`).join('')}
+                  </ul>
+                </div>
+                ` : ''}
             `;
         } else if (selectedService) {
             serviceDetails = `<div style="margin-bottom: 20px;"><h3 style="margin: 0; color: #1e293b; font-size: 18px; font-weight: 600;">Service: ${selectedService}</h3></div>`;
@@ -268,7 +298,7 @@ export async function POST(request: Request) {
                               </span>
                             </td>
                           </tr>
-                          ${formType === 'company' ? `
+            ${formType === 'company' ? `
                           <tr>
                             <td style="padding: 8px 0; color: #475569; font-size: 15px;">
                               <strong style="color: #1e293b; display: inline-block; min-width: 100px;">Company:</strong> ${company}
@@ -279,9 +309,9 @@ export async function POST(request: Request) {
                               <strong style="color: #1e293b; display: inline-block; min-width: 100px;">VAT Number:</strong> ${vatNumber}
                             </td>
                           </tr>
-                          ` : ''}
+            ` : ''}
                         </table>
-                      </div>
+          </div>
 
                       <!-- Service Details Section -->
                       <div style="background: linear-gradient(135deg, #ecfeff 0%, #e0f2fe 100%); border-left: 4px solid #10b981; padding: 25px; border-radius: 8px; margin-bottom: ${message ? '25px' : '0'};">
@@ -290,7 +320,7 @@ export async function POST(request: Request) {
                           Service Details
                         </h2>
                         <div style="color: #334155; font-size: 15px; line-height: 1.8;">
-                          ${serviceDetails}
+            ${serviceDetails}
                         </div>
                         ${message ? `
                         <div style="margin-top: 25px; padding-top: 25px; border-top: 2px solid #cbd5e1;">
@@ -298,7 +328,7 @@ export async function POST(request: Request) {
                           <p style="margin: 0; color: #475569; font-size: 15px; white-space: pre-wrap; background-color: #ffffff; padding: 15px; border-radius: 6px; border-left: 3px solid #06b6d4;">${message}</p>
                         </div>
                         ` : ''}
-                      </div>
+          </div>
                     </td>
                   </tr>
 
@@ -312,8 +342,8 @@ export async function POST(request: Request) {
                       <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
                         <p style="margin: 0; color: #94a3b8; font-size: 11px;">
                           © ${new Date().getFullYear()} Amples Network. All rights reserved.
-                        </p>
-                      </div>
+          </p>
+        </div>
                     </td>
                   </tr>
 
