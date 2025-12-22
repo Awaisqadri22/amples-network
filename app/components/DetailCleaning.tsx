@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import QuoteForm from './QuoteForm';
+import Footer from './Footer';
 
 const services = [
   { name: 'Move-out Cleaning', href: '/move-out-cleaning', icon: '🚚' },
@@ -172,6 +173,9 @@ export default function DetailCleaning() {
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
