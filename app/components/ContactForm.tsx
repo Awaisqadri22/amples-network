@@ -76,7 +76,20 @@ export default function ContactForm() {
     officeFloors: '',
     officeEntranceFloor: '',
     officeHasElevator: '',
-    officeAdditionalServices: [] as string[]
+    officeAdditionalServices: [] as string[],
+    // Detail Cleaning fields
+    detailHomeType: '',
+    detailCleanAll: '',
+    detailAreaSize: '',
+    detailFrequency: '',
+    detailPreferredDay: '',
+    detailPreferredTime: '',
+    detailBedroom: '0',
+    detailKitchen: '0',
+    detailBathroom: '0',
+    detailLivingRoom: '0',
+    detailOtherRooms: '0',
+    detailFloors: ''
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -257,6 +270,26 @@ export default function ContactForm() {
         return (formData.floorCleaningTypes as string[]).length > 0 && formData.floors !== '' && formData.hasPets !== '';
       }
     }
+
+    if (selectedService === 'Detail Cleaning') {
+      if (currentStep === 1) {
+        // Step 1 validation
+        return formData.detailHomeType !== '' && 
+               formData.detailCleanAll !== '' && 
+               formData.detailAreaSize !== '';
+      }
+      if (currentStep === 2) {
+        // Step 2 validation
+        return formData.detailFrequency !== '' && 
+               formData.detailPreferredDay !== '' && 
+               formData.detailPreferredTime !== '';
+      }
+      if (currentStep === 3) {
+        // Step 3 validation - room fields are always filled (default '0'), only floors is required
+        return formData.detailFloors !== '';
+      }
+      return true;
+    }
     
     return true;
   };
@@ -359,18 +392,43 @@ export default function ContactForm() {
     }
     
     if (selectedService === 'Office Cleaning') {
-      if (currentStep === 1) {
-        // Step 1 validation
-        return formData.officePremisesType !== '' && 
-               formData.officeCleanAll !== '' && 
-               formData.officeAreaSize !== '';
-      }
-      if (currentStep === 2) {
-        // Step 2 validation
-        return formData.officeFrequency !== '' && 
-               formData.officePreferredDateTime !== '';
-      }
-      return true;
+      // Step 1 validation
+      const step1Valid = 
+        formData.officePremisesType !== '' &&
+        formData.officeCleanAll !== '' &&
+        formData.officeAreaSize !== '';
+      
+      // Step 2 validation
+      const step2Valid = 
+        formData.officeFrequency !== '' &&
+        formData.officePreferredDateTime !== '';
+      
+      // Step 3 validation - all fields are optional
+      const step3Valid = true;
+      
+      // Step 4 validation
+      const step4Valid = 
+        formData.officeFloors !== '' &&
+        formData.officeEntranceFloor !== '' &&
+        formData.officeHasElevator !== '';
+      
+      return step1Valid && step2Valid && step3Valid && step4Valid;
+    }
+
+    if (selectedService === 'Detail Cleaning') {
+      // Step 1 validation
+      const step1Valid = 
+        formData.detailHomeType !== '' &&
+        formData.detailCleanAll !== '' &&
+        formData.detailAreaSize !== '';
+      
+      // Step 2 validation
+      const step2Valid = 
+        formData.detailFrequency !== '' &&
+        formData.detailPreferredDay !== '' &&
+        formData.detailPreferredTime !== '';
+      
+      return step1Valid && step2Valid;
     }
     
     // For other services, return true (they might have different validation)
@@ -410,7 +468,10 @@ export default function ContactForm() {
           floorCleaningDate: '', floorCleaningIsDateFlexible: '', floorCleaningServices: [], floorCleaningTypes: [],
           officePremisesType: '', officeCleanAll: '', officeAreaSize: '', officeFrequency: '', officePreferredDateTime: '',
           officeSpace: '0', kitchenSpace: '0', diningRoom: '0', meetingRoom: '0', dressingRoom: '0', toilet: '0', otherRooms: '0',
-          officeFloors: '', officeEntranceFloor: '', officeHasElevator: '', officeAdditionalServices: []
+          officeFloors: '', officeEntranceFloor: '', officeHasElevator: '', officeAdditionalServices: [],
+          detailHomeType: '', detailCleanAll: '', detailAreaSize: '',
+          detailFrequency: '', detailPreferredDay: '', detailPreferredTime: '',
+          detailBedroom: '0', detailKitchen: '0', detailBathroom: '0', detailLivingRoom: '0', detailOtherRooms: '0', detailFloors: ''
         });
         setCurrentStep(1);
         setSelectedService(null);
@@ -3093,8 +3154,469 @@ export default function ContactForm() {
             </>
           )}
 
-          {/* Submit button for other services (non-Home Cleaning, non-Move-out Cleaning, non-Window Cleaning, non-Construction Cleaning, non-Floor Cleaning, and non-Office Cleaning) */}
-          {selectedService && selectedService !== 'Home Cleaning' && selectedService !== 'Move-out Cleaning' && selectedService !== 'Window Cleaning' && selectedService !== 'Construction Cleaning' && selectedService !== 'Floor Cleaning' && selectedService !== 'Office Cleaning' && (
+          {/* Detail Cleaning Form */}
+          {selectedService === 'Detail Cleaning' && (
+            <>
+              {/* Step Indicator */}
+              <div className="flex items-center justify-center mb-6">
+                <div className="flex items-center space-x-2">
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 1 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    <span className="text-sm font-semibold">1</span>
+                  </div>
+                  <div className={`w-12 h-1 ${currentStep >= 2 ? 'bg-cyan-500' : 'bg-gray-200'}`}></div>
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 2 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    <span className="text-sm font-semibold">2</span>
+                  </div>
+                  <div className={`w-12 h-1 ${currentStep >= 3 ? 'bg-cyan-500' : 'bg-gray-200'}`}></div>
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 3 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    <span className="text-sm font-semibold">3</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 1: Basic Information */}
+              {currentStep === 1 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    Step 1: Basic Information
+                  </h3>
+
+                  {/* Home Type Dropdown */}
+                  <div className="form-group">
+                    <label htmlFor="detailHomeType" className="block text-sm font-medium text-gray-700 mb-1">
+                      What type of home should be cleaned? *
+                    </label>
+                    <select
+                      id="detailHomeType"
+                      name="detailHomeType"
+                      value={formData.detailHomeType}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">Select home type</option>
+                      <option value="villa">villa</option>
+                      <option value="apartment">apartment</option>
+                      <option value="semi-detached house">semi-detached house</option>
+                      <option value="holiday-home">holiday-home</option>
+                    </select>
+                  </div>
+
+                  {/* Should Entire Home be Cleaned Radio */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Should the entire home be cleaned? *
+                    </label>
+                    <div className="flex gap-6">
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="detailCleanAll"
+                            value="Yes"
+                            checked={formData.detailCleanAll === 'Yes'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Yes</span>
+                      </label>
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="radio"
+                            name="detailCleanAll"
+                            value="No"
+                            checked={formData.detailCleanAll === 'No'}
+                            onChange={handleChange}
+                            className="peer h-4 w-4 text-cyan-500 focus:ring-cyan-500 border-gray-300"
+                          />
+                        </div>
+                        <span className="ml-2 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">No</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Area Size Numeric Input */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label htmlFor="detailAreaSize" className="block text-sm font-medium text-gray-700 mb-1">
+                      Approximately how large an area should be cleaned? *
+                    </label>
+                    <input
+                      type="number"
+                      id="detailAreaSize"
+                      name="detailAreaSize"
+                      value={formData.detailAreaSize}
+                      onChange={handleChange}
+                      min="0"
+                      step="1"
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                      placeholder="Enter area in sq m"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Cleaning Schedule */}
+              {currentStep === 2 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Step 2: Cleaning Schedule
+                  </h3>
+
+                  {/* Frequency Dropdown */}
+                  <div className="form-group">
+                    <label htmlFor="detailFrequency" className="block text-sm font-medium text-gray-700 mb-1">
+                      How often do you want cleaning help? *
+                    </label>
+                    <select
+                      id="detailFrequency"
+                      name="detailFrequency"
+                      value={formData.detailFrequency}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">Select frequency</option>
+                      <option value="an opportunity">an opportunity</option>
+                      <option value="every month">every month</option>
+                      <option value="every other month">every other month</option>
+                      <option value="every three months">every three months</option>
+                    </select>
+                  </div>
+
+                  {/* Preferred Day and Time */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Add at least one suitable cleaning day and time *
+                    </label>
+                    <div className="grid grid-cols-2 gap-4">
+                      {/* Day Dropdown */}
+                      <div>
+                        <label htmlFor="detailPreferredDay" className="block text-xs font-medium text-gray-600 mb-1">
+                          Day
+                        </label>
+                        <select
+                          id="detailPreferredDay"
+                          name="detailPreferredDay"
+                          value={formData.detailPreferredDay}
+                          onChange={handleChange}
+                          required
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                        >
+                          <option value="">Select day</option>
+                          <option value="Monday">Monday</option>
+                          <option value="Tuesday">Tuesday</option>
+                          <option value="Wednesday">Wednesday</option>
+                          <option value="Thursday">Thursday</option>
+                          <option value="Friday">Friday</option>
+                          <option value="Saturday">Saturday</option>
+                          <option value="Sunday">Sunday</option>
+                        </select>
+                      </div>
+
+                      {/* Time Dropdown */}
+                      <div>
+                        <label htmlFor="detailPreferredTime" className="block text-xs font-medium text-gray-600 mb-1">
+                          Time
+                        </label>
+                        <select
+                          id="detailPreferredTime"
+                          name="detailPreferredTime"
+                          value={formData.detailPreferredTime}
+                          onChange={handleChange}
+                          required
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                        >
+                          <option value="">Select time</option>
+                          <option value="6-9">6-9</option>
+                          <option value="9-12">9-12</option>
+                          <option value="12-15">12-15</option>
+                          <option value="15-18">15-18</option>
+                          <option value="18-21">18-21</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Room Details */}
+              {currentStep === 3 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    Step 3: Room Details
+                  </h3>
+
+                  {/* Room Count Inputs */}
+                  <div className="form-group">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      Enter the number of rooms to be cleaned
+                    </label>
+                    <div className="space-y-3">
+                      {/* Bedroom */}
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm text-gray-700 font-medium">Bedroom</label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleDecrement('detailBedroom')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={parseInt(formData.detailBedroom) <= 0}
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                            </svg>
+                          </button>
+                          <input
+                            type="number"
+                            name="detailBedroom"
+                            value={formData.detailBedroom}
+                            onChange={(e) => handleNumberChange('detailBedroom', e.target.value)}
+                            min="0"
+                            className="w-20 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-center text-lg font-semibold"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleIncrement('detailBedroom')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Kitchen */}
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm text-gray-700 font-medium">Kitchen</label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleDecrement('detailKitchen')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={parseInt(formData.detailKitchen) <= 0}
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                            </svg>
+                          </button>
+                          <input
+                            type="number"
+                            name="detailKitchen"
+                            value={formData.detailKitchen}
+                            onChange={(e) => handleNumberChange('detailKitchen', e.target.value)}
+                            min="0"
+                            className="w-20 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-center text-lg font-semibold"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleIncrement('detailKitchen')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Bathroom */}
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm text-gray-700 font-medium">Bathroom</label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleDecrement('detailBathroom')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={parseInt(formData.detailBathroom) <= 0}
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                            </svg>
+                          </button>
+                          <input
+                            type="number"
+                            name="detailBathroom"
+                            value={formData.detailBathroom}
+                            onChange={(e) => handleNumberChange('detailBathroom', e.target.value)}
+                            min="0"
+                            className="w-20 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-center text-lg font-semibold"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleIncrement('detailBathroom')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Living Room */}
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm text-gray-700 font-medium">Living Room</label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleDecrement('detailLivingRoom')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={parseInt(formData.detailLivingRoom) <= 0}
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                            </svg>
+                          </button>
+                          <input
+                            type="number"
+                            name="detailLivingRoom"
+                            value={formData.detailLivingRoom}
+                            onChange={(e) => handleNumberChange('detailLivingRoom', e.target.value)}
+                            min="0"
+                            className="w-20 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-center text-lg font-semibold"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleIncrement('detailLivingRoom')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Other Rooms */}
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm text-gray-700 font-medium">Other Rooms</label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleDecrement('detailOtherRooms')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={parseInt(formData.detailOtherRooms) <= 0}
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                            </svg>
+                          </button>
+                          <input
+                            type="number"
+                            name="detailOtherRooms"
+                            value={formData.detailOtherRooms}
+                            onChange={(e) => handleNumberChange('detailOtherRooms', e.target.value)}
+                            min="0"
+                            className="w-20 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-center text-lg font-semibold"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleIncrement('detailOtherRooms')}
+                            className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-all duration-200"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Floors Dropdown */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label htmlFor="detailFloors" className="block text-sm font-medium text-gray-700 mb-1">
+                      How many floors need to be cleaned? *
+                    </label>
+                    <select
+                      id="detailFloors"
+                      name="detailFloors"
+                      value={formData.detailFloors}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">Select number of floors</option>
+                      <option value="1 floor">1 floor</option>
+                      <option value="2 floors">2 floors</option>
+                      <option value="3 or more floors">3 or more floors</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {/* Navigation Buttons */}
+              <div className="flex gap-3 mt-6">
+                {currentStep > 1 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setCurrentStep(currentStep - 1);
+                    }}
+                    className="flex-1 bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-300 transform hover:scale-[1.02] transition-all duration-300 shadow-md hover:shadow-lg"
+                  >
+                    Previous
+                  </button>
+                )}
+                {currentStep < 3 ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (isCurrentStepValid()) {
+                        setCurrentStep(currentStep + 1);
+                      }
+                    }}
+                    disabled={!isCurrentStepValid()}
+                    className="flex-1 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={status === 'loading' || !isFormValid()}
+                    className="flex-1 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+                  >
+                    {status === 'loading' ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Sending...
+                      </>
+                    ) : status === 'success' ? (
+                      'Request Sent Successfully! ✓'
+                    ) : status === 'error' ? (
+                      'Failed to Send. Try Again ✕'
+                    ) : (
+                      'Get Free Quote'
+                    )}
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Submit button for other services (non-Home Cleaning, non-Move-out Cleaning, non-Window Cleaning, non-Construction Cleaning, non-Floor Cleaning, non-Office Cleaning, and non-Detail Cleaning) */}
+          {selectedService && selectedService !== 'Home Cleaning' && selectedService !== 'Move-out Cleaning' && selectedService !== 'Window Cleaning' && selectedService !== 'Construction Cleaning' && selectedService !== 'Floor Cleaning' && selectedService !== 'Office Cleaning' && selectedService !== 'Detail Cleaning' && (
           <button
             type="submit"
             disabled={status === 'loading'}

@@ -19,7 +19,9 @@ export async function POST(request: Request) {
             floorCleaningDate, floorCleaningIsDateFlexible, floorCleaningServices, floorCleaningTypes,
             officePremisesType, officeCleanAll, officeAreaSize, officeFrequency, officePreferredDateTime,
             officeSpace, kitchenSpace, diningRoom, meetingRoom, dressingRoom, toilet, otherRooms,
-            officeFloors, officeEntranceFloor, officeHasElevator, officeAdditionalServices
+            officeFloors, officeEntranceFloor, officeHasElevator, officeAdditionalServices,
+            detailHomeType, detailCleanAll, detailAreaSize, detailFrequency, detailPreferredDay, detailPreferredTime,
+            detailBedroom, detailKitchen, detailBathroom, detailLivingRoom, detailOtherRooms, detailFloors
         } = requestData;
         
         // Log all received data for debugging
@@ -225,6 +227,41 @@ export async function POST(request: Request) {
                   </ul>
                 </div>
                 ` : ''}
+            `;
+        } else if (selectedService === 'Detail Cleaning') {
+            serviceDetails = `
+                <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                  <h4 style="margin: 0 0 12px 0; color: #06b6d4; font-size: 16px; font-weight: 600; display: flex; align-items: center;">
+                    <span style="display: inline-block; width: 8px; height: 8px; background-color: #06b6d4; border-radius: 50%; margin-right: 8px;"></span>
+                    Basic Information
+                  </h4>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Home Type:</strong> <span style="color: #475569;">${detailHomeType || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Should Entire Home be Cleaned:</strong> <span style="color: #475569;">${detailCleanAll || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Area Size:</strong> <span style="color: #475569;">${detailAreaSize ? detailAreaSize + ' sq m' : 'Not specified'}</span></p>
+                </div>
+                <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                  <h4 style="margin: 0 0 12px 0; color: #06b6d4; font-size: 16px; font-weight: 600; display: flex; align-items: center;">
+                    <span style="display: inline-block; width: 8px; height: 8px; background-color: #06b6d4; border-radius: 50%; margin-right: 8px;"></span>
+                    Cleaning Schedule
+                  </h4>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Frequency:</strong> <span style="color: #475569;">${detailFrequency || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Preferred Day:</strong> <span style="color: #475569;">${detailPreferredDay || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Preferred Time:</strong> <span style="color: #475569;">${detailPreferredTime || 'Not specified'}</span></p>
+                </div>
+                <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                  <h4 style="margin: 0 0 12px 0; color: #06b6d4; font-size: 16px; font-weight: 600; display: flex; align-items: center;">
+                    <span style="display: inline-block; width: 8px; height: 8px; background-color: #06b6d4; border-radius: 50%; margin-right: 8px;"></span>
+                    Room Details
+                  </h4>
+                  <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="margin: 6px 0;"><strong style="color: #1e293b;">Bedroom:</strong> <span style="color: #475569;">${detailBedroom || '0'}</span></li>
+                    <li style="margin: 6px 0;"><strong style="color: #1e293b;">Kitchen:</strong> <span style="color: #475569;">${detailKitchen || '0'}</span></li>
+                    <li style="margin: 6px 0;"><strong style="color: #1e293b;">Bathroom:</strong> <span style="color: #475569;">${detailBathroom || '0'}</span></li>
+                    <li style="margin: 6px 0;"><strong style="color: #1e293b;">Living Room:</strong> <span style="color: #475569;">${detailLivingRoom || '0'}</span></li>
+                    <li style="margin: 6px 0;"><strong style="color: #1e293b;">Other Rooms:</strong> <span style="color: #475569;">${detailOtherRooms || '0'}</span></li>
+                  </ul>
+                  <p style="margin: 12px 0 0 0;"><strong style="color: #1e293b;">Number of Floors:</strong> <span style="color: #475569;">${detailFloors || 'Not specified'}</span></p>
+                </div>
             `;
         } else if (selectedService) {
             serviceDetails = `<div style="margin-bottom: 20px;"><h3 style="margin: 0; color: #1e293b; font-size: 18px; font-weight: 600;">Service: ${selectedService}</h3></div>`;
