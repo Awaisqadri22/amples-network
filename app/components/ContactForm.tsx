@@ -89,7 +89,8 @@ export default function ContactForm() {
     detailBathroom: '0',
     detailLivingRoom: '0',
     detailOtherRooms: '0',
-    detailFloors: ''
+    detailFloors: '',
+    detailAdditionalCleaning: [] as string[]
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -471,7 +472,8 @@ export default function ContactForm() {
           officeFloors: '', officeEntranceFloor: '', officeHasElevator: '', officeAdditionalServices: [],
           detailHomeType: '', detailCleanAll: '', detailAreaSize: '',
           detailFrequency: '', detailPreferredDay: '', detailPreferredTime: '',
-          detailBedroom: '0', detailKitchen: '0', detailBathroom: '0', detailLivingRoom: '0', detailOtherRooms: '0', detailFloors: ''
+          detailBedroom: '0', detailKitchen: '0', detailBathroom: '0', detailLivingRoom: '0', detailOtherRooms: '0', detailFloors: '',
+          detailAdditionalCleaning: []
         });
         setCurrentStep(1);
         setSelectedService(null);
@@ -3554,6 +3556,59 @@ export default function ContactForm() {
                       <option value="2 floors">2 floors</option>
                       <option value="3 or more floors">3 or more floors</option>
                     </select>
+                  </div>
+
+                  {/* Additional Cleaning Options */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      Choose whether you want cleaning of the following:
+                    </label>
+                    <div className="space-y-3">
+                      {/* Garage */}
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            name="detailAdditionalCleaning"
+                            value="garage"
+                            checked={(formData.detailAdditionalCleaning as string[]).includes('garage')}
+                            onChange={(e) => handleCheckboxChange('detailAdditionalCleaning', 'garage', e.target.checked)}
+                            className="peer h-5 w-5 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                        </div>
+                        <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Garage</span>
+                      </label>
+
+                      {/* Balcony/Veranda/Terrace */}
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            name="detailAdditionalCleaning"
+                            value="balcony/veranda/terrace"
+                            checked={(formData.detailAdditionalCleaning as string[]).includes('balcony/veranda/terrace')}
+                            onChange={(e) => handleCheckboxChange('detailAdditionalCleaning', 'balcony/veranda/terrace', e.target.checked)}
+                            className="peer h-5 w-5 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                        </div>
+                        <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Balcony/Veranda/Terrace</span>
+                      </label>
+
+                      {/* Storage/Outbuilding */}
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            name="detailAdditionalCleaning"
+                            value="storage/outbuilding"
+                            checked={(formData.detailAdditionalCleaning as string[]).includes('storage/outbuilding')}
+                            onChange={(e) => handleCheckboxChange('detailAdditionalCleaning', 'storage/outbuilding', e.target.checked)}
+                            className="peer h-5 w-5 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                        </div>
+                        <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Storage/Outbuilding</span>
+                      </label>
+                    </div>
                   </div>
                 </div>
               )}
