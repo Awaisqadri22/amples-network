@@ -21,15 +21,24 @@ export async function POST(request: Request) {
             officeSpace, kitchenSpace, diningRoom, meetingRoom, dressingRoom, toilet, otherRooms,
             officeFloors, officeEntranceFloor, officeHasElevator, officeAdditionalServices,
             detailHomeType, detailCleanAll, detailAreaSize, detailFrequency, detailPreferredDay, detailPreferredTime,
-            detailBedroom, detailKitchen, detailBathroom, detailLivingRoom, detailOtherRooms, detailFloors
+            detailBedroom, detailKitchen, detailBathroom, detailLivingRoom, detailOtherRooms, detailFloors,
+            detailAdditionalCleaning
         } = requestData;
         
         // Log all received data for debugging
         console.log('Received form data:', JSON.stringify(requestData, null, 2));
+        console.log('Environment check - EMAIL_USER exists:', !!process.env.EMAIL_USER);
+        console.log('Environment check - EMAIL_PASS exists:', !!process.env.EMAIL_PASS);
 
         if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-            console.error('Missing email credentials. Make sure EMAIL_USER and EMAIL_PASS are set in .env.local');
-            return NextResponse.json({ error: 'Server new configuration error: Missing email credentials' }, { status: 500 });
+            const errorMsg = 'Missing email credentials. Make sure EMAIL_USER and EMAIL_PASS are set in Vercel environment variables.';
+            console.error(errorMsg);
+            console.error('EMAIL_USER:', process.env.EMAIL_USER ? 'Set (hidden)' : 'NOT SET');
+            console.error('EMAIL_PASS:', process.env.EMAIL_PASS ? 'Set (hidden)' : 'NOT SET');
+            return NextResponse.json({ 
+                error: 'Server configuration error: Missing email credentials',
+                details: 'Please configure EMAIL_USER and EMAIL_PASS in Vercel environment variables'
+            }, { status: 500 });
         }
 
         const transporter = nodemailer.createTransport({
@@ -46,10 +55,18 @@ export async function POST(request: Request) {
         // Verify connection configuration
         try {
             await transporter.verify();
-            console.log('Transporter connection verified');
+            console.log('Transporter connection verified successfully');
         } catch (verifyError) {
-            console.error('Transporter verification failed:', verifyError);
-            return NextResponse.json({ error: 'Failed to connect to email service', details: (verifyError as Error).message }, { status: 500 });
+            const errorDetails = verifyError as Error;
+            console.error('Transporter verification failed:', errorDetails);
+            console.error('Error name:', errorDetails.name);
+            console.error('Error message:', errorDetails.message);
+            console.error('Error stack:', errorDetails.stack);
+            return NextResponse.json({ 
+                error: 'Failed to connect to email service', 
+                details: errorDetails.message,
+                hint: 'Make sure you are using an App Password (not regular password) for Gmail. Enable 2FA and generate an App Password at: https://myaccount.google.com/apppasswords'
+            }, { status: 500 });
         }
 
         // Construct Email Content
@@ -261,6 +278,14 @@ export async function POST(request: Request) {
                     <li style="margin: 6px 0;"><strong style="color: #1e293b;">Other Rooms:</strong> <span style="color: #475569;">${detailOtherRooms || '0'}</span></li>
                   </ul>
                   <p style="margin: 12px 0 0 0;"><strong style="color: #1e293b;">Number of Floors:</strong> <span style="color: #475569;">${detailFloors || 'Not specified'}</span></p>
+                  ${Array.isArray(detailAdditionalCleaning) && detailAdditionalCleaning.length > 0 ? `
+                  <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e2e8f0;">
+                    <p style="margin: 0 0 8px 0; color: #1e293b; font-weight: 600;">Additional Cleaning Options:</p>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                      ${detailAdditionalCleaning.map((item: string) => `<li style="margin: 4px 0; color: #475569;">• ${item}</li>`).join('')}
+                    </ul>
+                  </div>
+                  ` : ''}
                 </div>
             `;
         } else if (selectedService) {
@@ -393,11 +418,38 @@ export async function POST(request: Request) {
       `,
         };
 
-        await transporter.sendMail(mailOptions);
+        console.log('Attempting to send email...');
+        const result = await transporter.sendMail(mailOptions);
+        console.log('Email sent successfully. Message ID:', result.messageId);
+        console.log('Response:', result.response);
 
         return NextResponse.json({ message: 'Email sent successfully' }, { status: 200 });
     } catch (error) {
-        console.error('Error sending email:', error);
-        return NextResponse.json({ error: 'Failed to send email', details: (error as Error).message }, { status: 500 });
+        const errorDetails = error as Error;
+        console.error('Error sending email:', errorDetails);
+        console.error('Error name:', errorDetails.name);
+        console.error('Error message:', errorDetails.message);
+        console.error('Error stack:', errorDetails.stack);
+        
+        // Provide more helpful error messages
+        let userFriendlyError = 'Failed to send email';
+        let hint = '';
+        
+        if (errorDetails.message.includes('Invalid login')) {
+            userFriendlyError = 'Email authentication failed';
+            hint = 'Please verify EMAIL_USER and EMAIL_PASS are correct. Use an App Password for Gmail.';
+        } else if (errorDetails.message.includes('timeout')) {
+            userFriendlyError = 'Email service timeout';
+            hint = 'The email service took too long to respond. Please try again.';
+        } else if (errorDetails.message.includes('ECONNREFUSED') || errorDetails.message.includes('ENOTFOUND')) {
+            userFriendlyError = 'Cannot connect to email service';
+            hint = 'Network error. Please check your internet connection and try again.';
+        }
+        
+        return NextResponse.json({ 
+            error: userFriendlyError, 
+            details: errorDetails.message,
+            hint: hint || 'Please check server logs for more details'
+        }, { status: 500 });
     }
 }

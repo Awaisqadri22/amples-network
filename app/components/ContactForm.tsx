@@ -12,6 +12,7 @@ export default function ContactForm() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [currentStep, setCurrentStep] = useState(1);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
 
   // Form State new
   const [formData, setFormData] = useState({
@@ -94,10 +95,61 @@ export default function ContactForm() {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const fieldName = e.target.name;
+    // Mark field as touched when user interacts with it
+    setTouchedFields(prev => new Set(prev).add(fieldName));
+    
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [fieldName]: e.target.value
     });
+  };
+
+  // Validation helper functions
+  const isFieldInvalid = (fieldName: string, value: string) => {
+    if (!touchedFields.has(fieldName)) return false; // Don't show error until field is touched
+    
+    switch (fieldName) {
+      case 'name':
+        return value.trim() === '';
+      case 'phone':
+        return value.trim() === '';
+      case 'email':
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return value.trim() === '' || !emailRegex.test(value);
+      case 'address':
+        return value.trim() === '' || !hasValidPostalCode(value);
+      case 'company':
+        return formType === 'company' && value.trim() === '';
+      case 'vatNumber':
+        return formType === 'company' && value.trim() === '';
+      default:
+        return value.trim() === '';
+    }
+  };
+
+  const getFieldError = (fieldName: string, value: string) => {
+    if (!touchedFields.has(fieldName)) return null;
+    
+    switch (fieldName) {
+      case 'name':
+        return value.trim() === '' ? 'Name is required' : null;
+      case 'phone':
+        return value.trim() === '' ? 'Phone number is required' : null;
+      case 'email':
+        if (value.trim() === '') return 'Email address is required';
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return !emailRegex.test(value) ? 'Please enter a valid email address' : null;
+      case 'address':
+        if (value.trim() === '') return 'Address is required';
+        return !hasValidPostalCode(value) ? 'Please include a 5-digit postal code in your address' : null;
+      case 'company':
+        return formType === 'company' && value.trim() === '' ? 'Company name is required' : null;
+      case 'vatNumber':
+        return formType === 'company' && value.trim() === '' ? 'VAT number is required' : null;
+      default:
+        return null;
+    }
   };
 
   const handleCheckboxChange = (name: string, value: string, checked: boolean) => {
@@ -438,6 +490,35 @@ export default function ContactForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Mark all required contact fields as touched to show validation errors
+    const requiredFields = ['name', 'phone', 'email', 'address'];
+    if (formType === 'company') {
+      requiredFields.push('company', 'vatNumber');
+    }
+    setTouchedFields(prev => {
+      const newSet = new Set(prev);
+      requiredFields.forEach(field => newSet.add(field));
+      return newSet;
+    });
+    
+    // Check if contact info is valid before proceeding
+    const contactInfoValid = requiredFields.every(field => {
+      if (field === 'address') {
+        return formData.address.trim() !== '' && hasValidPostalCode(formData.address);
+      }
+      if (field === 'email') {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return formData.email.trim() !== '' && emailRegex.test(formData.email);
+      }
+      return formData[field as keyof typeof formData].toString().trim() !== '';
+    });
+    
+    if (!contactInfoValid || !isFormValid()) {
+      setStatus('idle');
+      return;
+    }
+    
     setStatus('loading');
 
     try {
@@ -486,11 +567,33 @@ export default function ContactForm() {
           }, 300); // Small delay for fade-out animation
         }, 3000);
       } else {
+        // Try to get error details from response
+        try {
+          const errorData = await response.json();
+          console.error('API Error Response:', errorData);
+          if (errorData.error) {
+            console.error('Error:', errorData.error);
+          }
+          if (errorData.details) {
+            console.error('Error Details:', errorData.details);
+          }
+          if (errorData.hint) {
+            console.error('Hint:', errorData.hint);
+          }
+        } catch (parseError) {
+          console.error('Failed to parse error response:', parseError);
+          console.error('Response status:', response.status);
+          console.error('Response statusText:', response.statusText);
+        }
         setStatus('error');
         setTimeout(() => setStatus('idle'), 5000);
       }
     } catch (error) {
       console.error('Error submitting form:', error);
+      if (error instanceof Error) {
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+      }
       setStatus('error');
       setTimeout(() => setStatus('idle'), 5000);
     }
@@ -600,9 +703,19 @@ export default function ContactForm() {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                  onBlur={(e) => setTouchedFields(prev => new Set(prev).add(e.target.name))}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 transition-all ${
+                    isFieldInvalid('name', formData.name)
+                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:ring-cyan-500 focus:border-transparent'
+                  }`}
                   placeholder="Your name"
                 />
+                {getFieldError('name', formData.name) && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {getFieldError('name', formData.name)}
+                  </p>
+                )}
               </div>
               <div>
                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
@@ -615,9 +728,19 @@ export default function ContactForm() {
                   required
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                  onBlur={(e) => setTouchedFields(prev => new Set(prev).add(e.target.name))}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 transition-all ${
+                    isFieldInvalid('phone', formData.phone)
+                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:ring-cyan-500 focus:border-transparent'
+                  }`}
                   placeholder="0764447563"
                 />
+                {getFieldError('phone', formData.phone) && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {getFieldError('phone', formData.phone)}
+                  </p>
+                )}
               </div>
             </div>
             <div>
@@ -631,9 +754,19 @@ export default function ContactForm() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                onBlur={(e) => setTouchedFields(prev => new Set(prev).add(e.target.name))}
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 transition-all ${
+                  isFieldInvalid('email', formData.email)
+                    ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                    : 'border-gray-300 focus:ring-cyan-500 focus:border-transparent'
+                }`}
                 placeholder="your@email.com"
               />
+              {getFieldError('email', formData.email) && (
+                <p className="mt-1 text-sm text-red-600">
+                  {getFieldError('email', formData.email)}
+                </p>
+              )}
             </div>
             <div>
               <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
@@ -646,16 +779,17 @@ export default function ContactForm() {
                 required
                 value={formData.address}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all ${
-                  formData.address.trim() !== '' && !hasValidPostalCode(formData.address)
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300'
+                onBlur={(e) => setTouchedFields(prev => new Set(prev).add(e.target.name))}
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 transition-all ${
+                  isFieldInvalid('address', formData.address)
+                    ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                    : 'border-gray-300 focus:ring-cyan-500 focus:border-transparent'
                 }`}
                 placeholder="Street address, City, 12345"
               />
-              {formData.address.trim() !== '' && !hasValidPostalCode(formData.address) && (
+              {getFieldError('address', formData.address) && (
                 <p className="mt-1 text-sm text-red-600">
-                  Please include a 5-digit postal code in your address
+                  {getFieldError('address', formData.address)}
                 </p>
               )}
             </div>
