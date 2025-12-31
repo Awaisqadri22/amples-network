@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-type ServiceType = 'Move-out Cleaning' | 'Home Cleaning' | 'Detail Cleaning' | 'Office Cleaning' | 'Floor Cleaning' | 'Window Cleaning' | 'Staircase Cleaning' | 'Construction Cleaning' | 'Gym Cleaning';
+type ServiceType = 'Move-out Cleaning' | 'Home Cleaning' | 'Detail Cleaning' | 'Office Cleaning' | 'Floor Cleaning' | 'Window Cleaning' | 'Staircase Cleaning' | 'Construction Cleaning';
 
 export default function ContactForm() {
   const router = useRouter();
@@ -663,7 +663,7 @@ export default function ContactForm() {
       {/* Service Selection - Vertical List */}
       {!selectedService ? (
         <div className="space-y-2 mb-6">
-          {(['Move-out Cleaning', 'Home Cleaning', 'Detail Cleaning', 'Office Cleaning', 'Floor Cleaning', 'Window Cleaning', 'Staircase Cleaning', 'Construction Cleaning', 'Gym Cleaning'] as ServiceType[]).map((service) => (
+          {(['Move-out Cleaning', 'Home Cleaning', 'Detail Cleaning', 'Office Cleaning', 'Floor Cleaning', 'Window Cleaning', 'Staircase Cleaning', 'Construction Cleaning'] as ServiceType[]).map((service) => (
             <button
               key={service}
               type="button"
