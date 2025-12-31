@@ -12,7 +12,7 @@ const services = [
   { name: 'Office Cleaning', href: '/office-cleaning', icon: '🏢' },
   { name: 'Deep/Heavy-duty Cleaning', href: '/deep-cleaning', icon: '💪' },
   { name: 'Window Cleaning', href: '/window-cleaning', icon: '🪟' },
-  { name: 'Stairwell Cleaning', href: '/stairwell-cleaning', icon: '🪜', active: true },
+  { name: 'Staircase Cleaning', href: '/stairwell-cleaning', icon: '🪜', active: true },
   { name: 'Construction Cleaning', href: '/construction-cleaning', icon: '🔨' },
   { name: 'Gym Cleaning', href: '/gym-cleaning', icon: '💪' }
 ];
@@ -51,10 +51,10 @@ export default function StairwellCleaning() {
           <div className="text-white">
             <div className="text-sm uppercase tracking-wider text-cyan-200 mb-4">Our Service</div>
             <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
-              Stairwell Cleaning
+              Staircase Cleaning
             </h1>
             <p className="text-xl md:text-2xl text-gray-100 max-w-2xl">
-              Professional stairwell cleaning services to keep your staircases safe, clean, and well-maintained
+              Professional staircase cleaning services to keep your staircases safe, clean, and well-maintained
             </p>
           </div>
         </div>
@@ -67,10 +67,10 @@ export default function StairwellCleaning() {
             {/* Left side - 70% Text Content */}
             <div className="lg:col-span-7">
               <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                Professional Stairwell Cleaning Services
+                Professional Staircase Cleaning Services
               </h2>
               <p className="text-lg text-gray-600 mb-4">
-                At Amples, we understand that stairwells are high-traffic areas that require specialized attention. Our comprehensive stairwell cleaning services are designed to keep your staircases safe, hygienic, and visually appealing.
+                At Amples, we understand that staircases are high-traffic areas that require specialized attention. Our comprehensive staircase cleaning services are designed to keep your staircases safe, hygienic, and visually appealing.
               </p>
               <p className="text-lg text-gray-600 mb-4">
                 Our experienced team uses specialized equipment, eco-friendly cleaning solutions, and proven techniques to ensure every step, railing, and landing is thoroughly cleaned, sanitized, and maintained to the highest standards.
@@ -151,7 +151,7 @@ export default function StairwellCleaning() {
       <section className="py-16 bg-gradient-to-r from-cyan-500 to-emerald-500">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Ready to Clean Your Stairwell?
+            Ready to Clean Your Staircase?
           </h2>
           <p className="text-xl text-white/90 mb-8">
             Contact us today for a free quote and experience the Amples difference

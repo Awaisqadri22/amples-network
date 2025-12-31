@@ -7,7 +7,7 @@ const services = [
   { name: 'Office Cleaning', href: '/office-cleaning' },
   { name: 'Deep/Heavy-duty Cleaning', href: '/deep-cleaning' },
   { name: 'Window Cleaning', href: '/window-cleaning' },
-  { name: 'Stairwell Cleaning', href: '/stairwell-cleaning' },
+  { name: 'Staircase Cleaning', href: '/stairwell-cleaning' },
   { name: 'Construction Cleaning', href: '/construction-cleaning' },
   { name: 'Gym Cleaning', href: '/gym-cleaning' }
 ];

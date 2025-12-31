@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-type ServiceType = 'Move-out Cleaning' | 'Home Cleaning' | 'Detail Cleaning' | 'Office Cleaning' | 'Floor Cleaning' | 'Window Cleaning' | 'Stairwell Cleaning' | 'Construction Cleaning' | 'Gym Cleaning';
+type ServiceType = 'Move-out Cleaning' | 'Home Cleaning' | 'Detail Cleaning' | 'Office Cleaning' | 'Floor Cleaning' | 'Window Cleaning' | 'Staircase Cleaning' | 'Construction Cleaning' | 'Gym Cleaning';
 
 export default function ContactForm() {
   const router = useRouter();
@@ -91,7 +91,16 @@ export default function ContactForm() {
     detailLivingRoom: '0',
     detailOtherRooms: '0',
     detailFloors: '',
-    detailAdditionalCleaning: [] as string[]
+    detailAdditionalCleaning: [] as string[],
+    // Staircase Cleaning fields
+    staircaseFrequency: '',
+    staircasePreferredDay: '',
+    staircasePreferredTime: '',
+    staircaseProperties: '',
+    staircaseStairwells: '',
+    staircaseFloors: '',
+    staircaseAdditionalCleaning: [] as string[],
+    staircaseAdditionalServices: [] as string[]
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -484,6 +493,25 @@ export default function ContactForm() {
       return step1Valid && step2Valid;
     }
     
+    if (selectedService === 'Staircase Cleaning') {
+      // Step 1 validation
+      const step1Valid = 
+        formData.staircaseFrequency !== '' &&
+        formData.staircasePreferredDay !== '' &&
+        formData.staircasePreferredTime !== '';
+      
+      // Step 2 validation
+      const step2Valid = 
+        formData.staircaseProperties !== '' &&
+        formData.staircaseStairwells !== '' &&
+        formData.staircaseFloors !== '';
+      
+      // Step 3 validation - checkboxes are optional
+      const step3Valid = true;
+      
+      return step1Valid && step2Valid && step3Valid;
+    }
+    
     // For other services, return true (they might have different validation)
     return true;
   };
@@ -554,7 +582,10 @@ export default function ContactForm() {
           detailHomeType: '', detailCleanAll: '', detailAreaSize: '',
           detailFrequency: '', detailPreferredDay: '', detailPreferredTime: '',
           detailBedroom: '0', detailKitchen: '0', detailBathroom: '0', detailLivingRoom: '0', detailOtherRooms: '0', detailFloors: '',
-          detailAdditionalCleaning: []
+          detailAdditionalCleaning: [],
+          staircaseFrequency: '', staircasePreferredDay: '', staircasePreferredTime: '',
+          staircaseProperties: '', staircaseStairwells: '', staircaseFloors: '',
+          staircaseAdditionalCleaning: [], staircaseAdditionalServices: []
         });
         setCurrentStep(1);
         setSelectedService(null);
@@ -632,7 +663,7 @@ export default function ContactForm() {
       {/* Service Selection - Vertical List */}
       {!selectedService ? (
         <div className="space-y-2 mb-6">
-          {(['Move-out Cleaning', 'Home Cleaning', 'Detail Cleaning', 'Office Cleaning', 'Floor Cleaning', 'Window Cleaning', 'Stairwell Cleaning', 'Construction Cleaning', 'Gym Cleaning'] as ServiceType[]).map((service) => (
+          {(['Move-out Cleaning', 'Home Cleaning', 'Detail Cleaning', 'Office Cleaning', 'Floor Cleaning', 'Window Cleaning', 'Staircase Cleaning', 'Construction Cleaning', 'Gym Cleaning'] as ServiceType[]).map((service) => (
             <button
               key={service}
               type="button"
@@ -3804,8 +3835,487 @@ export default function ContactForm() {
             </>
           )}
 
-          {/* Submit button for other services (non-Home Cleaning, non-Move-out Cleaning, non-Window Cleaning, non-Construction Cleaning, non-Floor Cleaning, non-Office Cleaning, and non-Detail Cleaning) */}
-          {selectedService && selectedService !== 'Home Cleaning' && selectedService !== 'Move-out Cleaning' && selectedService !== 'Window Cleaning' && selectedService !== 'Construction Cleaning' && selectedService !== 'Floor Cleaning' && selectedService !== 'Office Cleaning' && selectedService !== 'Detail Cleaning' && (
+          {/* Staircase Cleaning Form */}
+          {selectedService === 'Staircase Cleaning' && (
+            <>
+              {/* Step Indicator */}
+              <div className="flex items-center justify-center mb-6">
+                <div className="flex items-center space-x-2">
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 1 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    <span className="text-sm font-semibold">1</span>
+                  </div>
+                  <div className={`w-12 h-1 ${currentStep >= 2 ? 'bg-cyan-500' : 'bg-gray-200'}`}></div>
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 2 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    <span className="text-sm font-semibold">2</span>
+                  </div>
+                  <div className={`w-12 h-1 ${currentStep >= 3 ? 'bg-cyan-500' : 'bg-gray-200'}`}></div>
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 3 ? 'bg-cyan-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    <span className="text-sm font-semibold">3</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 1: Cleaning Schedule */}
+              {currentStep === 1 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Step 1: Cleaning Schedule
+                  </h3>
+
+                  {/* Frequency Dropdown */}
+                  <div className="form-group">
+                    <label htmlFor="staircaseFrequency" className="block text-sm font-medium text-gray-700 mb-1">
+                      How often do you want stairs cleaned? *
+                    </label>
+                    <select
+                      id="staircaseFrequency"
+                      name="staircaseFrequency"
+                      value={formData.staircaseFrequency}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">Select frequency</option>
+                      <option value="an opportunity">an opportunity</option>
+                      <option value="several times a week">several times a week</option>
+                      <option value="weekly">weekly</option>
+                      <option value="every other week">every other week</option>
+                      <option value="every month">every month</option>
+                    </select>
+                  </div>
+
+                  {/* Preferred Day and Time */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Add at least one suitable cleaning day and time *
+                    </label>
+                    <div className="grid grid-cols-2 gap-4">
+                      {/* Day Dropdown */}
+                      <div>
+                        <label htmlFor="staircasePreferredDay" className="block text-xs font-medium text-gray-600 mb-1">
+                          Day
+                        </label>
+                        <select
+                          id="staircasePreferredDay"
+                          name="staircasePreferredDay"
+                          value={formData.staircasePreferredDay}
+                          onChange={handleChange}
+                          required
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                        >
+                          <option value="">Select day</option>
+                          <option value="Monday">Monday</option>
+                          <option value="Tuesday">Tuesday</option>
+                          <option value="Wednesday">Wednesday</option>
+                          <option value="Thursday">Thursday</option>
+                          <option value="Friday">Friday</option>
+                          <option value="Saturday">Saturday</option>
+                          <option value="Sunday">Sunday</option>
+                        </select>
+                      </div>
+
+                      {/* Time Dropdown */}
+                      <div>
+                        <label htmlFor="staircasePreferredTime" className="block text-xs font-medium text-gray-600 mb-1">
+                          Time
+                        </label>
+                        <select
+                          id="staircasePreferredTime"
+                          name="staircasePreferredTime"
+                          value={formData.staircasePreferredTime}
+                          onChange={handleChange}
+                          required
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                        >
+                          <option value="">Select time</option>
+                          <option value="6-9">6-9</option>
+                          <option value="9-12">9-12</option>
+                          <option value="12-15">12-15</option>
+                          <option value="15-18">15-18</option>
+                          <option value="18-21">18-21</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Property and Stairwell Details */}
+              {currentStep === 2 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    Step 2: Property and Stairwell Details
+                  </h3>
+
+                  {/* Properties Dropdown */}
+                  <div className="form-group">
+                    <label htmlFor="staircaseProperties" className="block text-sm font-medium text-gray-700 mb-1">
+                      How many properties need stair cleaning? *
+                    </label>
+                    <select
+                      id="staircaseProperties"
+                      name="staircaseProperties"
+                      value={formData.staircaseProperties}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">Select number of properties</option>
+                      <option value="1 property">1 property</option>
+                      <option value="2 properties">2 properties</option>
+                      <option value="3 or more properties">3 or more properties</option>
+                      <option value="10 or more properties">10 or more properties</option>
+                    </select>
+                  </div>
+
+                  {/* Stairwells Dropdown */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label htmlFor="staircaseStairwells" className="block text-sm font-medium text-gray-700 mb-1">
+                      How many stairwells need cleaning? *
+                    </label>
+                    <select
+                      id="staircaseStairwells"
+                      name="staircaseStairwells"
+                      value={formData.staircaseStairwells}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">Select number of stairwells</option>
+                      <option value="1 stairwell">1 stairwell</option>
+                      <option value="2 stairwells">2 stairwells</option>
+                      <option value="3 or more stairwells">3 or more stairwells</option>
+                      <option value="10 or more stairwells">10 or more stairwells</option>
+                    </select>
+                  </div>
+
+                  {/* Floors Dropdown */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label htmlFor="staircaseFloors" className="block text-sm font-medium text-gray-700 mb-1">
+                      Approximately how many floors does each stairwell have? *
+                    </label>
+                    <select
+                      id="staircaseFloors"
+                      name="staircaseFloors"
+                      value={formData.staircaseFloors}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">Select number of floors</option>
+                      <option value="1 floor">1 floor</option>
+                      <option value="2 floors">2 floors</option>
+                      <option value="3 floors">3 floors</option>
+                      <option value="4 floors">4 floors</option>
+                      <option value="5 or more floors">5 or more floors</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Additional Cleaning Options */}
+              {currentStep === 3 && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100 animate-fade-in">
+                  <h3 className="font-semibold text-gray-900 flex items-center mb-4">
+                    <svg className="w-5 h-5 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Step 3: Additional Cleaning Options
+                  </h3>
+
+                  {/* Additional Cleaning Options */}
+                  <div className="form-group">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      Choose whether you want cleaning of the following:
+                    </label>
+                    <div className="space-y-3">
+                      {/* Operating Spaces */}
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            name="staircaseAdditionalCleaning"
+                            value="operating spaces"
+                            checked={(formData.staircaseAdditionalCleaning as string[]).includes('operating spaces')}
+                            onChange={(e) => handleCheckboxChange('staircaseAdditionalCleaning', 'operating spaces', e.target.checked)}
+                            className="peer h-5 w-5 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                        </div>
+                        <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Operating Spaces</span>
+                      </label>
+
+                      {/* Community Center/Meeting Room */}
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            name="staircaseAdditionalCleaning"
+                            value="community center/meeting room"
+                            checked={(formData.staircaseAdditionalCleaning as string[]).includes('community center/meeting room')}
+                            onChange={(e) => handleCheckboxChange('staircaseAdditionalCleaning', 'community center/meeting room', e.target.checked)}
+                            className="peer h-5 w-5 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                        </div>
+                        <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Community Center/Meeting Room</span>
+                      </label>
+
+                      {/* Storage/Outbuilding */}
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            name="staircaseAdditionalCleaning"
+                            value="storage/outbuilding"
+                            checked={(formData.staircaseAdditionalCleaning as string[]).includes('storage/outbuilding')}
+                            onChange={(e) => handleCheckboxChange('staircaseAdditionalCleaning', 'storage/outbuilding', e.target.checked)}
+                            className="peer h-5 w-5 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                        </div>
+                        <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Storage/Outbuilding</span>
+                      </label>
+
+                      {/* Garage */}
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            name="staircaseAdditionalCleaning"
+                            value="garage"
+                            checked={(formData.staircaseAdditionalCleaning as string[]).includes('garage')}
+                            onChange={(e) => handleCheckboxChange('staircaseAdditionalCleaning', 'garage', e.target.checked)}
+                            className="peer h-5 w-5 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                        </div>
+                        <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Garage</span>
+                      </label>
+
+                      {/* Guest Apartment */}
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            name="staircaseAdditionalCleaning"
+                            value="guest apartment"
+                            checked={(formData.staircaseAdditionalCleaning as string[]).includes('guest apartment')}
+                            onChange={(e) => handleCheckboxChange('staircaseAdditionalCleaning', 'guest apartment', e.target.checked)}
+                            className="peer h-5 w-5 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                        </div>
+                        <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Guest Apartment</span>
+                      </label>
+
+                      {/* Basement Passage */}
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            name="staircaseAdditionalCleaning"
+                            value="basement passage"
+                            checked={(formData.staircaseAdditionalCleaning as string[]).includes('basement passage')}
+                            onChange={(e) => handleCheckboxChange('staircaseAdditionalCleaning', 'basement passage', e.target.checked)}
+                            className="peer h-5 w-5 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                        </div>
+                        <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Basement Passage</span>
+                      </label>
+
+                      {/* Laundry */}
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            name="staircaseAdditionalCleaning"
+                            value="laundry"
+                            checked={(formData.staircaseAdditionalCleaning as string[]).includes('laundry')}
+                            onChange={(e) => handleCheckboxChange('staircaseAdditionalCleaning', 'laundry', e.target.checked)}
+                            className="peer h-5 w-5 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                        </div>
+                        <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Laundry</span>
+                      </label>
+
+                      {/* Terrace */}
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            name="staircaseAdditionalCleaning"
+                            value="terrace"
+                            checked={(formData.staircaseAdditionalCleaning as string[]).includes('terrace')}
+                            onChange={(e) => handleCheckboxChange('staircaseAdditionalCleaning', 'terrace', e.target.checked)}
+                            className="peer h-5 w-5 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                        </div>
+                        <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Terrace</span>
+                      </label>
+
+                      {/* Attic Space */}
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            name="staircaseAdditionalCleaning"
+                            value="attic space"
+                            checked={(formData.staircaseAdditionalCleaning as string[]).includes('attic space')}
+                            onChange={(e) => handleCheckboxChange('staircaseAdditionalCleaning', 'attic space', e.target.checked)}
+                            className="peer h-5 w-5 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                        </div>
+                        <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Attic Space</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Additional Services */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      Additional services
+                    </label>
+                    <div className="space-y-3">
+                      {/* Elevator Cleaning */}
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            name="staircaseAdditionalServices"
+                            value="want elevator cleaning"
+                            checked={(formData.staircaseAdditionalServices as string[]).includes('want elevator cleaning')}
+                            onChange={(e) => handleCheckboxChange('staircaseAdditionalServices', 'want elevator cleaning', e.target.checked)}
+                            className="peer h-5 w-5 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                        </div>
+                        <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Want Elevator Cleaning</span>
+                      </label>
+
+                      {/* Window Cleaning */}
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            name="staircaseAdditionalServices"
+                            value="want window cleaning"
+                            checked={(formData.staircaseAdditionalServices as string[]).includes('want window cleaning')}
+                            onChange={(e) => handleCheckboxChange('staircaseAdditionalServices', 'want window cleaning', e.target.checked)}
+                            className="peer h-5 w-5 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                        </div>
+                        <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Want Window Cleaning</span>
+                      </label>
+
+                      {/* Floor Care */}
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            name="staircaseAdditionalServices"
+                            value="want floor care"
+                            checked={(formData.staircaseAdditionalServices as string[]).includes('want floor care')}
+                            onChange={(e) => handleCheckboxChange('staircaseAdditionalServices', 'want floor care', e.target.checked)}
+                            className="peer h-5 w-5 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                        </div>
+                        <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Want Floor Care</span>
+                      </label>
+
+                      {/* Entrance Mats Cleaned */}
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            name="staircaseAdditionalServices"
+                            value="want entrance mats cleaned"
+                            checked={(formData.staircaseAdditionalServices as string[]).includes('want entrance mats cleaned')}
+                            onChange={(e) => handleCheckboxChange('staircaseAdditionalServices', 'want entrance mats cleaned', e.target.checked)}
+                            className="peer h-5 w-5 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                        </div>
+                        <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Want Entrance Mats Cleaned</span>
+                      </label>
+
+                      {/* Outdoor Sweeping */}
+                      <label className="flex items-center cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            name="staircaseAdditionalServices"
+                            value="want outdoor sweeping"
+                            checked={(formData.staircaseAdditionalServices as string[]).includes('want outdoor sweeping')}
+                            onChange={(e) => handleCheckboxChange('staircaseAdditionalServices', 'want outdoor sweeping', e.target.checked)}
+                            className="peer h-5 w-5 text-cyan-500 focus:ring-cyan-500 border-gray-300 rounded"
+                          />
+                        </div>
+                        <span className="ml-3 text-sm text-gray-700 group-hover:text-cyan-600 transition-colors">Want Outdoor Sweeping</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Navigation Buttons */}
+              <div className="flex gap-3 mt-6">
+                {currentStep > 1 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setCurrentStep(currentStep - 1);
+                    }}
+                    className="flex-1 bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-300 transform hover:scale-[1.02] transition-all duration-300 shadow-md hover:shadow-lg"
+                  >
+                    Previous
+                  </button>
+                )}
+                {currentStep < 3 ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (isCurrentStepValid()) {
+                        setCurrentStep(currentStep + 1);
+                      }
+                    }}
+                    disabled={!isCurrentStepValid()}
+                    className="flex-1 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={status === 'loading' || !isFormValid()}
+                    className="flex-1 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+                  >
+                    {status === 'loading' ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Sending...
+                      </>
+                    ) : status === 'success' ? (
+                      'Request Sent Successfully! ✓'
+                    ) : status === 'error' ? (
+                      'Failed to Send. Try Again ✕'
+                    ) : (
+                      'Get Free Quote'
+                    )}
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Submit button for other services (non-Home Cleaning, non-Move-out Cleaning, non-Window Cleaning, non-Construction Cleaning, non-Floor Cleaning, non-Office Cleaning, non-Detail Cleaning, and non-Staircase Cleaning) */}
+          {selectedService && selectedService !== 'Home Cleaning' && selectedService !== 'Move-out Cleaning' && selectedService !== 'Window Cleaning' && selectedService !== 'Construction Cleaning' && selectedService !== 'Floor Cleaning' && selectedService !== 'Office Cleaning' && selectedService !== 'Detail Cleaning' && selectedService !== 'Staircase Cleaning' && (
           <button
             type="submit"
             disabled={status === 'loading'}

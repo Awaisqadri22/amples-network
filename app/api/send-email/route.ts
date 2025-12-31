@@ -22,7 +22,10 @@ export async function POST(request: Request) {
             officeFloors, officeEntranceFloor, officeHasElevator, officeAdditionalServices,
             detailHomeType, detailCleanAll, detailAreaSize, detailFrequency, detailPreferredDay, detailPreferredTime,
             detailBedroom, detailKitchen, detailBathroom, detailLivingRoom, detailOtherRooms, detailFloors,
-            detailAdditionalCleaning
+            detailAdditionalCleaning,
+            staircaseFrequency, staircasePreferredDay, staircasePreferredTime,
+            staircaseProperties, staircaseStairwells, staircaseFloors,
+            staircaseAdditionalCleaning, staircaseAdditionalServices
         } = requestData;
         
         // Log all received data for debugging
@@ -287,6 +290,49 @@ export async function POST(request: Request) {
                   </div>
                   ` : ''}
                 </div>
+            `;
+        } else if (selectedService === 'Staircase Cleaning') {
+            serviceDetails = `
+                <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                  <h4 style="margin: 0 0 12px 0; color: #06b6d4; font-size: 16px; font-weight: 600; display: flex; align-items: center;">
+                    <span style="display: inline-block; width: 8px; height: 8px; background-color: #06b6d4; border-radius: 50%; margin-right: 8px;"></span>
+                    Cleaning Schedule
+                  </h4>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Frequency:</strong> <span style="color: #475569;">${staircaseFrequency || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Preferred Day:</strong> <span style="color: #475569;">${staircasePreferredDay || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Preferred Time:</strong> <span style="color: #475569;">${staircasePreferredTime || 'Not specified'}</span></p>
+                </div>
+                <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                  <h4 style="margin: 0 0 12px 0; color: #06b6d4; font-size: 16px; font-weight: 600; display: flex; align-items: center;">
+                    <span style="display: inline-block; width: 8px; height: 8px; background-color: #06b6d4; border-radius: 50%; margin-right: 8px;"></span>
+                    Property and Stairwell Details
+                  </h4>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Number of Properties:</strong> <span style="color: #475569;">${staircaseProperties || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Number of Stairwells:</strong> <span style="color: #475569;">${staircaseStairwells || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Floors per Stairwell:</strong> <span style="color: #475569;">${staircaseFloors || 'Not specified'}</span></p>
+                </div>
+                ${Array.isArray(staircaseAdditionalCleaning) && staircaseAdditionalCleaning.length > 0 ? `
+                <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                  <h4 style="margin: 0 0 12px 0; color: #06b6d4; font-size: 16px; font-weight: 600; display: flex; align-items: center;">
+                    <span style="display: inline-block; width: 8px; height: 8px; background-color: #06b6d4; border-radius: 50%; margin-right: 8px;"></span>
+                    Additional Cleaning Options
+                  </h4>
+                  <ul style="list-style: none; padding: 0; margin: 0;">
+                    ${staircaseAdditionalCleaning.map((item: string) => `<li style="margin: 4px 0; color: #475569;">• ${item}</li>`).join('')}
+                  </ul>
+                </div>
+                ` : ''}
+                ${Array.isArray(staircaseAdditionalServices) && staircaseAdditionalServices.length > 0 ? `
+                <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                  <h4 style="margin: 0 0 12px 0; color: #06b6d4; font-size: 16px; font-weight: 600; display: flex; align-items: center;">
+                    <span style="display: inline-block; width: 8px; height: 8px; background-color: #06b6d4; border-radius: 50%; margin-right: 8px;"></span>
+                    Additional Services
+                  </h4>
+                  <ul style="list-style: none; padding: 0; margin: 0;">
+                    ${staircaseAdditionalServices.map((item: string) => `<li style="margin: 4px 0; color: #475569;">• ${item}</li>`).join('')}
+                  </ul>
+                </div>
+                ` : ''}
             `;
         } else if (selectedService) {
             serviceDetails = `<div style="margin-bottom: 20px;"><h3 style="margin: 0; color: #1e293b; font-size: 18px; font-weight: 600;">Service: ${selectedService}</h3></div>`;
