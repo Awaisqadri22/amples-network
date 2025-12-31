@@ -79,15 +79,18 @@ export default function Navbar() {
                   <div className="px-4 py-2 text-sm font-semibold text-gray-500 border-b border-gray-100">
                     Major Cities
                   </div>
-                  {['Stockholm', 'Göteborg', 'Malmö', 'Uppsala', 'Västerås', 'Örebro', 'Linköping', 'Helsingborg', 'Jönköping', 'Norrköping', 'Lund', 'Umeå'].map((city) => (
-                    <a
-                      key={city}
-                      href={city === 'Stockholm' ? '/stockholm' : `#${city.toLowerCase().replace('ö', 'o').replace('å', 'a').replace('ä', 'a')}`}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-cyan-50 hover:text-cyan-600 transition-colors"
-                    >
-                      {city}
-                    </a>
-                  ))}
+                    {['Stockholm', 'Göteborg', 'Malmö', 'Uppsala', 'Västerås', 'Örebro', 'Linköping', 'Helsingborg', 'Jönköping', 'Norrköping', 'Lund', 'Umeå'].map((city) => {
+                      const cityHref = city === 'Stockholm' ? '/stockholm' : city === 'Uppsala' ? '/uppsala' : `#${city.toLowerCase().replace('ö', 'o').replace('å', 'a').replace('ä', 'a')}`;
+                      return (
+                        <a
+                          key={city}
+                          href={cityHref}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-cyan-50 hover:text-cyan-600 transition-colors"
+                        >
+                          {city}
+                        </a>
+                      );
+                    })}
                 </div>
               </div>
             </div>
@@ -184,16 +187,19 @@ export default function Navbar() {
                   Featured Cities
                 </div>
                 <div className="pl-4 space-y-2">
-                  {['Stockholm', 'Göteborg', 'Malmö', 'Uppsala', 'Västerås', 'Örebro', 'Linköping', 'Helsingborg', 'Jönköping', 'Norrköping', 'Lund', 'Umeå'].map((city) => (
-                    <a
-                      key={city}
-                      href={city === 'Stockholm' ? '/stockholm' : `#${city.toLowerCase().replace('ö', 'o').replace('å', 'a').replace('ä', 'a')}`}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block py-2 text-sm text-gray-600 hover:text-cyan-600 hover:pl-2 transition-all"
-                    >
-                      {city}
-                    </a>
-                  ))}
+                  {['Stockholm', 'Göteborg', 'Malmö', 'Uppsala', 'Västerås', 'Örebro', 'Linköping', 'Helsingborg', 'Jönköping', 'Norrköping', 'Lund', 'Umeå'].map((city) => {
+                    const cityHref = city === 'Stockholm' ? '/stockholm' : city === 'Uppsala' ? '/uppsala' : `#${city.toLowerCase().replace('ö', 'o').replace('å', 'a').replace('ä', 'a')}`;
+                    return (
+                      <a
+                        key={city}
+                        href={cityHref}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block py-2 text-sm text-gray-600 hover:text-cyan-600 hover:pl-2 transition-all"
+                      >
+                        {city}
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
 
