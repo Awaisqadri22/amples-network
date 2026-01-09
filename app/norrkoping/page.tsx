@@ -4,26 +4,26 @@ import Navbar from '../components/Navbar';
 import Breadcrumb from '../components/Breadcrumb';
 import Footer from '../components/Footer';
 
-export default function LinkopingPage() {
+export default function NorrkopingPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <Breadcrumb cityName="Linköping" />
+      <Breadcrumb cityName="Norrköping" />
 
       {/* Banner Section */}
       <section className="relative h-[400px] md:h-[500px] overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-emerald-500 to-cyan-600">
-          <div className="absolute inset-0 bg-[url('/linkoping.jpg')] bg-cover bg-center mix-blend-overlay"></div>
+          <div className="absolute inset-0 bg-[url('/norrkoping.jpeg')] bg-cover bg-center mix-blend-overlay"></div>
         </div>
         <div className="absolute inset-0 bg-black/40"></div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
           <div className="text-white">
             <div className="text-sm uppercase tracking-wider text-cyan-200 mb-4">Our Location</div>
             <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
-              Linköping
+              Norrköping
             </h1>
             <p className="text-xl md:text-2xl text-gray-100 max-w-2xl">
-              Professional cleaning services in Linköping
+              Professional cleaning services in Norrköping
             </p>
           </div>
         </div>
@@ -34,15 +34,15 @@ export default function LinkopingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              Moving cleaning in Linköping
+              Moving cleaning in Norrköping
             </h2>
             <div className="space-y-6 text-lg text-gray-700 leading-relaxed">
               <p className="text-justify">
-                Are you looking for moving cleaning in Linköping at a good price?
-                Do you live in or around central Linköping, e.g. in <strong>Solna</strong>, <strong>Nacka</strong>, <strong>Sundbyberg</strong>? Or do you live a bit outside? Like in e.g. <strong>Täby</strong>, <strong>Sollentuna</strong>, <strong>Huddinge</strong> or <strong>Haninge</strong>? No matter where in Linköping you live, as a customer of Qleano you always pay the same fixed price per square meter for moving cleaning.
+                Are you looking for moving cleaning in Norrköping at a good price?
+                Do you live in or around central Norrköping, e.g. in <strong>Solna</strong>, <strong>Nacka</strong>, <strong>Sundbyberg</strong>? Or do you live a bit outside? Like in e.g. <strong>Täby</strong>, <strong>Sollentuna</strong>, <strong>Huddinge</strong> or <strong>Haninge</strong>? No matter where in Norrköping you live, as a customer of Qleano you always pay the same fixed price per square meter for moving cleaning.
               </p>
               <p className="text-justify">
-                Our cleaning companies in Linköping have good reviews from our customers and all our collaborations are continuously evaluated by us based on high-level goals for quality and customer satisfaction.
+                Our cleaning companies in Norrköping have good reviews from our customers and all our collaborations are continuously evaluated by us based on high-level goals for quality and customer satisfaction.
               </p>
             </div>
           </div>
@@ -106,7 +106,7 @@ export default function LinkopingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">
-              What is included in a moving cleaning in Linköping?
+              What is included in a moving cleaning in Norrköping?
             </h2>
 
             {/* Included and Not Included Grid */}
@@ -175,10 +175,10 @@ export default function LinkopingPage() {
             {/* Additional Information */}
             <div className="bg-gray-50 rounded-xl p-6 mb-8 border border-gray-200">
               <p className="text-lg text-gray-700 leading-relaxed text-justify">
-                Any additional spaces and options, as well as whether or not they will affect your final price, you will see in the booking form safely and securely before you book your moving cleaning in Linköping.
+                Any additional spaces and options, as well as whether or not they will affect your final price, you will see in the booking form safely and securely before you book your moving cleaning in Norrköping.
               </p>
               <p className="text-lg text-gray-700 leading-relaxed text-justify mt-4">
-                If you want to know more, we recommend that you read about the <strong>requirements for moving house cleaning</strong>. You can also read our <strong>complete moving house cleaning checklist</strong> and what is included in a moving house cleaning in Linköping.
+                If you want to know more, we recommend that you read about the <strong>requirements for moving house cleaning</strong>. You can also read our <strong>complete moving house cleaning checklist</strong> and what is included in a moving house cleaning in Norrköping.
               </p>
             </div>
 
@@ -188,7 +188,7 @@ export default function LinkopingPage() {
                 <svg className="w-8 h-8 mr-3 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
-                Tips and preparations for your moving cleaning in Linköping:
+                Tips and preparations for your moving cleaning in Norrköping:
               </h3>
               <ul className="space-y-4 text-lg text-gray-700">
                 <li className="flex items-start">
@@ -230,7 +230,7 @@ export default function LinkopingPage() {
                 14 day warranty
               </h3>
               <p className="text-lg text-gray-700 leading-relaxed">
-                We always aim for 100% satisfied customers. That&apos;s why as a customer in Linköping you have a quality guarantee with us for 14 days.
+                We always aim for 100% satisfied customers. That&apos;s why as a customer in Norrköping you have a quality guarantee with us for 14 days.
               </p>
             </div>
 
@@ -264,7 +264,7 @@ export default function LinkopingPage() {
                 Safe cleaning company
               </h3>
               <p className="text-lg text-gray-700 leading-relaxed">
-                We evaluate our collaborations with local cleaning companies in Linköping on an ongoing basis with a focus on quality and customer satisfaction.
+                We evaluate our collaborations with local cleaning companies in Norrköping on an ongoing basis with a focus on quality and customer satisfaction.
               </p>
             </div>
           </div>

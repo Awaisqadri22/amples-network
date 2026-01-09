@@ -80,7 +80,7 @@ export default function Navbar() {
                     Major Cities
                   </div>
                     {['Stockholm', 'Göteborg', 'Malmö', 'Uppsala', 'Västerås', 'Örebro', 'Linköping', 'Helsingborg', 'Jönköping', 'Norrköping', 'Lund', 'Umeå'].map((city) => {
-                      const cityHref = city === 'Stockholm' ? '/stockholm' : city === 'Uppsala' ? '/uppsala' : city === 'Örebro' ? '/orebro' : city === 'Göteborg' ? '/gothenburg' : city === 'Malmö' ? '/malmo' : city === 'Västerås' ? '/vasteras' : city === 'Linköping' ? '/linkoping' : `#${city.toLowerCase().replace('ö', 'o').replace('å', 'a').replace('ä', 'a')}`;
+                      const cityHref = city === 'Stockholm' ? '/stockholm' : city === 'Uppsala' ? '/uppsala' : city === 'Örebro' ? '/orebro' : city === 'Göteborg' ? '/gothenburg' : city === 'Malmö' ? '/malmo' : city === 'Västerås' ? '/vasteras' : city === 'Linköping' ? '/linkoping' : city === 'Helsingborg' ? '/helsingborg' : city === 'Jönköping' ? '/jonkoping' : city === 'Norrköping' ? '/norrkoping' : city === 'Lund' ? '/lund' : city === 'Umeå' ? '/umea' : `#${city.toLowerCase().replace('ö', 'o').replace('å', 'a').replace('ä', 'a')}`;
                       return (
                         <a
                           key={city}
@@ -188,7 +188,7 @@ export default function Navbar() {
                 </div>
                 <div className="pl-4 space-y-2">
                   {['Stockholm', 'Göteborg', 'Malmö', 'Uppsala', 'Västerås', 'Örebro', 'Linköping', 'Helsingborg', 'Jönköping', 'Norrköping', 'Lund', 'Umeå'].map((city) => {
-                    const cityHref = city === 'Stockholm' ? '/stockholm' : city === 'Uppsala' ? '/uppsala' : city === 'Örebro' ? '/orebro' : city === 'Göteborg' ? '/gothenburg' : city === 'Malmö' ? '/malmo' : city === 'Västerås' ? '/vasteras' : city === 'Linköping' ? '/linkoping' : `#${city.toLowerCase().replace('ö', 'o').replace('å', 'a').replace('ä', 'a')}`;
+                    const cityHref = city === 'Stockholm' ? '/stockholm' : city === 'Uppsala' ? '/uppsala' : city === 'Örebro' ? '/orebro' : city === 'Göteborg' ? '/gothenburg' : city === 'Malmö' ? '/malmo' : city === 'Västerås' ? '/vasteras' : city === 'Linköping' ? '/linkoping' : city === 'Helsingborg' ? '/helsingborg' : city === 'Jönköping' ? '/jonkoping' : city === 'Norrköping' ? '/norrkoping' : city === 'Lund' ? '/lund' : city === 'Umeå' ? '/umea' : `#${city.toLowerCase().replace('ö', 'o').replace('å', 'a').replace('ä', 'a')}`;
                     return (
                       <a
                         key={city}
