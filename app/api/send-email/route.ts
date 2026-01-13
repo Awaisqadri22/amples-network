@@ -7,8 +7,8 @@ export async function POST(request: Request) {
         const {
             name, phone, email, address, message,
             formType, company, vatNumber,
-            selectedService, homeType, cleanAll,
-            areaSize, frequency, preferredDateTime,
+            selectedService, serviceType, homeType, cleanAll,
+            areaSize, squareMeter, frequency, preferredDateTime,
             numberOfRooms, bedroom, kitchen, livingRoom,
             floors, hasPets, comments,
             moveOutCleaningDate, isDateFlexible, dateFlexibilityRange,
@@ -74,7 +74,21 @@ export async function POST(request: Request) {
 
         // Construct Email Content
         let serviceDetails = '';
-        if (selectedService === 'Home Cleaning') {
+        const isContactForm = serviceType && squareMeter !== undefined;
+        
+        if (isContactForm) {
+            // Contact Section Form
+            serviceDetails = `
+                <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                  <h4 style="margin: 0 0 12px 0; color: #06b6d4; font-size: 16px; font-weight: 600; display: flex; align-items: center;">
+                    <span style="display: inline-block; width: 8px; height: 8px; background-color: #06b6d4; border-radius: 50%; margin-right: 8px;"></span>
+                    Service Request Details
+                  </h4>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Service Type:</strong> <span style="color: #475569;">${serviceType || 'Not specified'}</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">Square Meter:</strong> <span style="color: #475569;">${squareMeter || 'Not specified'} m²</span></p>
+                </div>
+            `;
+        } else if (selectedService === 'Home Cleaning') {
             serviceDetails = `
                 <div style="margin-bottom: 20px;">
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Home Type:</strong> <span style="color: #475569;">${homeType || 'Not specified'}</span></p>
@@ -341,8 +355,10 @@ export async function POST(request: Request) {
         const mailOptions = {
             from: `"${name}" <${process.env.EMAIL_USER}>`, // Use authenticated email as sender, but display user's name
             replyTo: email, // Set reply-to to user's email so replies go to them
-            to: 'awaisiqbalqadri22@gmail.com', // Send to your email address
-            subject: `New Job from ${name} - ${selectedService || 'General Inquiry'}`,
+            to: 'info@amples.se', // Send to info@amples.se (make sure email forwarding is set up)
+            subject: isContactForm 
+                ? `New Contact Form Submission from ${name} - ${serviceType || 'General Inquiry'}`
+                : `New Job from ${name} - ${selectedService || 'General Inquiry'}`,
             html: `
         <!DOCTYPE html>
         <html lang="en">

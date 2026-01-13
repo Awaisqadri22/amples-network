@@ -74,6 +74,48 @@ Since Gmail no longer supports "Less secure app access", you need to use an App 
 
 3. Use this App Password as your `EMAIL_PASS` in Vercel environment variables
 
+### Using a Custom Domain Email (info@amples.se)
+
+If you want to receive emails at `info@amples.se` instead of a Gmail address, you have two options:
+
+#### Option 1: Email Forwarding (Recommended - Easiest)
+
+1. **Set up email forwarding** in your domain provider:
+   - Log in to your domain registrar (e.g., Namecheap, GoDaddy, etc.)
+   - Navigate to Email Forwarding or Email Management
+   - Create a forward: `info@amples.se` → `your-personal-email@gmail.com`
+   - Save the changes
+
+2. **Update the code** (already done):
+   - The code now sends to `info@amples.se`
+   - Emails will automatically forward to your Gmail
+
+3. **Keep using Gmail for sending**:
+   - Keep `EMAIL_USER` as your Gmail address in Vercel
+   - Keep `EMAIL_PASS` as your Gmail App Password
+   - The emails will be sent FROM your Gmail but TO `info@amples.se`
+
+#### Option 2: Use Google Workspace (Professional Setup)
+
+1. **Set up Google Workspace** for your domain:
+   - Sign up for Google Workspace at [workspace.google.com](https://workspace.google.com)
+   - Verify your domain ownership
+   - Create the email account `info@amples.se`
+
+2. **Generate App Password for info@amples.se**:
+   - Log in to the `info@amples.se` account
+   - **📖 See detailed step-by-step guide:** [APP_PASSWORD_GUIDE.md](./APP_PASSWORD_GUIDE.md)
+   - Follow the same App Password setup steps above
+   - Generate a new App Password
+
+3. **Update Vercel Environment Variables**:
+   - Change `EMAIL_USER` to: `info@amples.se`
+   - Change `EMAIL_PASS` to: (App Password for info@amples.se)
+
+4. **Update the code** (if needed):
+   - The recipient email is already set to `info@amples.se`
+   - You can also change the `from` field if desired
+
 ### Troubleshooting Email Issues
 
 If emails are not being sent in production:

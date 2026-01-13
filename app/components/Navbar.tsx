@@ -94,7 +94,7 @@ export default function Navbar() {
                 </div>
               </div>
             </div>
-            <Link href={isHomePage ? "#contacts" : "/#contacts"} className="text-gray-700 hover:text-cyan-500 transition-colors">Contact</Link>
+            <Link href={isHomePage ? "#contacts" : "/#contacts"} className="text-gray-700 hover:text-cyan-500 transition-colors">Contact US</Link>
             <Link href={isHomePage ? "#book" : "/#book"} className="bg-gradient-to-r from-cyan-500 to-emerald-500 text-white px-4 py-2 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl">Book Now</Link>
           </div>
           {/* Mobile menu button */}
@@ -210,7 +210,7 @@ export default function Navbar() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="block py-3 text-gray-700 hover:text-cyan-600 transition-colors"
                 >
-                  Contact
+                  Contact US
                 </Link>
               </div>
 
