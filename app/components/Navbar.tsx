@@ -8,6 +8,8 @@ import { usePathname } from 'next/navigation';
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
+  const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
+  const [citiesDropdownOpen, setCitiesDropdownOpen] = useState(false);
   const pathname = usePathname();
   const isHomePage = pathname === '/';
 
@@ -28,6 +30,12 @@ export default function Navbar() {
     setTimeout(() => {
       setShowNotification(false);
     }, 3000);
+  };
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+    setServicesDropdownOpen(false);
+    setCitiesDropdownOpen(false);
   };
 
   return (
@@ -155,7 +163,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40" onClick={() => setMobileMenuOpen(false)}>
+        <div className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40" onClick={closeMobileMenu}>
           <div className="bg-white w-80 h-full shadow-2xl overflow-y-auto animate-slide-in-right" onClick={(e) => e.stopPropagation()}>
             <div className="p-6 border-b border-gray-200 flex items-center justify-between">
               <Link 
@@ -177,7 +185,7 @@ export default function Navbar() {
                 />
               </Link>
               <button 
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={closeMobileMenu}
                 className="text-gray-700 hover:text-cyan-500"
               >
                 <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -190,59 +198,85 @@ export default function Navbar() {
             <div className="p-4 space-y-2">
               {/* Services Dropdown */}
               <div className="border-b border-gray-100 pb-4">
-                <div className="flex items-center justify-between py-3 text-gray-700 font-medium">
-                  Services
-                </div>
-                <div className="pl-4 space-y-2">
-                  {[
-                    { name: 'Move-out Cleaning', href: '/move-out-cleaning' },
-                    { name: 'Home Cleaning', href: '/home-cleaning' },
-                    { name: 'Detail Cleaning', href: '/detail-cleaning' },
-                    { name: 'Office Cleaning', href: '/office-cleaning' },
-                    { name: 'Deep/Heavy-duty Cleaning', href: '/deep-cleaning' },
-                    { name: 'Window Cleaning', href: '/window-cleaning' },
-                    { name: 'Staircase Cleaning', href: '/stairwell-cleaning' },
-                    { name: 'Construction Cleaning', href: '/construction-cleaning' }
-                  ].map((service) => (
-                    <a
-                      key={service.name}
-                      href={service.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block py-2 text-sm text-gray-600 hover:text-cyan-600 hover:pl-2 transition-all"
-                    >
-                      {service.name}
-                    </a>
-                  ))}
-                </div>
+                <button
+                  onClick={() => setServicesDropdownOpen(!servicesDropdownOpen)}
+                  className="flex items-center justify-between w-full py-3 text-gray-700 font-medium hover:text-cyan-600 transition-colors"
+                >
+                  <span>Services</span>
+                  <svg
+                    className={`w-5 h-5 transition-transform duration-200 ${servicesDropdownOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {servicesDropdownOpen && (
+                  <div className="pl-4 space-y-2 mt-2">
+                    {[
+                      { name: 'Move-out Cleaning', href: '/move-out-cleaning' },
+                      { name: 'Home Cleaning', href: '/home-cleaning' },
+                      { name: 'Detail Cleaning', href: '/detail-cleaning' },
+                      { name: 'Office Cleaning', href: '/office-cleaning' },
+                      { name: 'Deep/Heavy-duty Cleaning', href: '/deep-cleaning' },
+                      { name: 'Window Cleaning', href: '/window-cleaning' },
+                      { name: 'Staircase Cleaning', href: '/stairwell-cleaning' },
+                      { name: 'Construction Cleaning', href: '/construction-cleaning' }
+                    ].map((service) => (
+                      <a
+                        key={service.name}
+                        href={service.href}
+                        onClick={closeMobileMenu}
+                        className="block py-2 text-sm text-gray-600 hover:text-cyan-600 hover:pl-2 transition-all"
+                      >
+                        {service.name}
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Featured Cities Dropdown */}
               <div className="border-b border-gray-100 pb-4">
-                <div className="flex items-center justify-between py-3 text-gray-700 font-medium">
-                  Featured Cities
-                </div>
-                <div className="pl-4 space-y-2">
-                  {['Stockholm', 'Göteborg', 'Malmö', 'Uppsala', 'Västerås', 'Örebro', 'Linköping', 'Helsingborg', 'Jönköping', 'Norrköping', 'Lund', 'Umeå'].map((city) => {
-                    const cityHref = city === 'Stockholm' ? '/stockholm' : city === 'Uppsala' ? '/uppsala' : city === 'Örebro' ? '/orebro' : city === 'Göteborg' ? '/gothenburg' : city === 'Malmö' ? '/malmo' : city === 'Västerås' ? '/vasteras' : city === 'Linköping' ? '/linkoping' : city === 'Helsingborg' ? '/helsingborg' : city === 'Jönköping' ? '/jonkoping' : city === 'Norrköping' ? '/norrkoping' : city === 'Lund' ? '/lund' : city === 'Umeå' ? '/umea' : `#${city.toLowerCase().replace('ö', 'o').replace('å', 'a').replace('ä', 'a')}`;
-                    return (
-                      <a
-                        key={city}
-                        href={cityHref}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="block py-2 text-sm text-gray-600 hover:text-cyan-600 hover:pl-2 transition-all"
-                      >
-                        {city}
-                      </a>
-                    );
-                  })}
-                </div>
+                <button
+                  onClick={() => setCitiesDropdownOpen(!citiesDropdownOpen)}
+                  className="flex items-center justify-between w-full py-3 text-gray-700 font-medium hover:text-cyan-600 transition-colors"
+                >
+                  <span>Featured Cities</span>
+                  <svg
+                    className={`w-5 h-5 transition-transform duration-200 ${citiesDropdownOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {citiesDropdownOpen && (
+                  <div className="pl-4 space-y-2 mt-2">
+                    {['Stockholm', 'Göteborg', 'Malmö', 'Uppsala', 'Västerås', 'Örebro', 'Linköping', 'Helsingborg', 'Jönköping', 'Norrköping', 'Lund', 'Umeå'].map((city) => {
+                      const cityHref = city === 'Stockholm' ? '/stockholm' : city === 'Uppsala' ? '/uppsala' : city === 'Örebro' ? '/orebro' : city === 'Göteborg' ? '/gothenburg' : city === 'Malmö' ? '/malmo' : city === 'Västerås' ? '/vasteras' : city === 'Linköping' ? '/linkoping' : city === 'Helsingborg' ? '/helsingborg' : city === 'Jönköping' ? '/jonkoping' : city === 'Norrköping' ? '/norrkoping' : city === 'Lund' ? '/lund' : city === 'Umeå' ? '/umea' : `#${city.toLowerCase().replace('ö', 'o').replace('å', 'a').replace('ä', 'a')}`;
+                      return (
+                        <a
+                          key={city}
+                          href={cityHref}
+                          onClick={closeMobileMenu}
+                          className="block py-2 text-sm text-gray-600 hover:text-cyan-600 hover:pl-2 transition-all"
+                        >
+                          {city}
+                        </a>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Moving Cleaning Checklist */}
               <div className="border-b border-gray-100 pb-4 space-y-2">
                 <Link 
                   href="/move-out-cleaning/checklist" 
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={closeMobileMenu}
                   className="block py-3 text-gray-700 hover:text-cyan-600 transition-colors"
                 >
                   Moving Cleaning Checklist
@@ -253,7 +287,7 @@ export default function Navbar() {
               <div className="border-b border-gray-100 pb-4 space-y-2">
                 <button 
                   onClick={(e) => {
-                    setMobileMenuOpen(false);
+                    closeMobileMenu();
                     handleTermsDownload(e);
                   }}
                   className="block w-full text-left py-3 text-gray-700 hover:text-cyan-600 transition-colors"
@@ -266,7 +300,7 @@ export default function Navbar() {
               <div className="border-b border-gray-100 pb-4 space-y-2">
                 <Link 
                   href={isHomePage ? "#contacts" : "/#contacts"} 
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={closeMobileMenu}
                   className="block py-3 text-gray-700 hover:text-cyan-600 transition-colors"
                 >
                   Contact US
@@ -277,7 +311,7 @@ export default function Navbar() {
               <div className="pt-4 border-t border-gray-100">
                 <Link 
                   href={isHomePage ? "#book" : "/#book"} 
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={closeMobileMenu}
                   className="block w-full bg-gradient-to-r from-cyan-500 to-emerald-500 text-white text-center py-3 px-6 rounded-lg font-semibold hover:from-cyan-600 hover:to-emerald-600 transition-all shadow-lg"
                 >
                   Book Now
