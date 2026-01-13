@@ -94,6 +94,7 @@ export default function Navbar() {
                 </div>
               </div>
             </div>
+            <Link href="/move-out-cleaning/checklist" className="text-gray-700 hover:text-cyan-500 transition-colors">Moving Cleaning Checklist</Link>
             <Link href={isHomePage ? "#contacts" : "/#contacts"} className="text-gray-700 hover:text-cyan-500 transition-colors">Contact US</Link>
             <Link href={isHomePage ? "#book" : "/#book"} className="bg-gradient-to-r from-cyan-500 to-emerald-500 text-white px-4 py-2 rounded-lg hover:from-cyan-600 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl">Book Now</Link>
           </div>
@@ -201,6 +202,17 @@ export default function Navbar() {
                     );
                   })}
                 </div>
+              </div>
+
+              {/* Moving Cleaning Checklist */}
+              <div className="border-b border-gray-100 pb-4 space-y-2">
+                <Link 
+                  href="/move-out-cleaning/checklist" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block py-3 text-gray-700 hover:text-cyan-600 transition-colors"
+                >
+                  Moving Cleaning Checklist
+                </Link>
               </div>
 
               {/* Contact & Book Now */}
