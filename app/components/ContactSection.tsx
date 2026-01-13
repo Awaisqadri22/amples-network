@@ -366,7 +366,7 @@ export default function ContactSection() {
                       : 'hover:from-cyan-600 hover:to-emerald-600'
                   }`}
                 >
-                  {isSubmitting ? 'Sending...' : 'send email'}
+                  {isSubmitting ? 'Sending...' : 'Send email'}
                 </button>
               </div>
             </form>
