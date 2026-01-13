@@ -38,7 +38,7 @@ export default function LinkopingPage() {
             </h2>
             <div className="space-y-6 text-lg text-gray-700 leading-relaxed">
               <p className="text-justify">
-                Are you looking for moving cleaning in Linköping at a good price? No matter where in Linköping you live, as a customer of Qleano you always pay the same fixed price per square meter for moving cleaning.
+                Are you looking for moving cleaning in Linköping at a good price? No matter where in Linköping you live, as a customer of Amples you always pay the same fixed price per square meter for moving cleaning.
               </p>
               <p className="text-justify">
                 Our cleaning companies in Linköping have good reviews from our customers and all our collaborations are continuously evaluated by us based on high-level goals for quality and customer satisfaction.

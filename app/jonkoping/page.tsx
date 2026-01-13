@@ -39,7 +39,7 @@ export default function JonkopingPage() {
             <div className="space-y-6 text-lg text-gray-700 leading-relaxed">
               <p className="text-justify">
                 Are you looking for moving cleaning in Jönköping at a good price?
-                Do you live in or around central Jönköping, Or do you live a bit outside? No matter where in Jönköping you live, as a customer of Qleano you always pay the same fixed price per square meter for moving cleaning.
+                Do you live in or around central Jönköping, Or do you live a bit outside? No matter where in Jönköping you live, as a customer of Amples you always pay the same fixed price per square meter for moving cleaning.
               </p>
               <p className="text-justify">
                 Our cleaning companies in Jönköping have good reviews from our customers and all our collaborations are continuously evaluated by us based on high-level goals for quality and customer satisfaction.

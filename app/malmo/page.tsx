@@ -39,7 +39,7 @@ export default function MalmoPage() {
             <div className="space-y-6 text-lg text-gray-700 leading-relaxed">
               <p className="text-justify">
                 Are you looking for moving cleaning in Malmö at a good price?
-                Do you live in or around central Malmö, e.g. in <strong>Solna</strong>, <strong>Nacka</strong>, <strong>Sundbyberg</strong>? Or do you live a bit outside? Like in e.g. <strong>Täby</strong>, <strong>Sollentuna</strong>, <strong>Huddinge</strong> or <strong>Haninge</strong>? No matter where in Malmö you live, as a customer of Qleano you always pay the same fixed price per square meter for moving cleaning.
+                Do you live in or around central Malmö, Or do you live a bit outside?  No matter where in Malmö you live, as a customer of Amples you always pay the same fixed price per square meter for moving cleaning.
               </p>
               <p className="text-justify">
                 Our cleaning companies in Malmö have good reviews from our customers and all our collaborations are continuously evaluated by us based on high-level goals for quality and customer satisfaction.
