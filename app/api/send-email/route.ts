@@ -355,7 +355,8 @@ export async function POST(request: Request) {
         const mailOptions = {
             from: `"${name}" <${process.env.EMAIL_USER}>`, // Use authenticated email as sender, but display user's name
             replyTo: email, // Set reply-to to user's email so replies go to them
-            to: 'info@amples.se', // Send to info@amples.se (make sure email forwarding is set up)
+            to: 'awaisiqbalqadri22@gmail.com', // Send to admin email
+            cc: email && email.trim() ? email : undefined, // Send copy to user's email
             subject: isContactForm 
                 ? `New Contact Form Submission from ${name} - ${serviceType || 'General Inquiry'}`
                 : `New Job from ${name} - ${selectedService || 'General Inquiry'}`,
