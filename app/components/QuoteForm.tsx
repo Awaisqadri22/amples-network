@@ -74,7 +74,7 @@ export default function QuoteForm({ idPrefix = 'form', sticky = true }: QuoteFor
             required
             value={formData.name}
             onChange={handleChange}
-            className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+            className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder:text-gray-500"
             placeholder="Your name"
           />
         </div>
@@ -89,7 +89,7 @@ export default function QuoteForm({ idPrefix = 'form', sticky = true }: QuoteFor
             required
             value={formData.phone}
             onChange={handleChange}
-            className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+            className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder:text-gray-500"
             placeholder="0764447563"
           />
         </div>
@@ -104,7 +104,7 @@ export default function QuoteForm({ idPrefix = 'form', sticky = true }: QuoteFor
             required
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+            className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder:text-gray-500"
             placeholder="your@email.com"
           />
         </div>
