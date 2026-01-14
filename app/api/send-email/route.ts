@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import connectMongo from '@/lib/mongodb';
+import User from '@/models/User';
+import Quote from '@/models/Quote';
+import Booking from '@/models/Booking';
 
 export async function POST(request: Request) {
     try {
@@ -8,7 +12,7 @@ export async function POST(request: Request) {
             name, phone, email, address, message,
             formType, company, vatNumber,
             selectedService, serviceType, homeType, cleanAll,
-            areaSize, squareMeter, frequency, preferredDateTime,
+            areaSize, squareMeter, city, frequency, preferredDateTime,
             numberOfRooms, bedroom, kitchen, livingRoom,
             floors, hasPets, comments,
             moveOutCleaningDate, isDateFlexible, dateFlexibilityRange,
@@ -72,6 +76,48 @@ export async function POST(request: Request) {
             }, { status: 500 });
         }
 
+        // Save request in MongoDB
+        await connectMongo();
+        const rawEmail = typeof email === 'string' ? email.trim() : '';
+        const normalizedEmail = rawEmail ? rawEmail.toLowerCase() : '';
+        let userDoc = null;
+
+        if (normalizedEmail) {
+            const userUpdate: Record<string, string> = {};
+            if (name) userUpdate.name = name;
+            if (phone) userUpdate.phone = phone;
+
+            userDoc = await User.findOneAndUpdate(
+                { email: normalizedEmail },
+                {
+                    $set: userUpdate,
+                    $setOnInsert: { email: normalizedEmail }
+                },
+                { new: true, upsert: true }
+            );
+        }
+
+        const submissionKind = requestData.submissionKind === 'booking' ? 'booking' : 'quote';
+        const submissionPayload = {
+            user: userDoc?._id,
+            userEmail: rawEmail || undefined,
+            name,
+            phone,
+            serviceType,
+            selectedService,
+            squareMeter,
+            city,
+            formType,
+            source: 'website',
+            details: requestData
+        };
+
+        if (submissionKind === 'booking') {
+            await Booking.create(submissionPayload);
+        } else {
+            await Quote.create(submissionPayload);
+        }
+
         // Construct Email Content
         let serviceDetails = '';
         const isContactForm = serviceType && squareMeter !== undefined;
@@ -86,6 +132,7 @@ export async function POST(request: Request) {
                   </h4>
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Service Type:</strong> <span style="color: #475569;">${serviceType || 'Not specified'}</span></p>
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Square Meter:</strong> <span style="color: #475569;">${squareMeter || 'Not specified'} m²</span></p>
+                  <p style="margin: 8px 0;"><strong style="color: #1e293b;">City:</strong> <span style="color: #475569;">${city || 'Not specified'}</span></p>
                 </div>
             `;
         } else if (selectedService === 'Home Cleaning') {
@@ -352,11 +399,17 @@ export async function POST(request: Request) {
             serviceDetails = `<div style="margin-bottom: 20px;"><h3 style="margin: 0; color: #1e293b; font-size: 18px; font-weight: 600;">Service: ${selectedService}</h3></div>`;
         }
 
-        const mailOptions = {
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || 'https://amples.se';
+        const contactSectionUrl = `${siteUrl}/#contacts`;
+        const logoUrl = `${siteUrl}/amples%20logo.png`;
+        const displayService = serviceType || selectedService || 'Cleaning Service';
+        const displaySquareMeter = squareMeter || areaSize || 'Not specified';
+        const displayCity = city || 'Not specified';
+
+        const adminMailOptions = {
             from: `"${name}" <${process.env.EMAIL_USER}>`, // Use authenticated email as sender, but display user's name
             replyTo: email, // Set reply-to to user's email so replies go to them
             to: 'awaisiqbalqadri22@gmail.com', // Send to admin email
-            cc: email && email.trim() ? email : undefined, // Send copy to user's email
             subject: isContactForm 
                 ? `New Contact Form Submission from ${name} - ${serviceType || 'General Inquiry'}`
                 : `New Job from ${name} - ${selectedService || 'General Inquiry'}`,
@@ -481,10 +534,123 @@ export async function POST(request: Request) {
       `,
         };
 
+        const userMailOptions = email && email.trim() ? {
+            from: `"Amples" <${process.env.EMAIL_USER}>`,
+            replyTo: 'info@amples.com',
+            to: email,
+            subject: `We received your ${displayService} request`,
+            html: `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>We Received Your Request</title>
+        </head>
+        <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6; line-height: 1.6;">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f3f4f6; padding: 40px 20px;">
+            <tr>
+              <td align="center">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="640" style="max-width: 640px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);">
+                  <tr>
+                    <td style="background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); padding: 32px 28px;">
+                      <p style="margin: 0; color: #e0f2fe; font-size: 14px; letter-spacing: 1px; text-transform: uppercase;">Hello dear customer</p>
+                      <h1 style="margin: 8px 0 0 0; color: #ffffff; font-size: 26px; font-weight: 700;">Your request has been received</h1>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="padding: 28px;">
+                      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+                        <p style="margin: 0 0 12px 0; color: #0f172a; font-size: 16px; font-weight: 600;">Request Summary</p>
+                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="color: #475569; font-size: 15px;">
+                          <tr>
+                            <td style="padding: 6px 0; width: 35%;"><strong style="color: #1e293b;">Service</strong></td>
+                            <td style="padding: 6px 0;">${displayService}</td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 6px 0;"><strong style="color: #1e293b;">Square Meter</strong></td>
+                            <td style="padding: 6px 0;">${displaySquareMeter} ${displaySquareMeter === 'Not specified' ? '' : 'm²'}</td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 6px 0;"><strong style="color: #1e293b;">City</strong></td>
+                            <td style="padding: 6px 0;">${displayCity}</td>
+                          </tr>
+                        </table>
+                      </div>
+
+                      <h2 style="margin: 0 0 16px 0; color: #0f172a; font-size: 20px; font-weight: 700;">At Amples, the following is always included</h2>
+                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom: 24px;">
+                        <tr>
+                          <td style="padding: 8px 0; color: #475569; font-size: 15px;">
+                            <span style="display: inline-block; width: 28px; height: 28px; border-radius: 50%; background-color: #e0f2fe; color: #0284c7; text-align: center; line-height: 28px; margin-right: 10px;">🪟</span>
+                            Window cleaning
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 8px 0; color: #475569; font-size: 15px;">
+                            <span style="display: inline-block; width: 28px; height: 28px; border-radius: 50%; background-color: #ecfeff; color: #0ea5e9; text-align: center; line-height: 28px; margin-right: 10px;">🧴</span>
+                            Cleaning supplies
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 8px 0; color: #475569; font-size: 15px;">
+                            <span style="display: inline-block; width: 28px; height: 28px; border-radius: 50%; background-color: #dcfce7; color: #16a34a; text-align: center; line-height: 28px; margin-right: 10px;">✅</span>
+                            14 day warranty
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 8px 0; color: #475569; font-size: 15px;">
+                            <span style="display: inline-block; width: 28px; height: 28px; border-radius: 50%; background-color: #f0f9ff; color: #0284c7; text-align: center; line-height: 28px; margin-right: 10px;">🔁</span>
+                            Free rebooking
+                          </td>
+                        </tr>
+                      </table>
+
+                      <div style="background: #f8fafc; border-left: 4px solid #10b981; padding: 16px 18px; border-radius: 10px; color: #334155; font-size: 15px; margin-bottom: 24px;">
+                        <p style="margin: 0;">Your moving experience is our focus!</p>
+                        <p style="margin: 10px 0 0 0;">We will guide you through the move and are here to make sure you are 100% satisfied! We are available 8-16 every weekday at <strong>0764447563</strong>. Feel free to contact us!</p>
+                      </div>
+
+                      <div style="text-align: center; margin-bottom: 24px;">
+                        <img src="${logoUrl}" alt="Amples" style="width: 140px; height: 140px; object-fit: contain; border-radius: 20px; border: 1px solid #e2e8f0; padding: 12px; background-color: #ffffff;" />
+                      </div>
+
+                      <div style="background: #0f172a; border-radius: 14px; padding: 22px; color: #e2e8f0; text-align: center;">
+                        <div style="font-size: 28px; margin-bottom: 6px;">☎️</div>
+                        <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #ffffff;">Contact us</h3>
+                        <p style="margin: 0 0 16px 0; font-size: 14px; color: #cbd5f5;">Haven't found what you're looking for above?</p>
+                        <a href="${contactSectionUrl}" style="display: inline-block; background: #06b6d4; color: #ffffff; text-decoration: none; padding: 12px 22px; border-radius: 999px; font-weight: 600; font-size: 14px;">Contact Amples</a>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="background-color: #f8fafc; padding: 18px; text-align: center; border-top: 1px solid #e2e8f0;">
+                      <p style="margin: 0; color: #94a3b8; font-size: 12px;">
+                        © ${new Date().getFullYear()} Amples. All rights reserved.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
+            `,
+        } : null;
+
         console.log('Attempting to send email...');
-        const result = await transporter.sendMail(mailOptions);
-        console.log('Email sent successfully. Message ID:', result.messageId);
-        console.log('Response:', result.response);
+        const result = await transporter.sendMail(adminMailOptions);
+        console.log('Admin email sent successfully. Message ID:', result.messageId);
+        console.log('Admin response:', result.response);
+
+        if (userMailOptions) {
+            const userResult = await transporter.sendMail(userMailOptions);
+            console.log('User email sent successfully. Message ID:', userResult.messageId);
+            console.log('User response:', userResult.response);
+        }
 
         return NextResponse.json({ message: 'Email sent successfully' }, { status: 200 });
     } catch (error) {
