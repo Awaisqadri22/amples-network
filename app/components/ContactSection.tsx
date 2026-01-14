@@ -182,7 +182,9 @@ export default function ContactSection() {
   return (
     <section id="contacts" className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-2 gap-12">
+        <div className="relative rounded-2xl p-[3px] bg-gradient-to-r from-cyan-500 via-emerald-500 to-cyan-500 shadow-2xl">
+          <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-8 md:p-12">
+            <div className="grid md:grid-cols-2 gap-12">
           {/* Left Side - Existing Content */}
           <div>
             <h2 className="text-3xl font-bold mb-4 text-gray-900">Get In Touch</h2>
@@ -370,6 +372,8 @@ export default function ContactSection() {
                 </button>
               </div>
             </form>
+          </div>
+            </div>
           </div>
         </div>
       </div>
