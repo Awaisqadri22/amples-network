@@ -1,14 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 type ServiceType = 'Move-out Cleaning' | 'Home Cleaning' | 'Detail Cleaning' | 'Office Cleaning' | 'Floor Cleaning' | 'Window Cleaning' | 'Staircase Cleaning' | 'Construction Cleaning';
 
-export default function ContactForm() {
+interface ContactFormProps {
+  defaultService?: ServiceType | null;
+}
+
+export default function ContactForm({ defaultService = null }: ContactFormProps = {}) {
   const router = useRouter();
   const [formType, setFormType] = useState<'private' | 'company'>('private');
-  const [selectedService, setSelectedService] = useState<ServiceType | null>(null);
+  const [selectedService, setSelectedService] = useState<ServiceType | null>(defaultService);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [currentStep, setCurrentStep] = useState(1);
   const [showSuccessModal, setShowSuccessModal] = useState(false);

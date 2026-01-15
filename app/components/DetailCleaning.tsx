@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import QuoteForm from './QuoteForm';
+import ContactForm from './ContactForm';
 import Footer from './Footer';
 
 const services = [
@@ -98,7 +98,7 @@ export default function DetailCleaning() {
 
             {/* Right side - 30% Form */}
             <div className="lg:col-span-3">
-              <QuoteForm idPrefix="detail-cleaning" />
+              <ContactForm defaultService="Detail Cleaning" />
             </div>
           </div>
         </div>

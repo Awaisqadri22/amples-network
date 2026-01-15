@@ -17,7 +17,7 @@ export async function POST(request: Request) {
             floors, hasPets, comments,
             moveOutCleaningDate, isDateFlexible, dateFlexibilityRange,
             windowCleaningDate, windowsWithBars, windowsWithoutBars, topHungWindows,
-            windowType, hasGlazedBalcony, windowHomeType, windowFloors, needsLadder,
+            windowType, hasGlazedBalcony, windowFloors, needsLadder,
             constructionWorkType, constructionCleaningIncludes, constructionCleaningDate,
             constructionHomeType, constructionAreaSize, constructionFloors,
             floorCleaningDate, floorCleaningIsDateFlexible, floorCleaningServices, floorCleaningTypes,
@@ -76,46 +76,64 @@ export async function POST(request: Request) {
             }, { status: 500 });
         }
 
-        // Save request in MongoDB
-        await connectMongo();
-        const rawEmail = typeof email === 'string' ? email.trim() : '';
-        const normalizedEmail = rawEmail ? rawEmail.toLowerCase() : '';
+        // Save request in MongoDB (optional - don't block email if DB fails)
         let userDoc = null;
+        try {
+            console.log('🔄 Starting MongoDB save process...');
+            await connectMongo();
+            const rawEmail = typeof email === 'string' ? email.trim() : '';
+            const normalizedEmail = rawEmail ? rawEmail.toLowerCase() : '';
 
-        if (normalizedEmail) {
-            const userUpdate: Record<string, string> = {};
-            if (name) userUpdate.name = name;
-            if (phone) userUpdate.phone = phone;
+            if (normalizedEmail) {
+                console.log('📧 Processing user with email:', normalizedEmail);
+                const userUpdate: Record<string, string> = {};
+                if (name) userUpdate.name = name;
+                if (phone) userUpdate.phone = phone;
 
-            userDoc = await User.findOneAndUpdate(
-                { email: normalizedEmail },
-                {
-                    $set: userUpdate,
-                    $setOnInsert: { email: normalizedEmail }
-                },
-                { new: true, upsert: true }
-            );
-        }
+                userDoc = await User.findOneAndUpdate(
+                    { email: normalizedEmail },
+                    {
+                        $set: userUpdate,
+                        $setOnInsert: { email: normalizedEmail }
+                    },
+                    { new: true, upsert: true }
+                );
+                console.log('✅ User saved/updated:', userDoc?._id);
+            } else {
+                console.log('⚠️ No email provided, skipping user creation');
+            }
 
-        const submissionKind = requestData.submissionKind === 'booking' ? 'booking' : 'quote';
-        const submissionPayload = {
-            user: userDoc?._id,
-            userEmail: rawEmail || undefined,
-            name,
-            phone,
-            serviceType,
-            selectedService,
-            squareMeter,
-            city,
-            formType,
-            source: 'website',
-            details: requestData
-        };
+            const submissionKind = requestData.submissionKind === 'booking' ? 'booking' : 'quote';
+            const submissionPayload = {
+                user: userDoc?._id,
+                userEmail: rawEmail || undefined,
+                name,
+                phone,
+                serviceType,
+                selectedService,
+                squareMeter,
+                city,
+                formType,
+                source: 'website',
+                details: requestData
+            };
 
-        if (submissionKind === 'booking') {
-            await Booking.create(submissionPayload);
-        } else {
-            await Quote.create(submissionPayload);
+            console.log('💾 Saving submission as:', submissionKind);
+            if (submissionKind === 'booking') {
+                const booking = await Booking.create(submissionPayload);
+                console.log('✅ Booking saved with ID:', booking._id);
+            } else {
+                const quote = await Quote.create(submissionPayload);
+                console.log('✅ Quote saved with ID:', quote._id);
+            }
+            console.log('✅ Successfully saved to MongoDB');
+        } catch (dbError) {
+            const errorDetails = dbError as Error;
+            console.error('❌ MongoDB save failed (continuing with email):');
+            console.error('Error name:', errorDetails.name);
+            console.error('Error message:', errorDetails.message);
+            console.error('Full error:', errorDetails);
+            // Continue with email sending even if DB save fails
         }
 
         // Construct Email Content

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import QuoteForm from './QuoteForm';
+import ContactForm from './ContactForm';
 import Footer from './Footer';
 
 const services = [
@@ -121,7 +121,7 @@ export default function MoveOutCleaning() {
 
             {/* Right side - 30% Form */}
             <div className="lg:col-span-3">
-              <QuoteForm idPrefix="move-out" />
+              <ContactForm defaultService="Move-out Cleaning" />
             </div>
           </div>
         </div>
