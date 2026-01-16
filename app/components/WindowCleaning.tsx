@@ -151,24 +151,24 @@ export default function WindowCleaning() {
       <section className="py-16 bg-gradient-to-r from-cyan-500 to-emerald-500">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Ready for Crystal-Clear Windows?
+            Ready to Grow Your Business?
           </h2>
           <p className="text-xl text-white/90 mb-8">
-            Contact us today for a free quote and experience the Amples difference
+            Join the Amples network today and start connecting with customers across Sweden
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="tel:+46123456789"
+              href="tel:0764447563"
               className="bg-white text-cyan-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
             >
               📞 Call Us Now
             </a>
-            <a
-              href="#contact-form"
+            <Link
+              href="/"
               className="bg-emerald-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-emerald-700 transition-colors"
             >
-              Get Free Quote
-            </a>
+              Get Started
+            </Link>
           </div>
         </div>
       </section>

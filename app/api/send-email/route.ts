@@ -17,7 +17,7 @@ export async function POST(request: Request) {
             floors, hasPets, comments,
             moveOutCleaningDate, isDateFlexible, dateFlexibilityRange,
             windowCleaningDate, windowsWithBars, windowsWithoutBars, topHungWindows,
-            windowType, hasGlazedBalcony, windowFloors, needsLadder,
+            windowType, hasGlazedBalcony, windowHomeType, windowFloors, needsLadder,
             constructionWorkType, constructionCleaningIncludes, constructionCleaningDate,
             constructionHomeType, constructionAreaSize, constructionFloors,
             floorCleaningDate, floorCleaningIsDateFlexible, floorCleaningServices, floorCleaningTypes,
@@ -79,13 +79,11 @@ export async function POST(request: Request) {
         // Save request in MongoDB (optional - don't block email if DB fails)
         let userDoc = null;
         try {
-            console.log('🔄 Starting MongoDB save process...');
             await connectMongo();
             const rawEmail = typeof email === 'string' ? email.trim() : '';
             const normalizedEmail = rawEmail ? rawEmail.toLowerCase() : '';
 
             if (normalizedEmail) {
-                console.log('📧 Processing user with email:', normalizedEmail);
                 const userUpdate: Record<string, string> = {};
                 if (name) userUpdate.name = name;
                 if (phone) userUpdate.phone = phone;
@@ -98,41 +96,127 @@ export async function POST(request: Request) {
                     },
                     { new: true, upsert: true }
                 );
-                console.log('✅ User saved/updated:', userDoc?._id);
-            } else {
-                console.log('⚠️ No email provided, skipping user creation');
             }
 
             const submissionKind = requestData.submissionKind === 'booking' ? 'booking' : 'quote';
             const submissionPayload = {
+                // User reference and basic contact info
                 user: userDoc?._id,
                 userEmail: rawEmail || undefined,
                 name,
                 phone,
+                email: rawEmail || undefined,
+                address,
+                
+                // Service information
                 serviceType,
                 selectedService,
                 squareMeter,
                 city,
                 formType,
+                company,
+                vatNumber,
+                message,
+                
+                // Common fields for all services
+                homeType,
+                cleanAll,
+                areaSize,
+                frequency,
+                preferredDateTime: preferredDateTime ? new Date(preferredDateTime) : undefined,
+                numberOfRooms,
+                bedroom,
+                kitchen,
+                livingRoom,
+                floors,
+                hasPets,
+                comments,
+                
+                // Move-out Cleaning specific fields
+                moveOutCleaningDate: moveOutCleaningDate ? new Date(moveOutCleaningDate) : undefined,
+                isDateFlexible,
+                dateFlexibilityRange,
+                
+                // Window Cleaning specific fields
+                windowCleaningDate: windowCleaningDate ? new Date(windowCleaningDate) : undefined,
+                windowsWithBars,
+                windowsWithoutBars,
+                topHungWindows,
+                windowType: Array.isArray(windowType) ? windowType : [],
+                hasGlazedBalcony,
+                windowFloors,
+                needsLadder,
+                
+                // Construction Cleaning specific fields
+                constructionWorkType: Array.isArray(constructionWorkType) ? constructionWorkType : [],
+                constructionCleaningIncludes: Array.isArray(constructionCleaningIncludes) ? constructionCleaningIncludes : [],
+                constructionCleaningDate: constructionCleaningDate ? new Date(constructionCleaningDate) : undefined,
+                constructionHomeType,
+                constructionAreaSize,
+                constructionFloors,
+                
+                // Floor Cleaning specific fields
+                floorCleaningDate: floorCleaningDate ? new Date(floorCleaningDate) : undefined,
+                floorCleaningIsDateFlexible,
+                floorCleaningServices: Array.isArray(floorCleaningServices) ? floorCleaningServices : [],
+                floorCleaningTypes: Array.isArray(floorCleaningTypes) ? floorCleaningTypes : [],
+                
+                // Office Cleaning specific fields
+                officePremisesType,
+                officeCleanAll,
+                officeAreaSize,
+                officeFrequency,
+                officePreferredDateTime: officePreferredDateTime ? new Date(officePreferredDateTime) : undefined,
+                officeSpace,
+                kitchenSpace,
+                diningRoom,
+                meetingRoom,
+                dressingRoom,
+                toilet,
+                otherRooms,
+                officeFloors,
+                officeEntranceFloor,
+                officeHasElevator,
+                officeAdditionalServices: Array.isArray(officeAdditionalServices) ? officeAdditionalServices : [],
+                
+                // Detail Cleaning specific fields
+                detailHomeType,
+                detailCleanAll,
+                detailAreaSize,
+                detailFrequency,
+                detailPreferredDay,
+                detailPreferredTime,
+                detailBedroom,
+                detailKitchen,
+                detailBathroom,
+                detailLivingRoom,
+                detailOtherRooms,
+                detailFloors,
+                detailAdditionalCleaning: Array.isArray(detailAdditionalCleaning) ? detailAdditionalCleaning : [],
+                
+                // Staircase Cleaning specific fields
+                staircaseFrequency,
+                staircasePreferredDay,
+                staircasePreferredTime,
+                staircaseProperties,
+                staircaseStairwells,
+                staircaseFloors,
+                staircaseAdditionalCleaning: Array.isArray(staircaseAdditionalCleaning) ? staircaseAdditionalCleaning : [],
+                staircaseAdditionalServices: Array.isArray(staircaseAdditionalServices) ? staircaseAdditionalServices : [],
+                
+                // Metadata
                 source: 'website',
-                details: requestData
+                details: requestData // Keep full request data for reference
             };
 
-            console.log('💾 Saving submission as:', submissionKind);
             if (submissionKind === 'booking') {
-                const booking = await Booking.create(submissionPayload);
-                console.log('✅ Booking saved with ID:', booking._id);
+                await Booking.create(submissionPayload);
             } else {
-                const quote = await Quote.create(submissionPayload);
-                console.log('✅ Quote saved with ID:', quote._id);
+                await Quote.create(submissionPayload);
             }
-            console.log('✅ Successfully saved to MongoDB');
+            console.log('Successfully saved to MongoDB');
         } catch (dbError) {
-            const errorDetails = dbError as Error;
-            console.error('❌ MongoDB save failed (continuing with email):');
-            console.error('Error name:', errorDetails.name);
-            console.error('Error message:', errorDetails.message);
-            console.error('Full error:', errorDetails);
+            console.error('MongoDB save failed (continuing with email):', dbError);
             // Continue with email sending even if DB save fails
         }
 

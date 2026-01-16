@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import Navbar from '../components/Navbar';
 import Breadcrumb from '../components/Breadcrumb';
 import Footer from '../components/Footer';
@@ -267,6 +268,32 @@ export default function VasterasPage() {
                 We evaluate our collaborations with local cleaning companies in Västerås on an ongoing basis with a focus on quality and customer satisfaction.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 bg-gradient-to-r from-cyan-500 to-emerald-500">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Ready to Grow Your Business?
+          </h2>
+          <p className="text-xl text-white/90 mb-8">
+            Join the Amples network today and start connecting with customers across Sweden
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="tel:0764447563"
+              className="bg-white text-cyan-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+            >
+              📞 Call Us Now
+            </a>
+            <Link
+              href="/"
+              className="bg-emerald-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-emerald-700 transition-colors"
+            >
+              Get Started
+            </Link>
           </div>
         </div>
       </section>

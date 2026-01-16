@@ -103,6 +103,7 @@ export default function Navbar() {
               </div>
             </div>
             <Link href="/move-out-cleaning/checklist" className="text-gray-700 hover:text-cyan-500 transition-colors">Moving Cleaning Checklist</Link>
+            <Link href="/connect-company" className="text-gray-700 hover:text-cyan-500 transition-colors">Connect Company</Link>
             <Link href={isHomePage ? "#contacts" : "/#contacts"} className="text-gray-700 hover:text-cyan-500 transition-colors">Contact US</Link>
           </div>
           {/* Mobile menu button */}
@@ -245,6 +246,17 @@ export default function Navbar() {
                   className="block py-3 text-gray-700 hover:text-cyan-600 transition-colors"
                 >
                   Moving Cleaning Checklist
+                </Link>
+              </div>
+
+              {/* Connect Company */}
+              <div className="border-b border-gray-100 pb-4 space-y-2">
+                <Link 
+                  href="/connect-company" 
+                  onClick={closeMobileMenu}
+                  className="block py-3 text-gray-700 hover:text-cyan-600 transition-colors"
+                >
+                  Connect Company
                 </Link>
               </div>
 
