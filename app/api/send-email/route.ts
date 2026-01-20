@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
-import connectMongo from '@/lib/mongodb';
-import User from '@/models/User';
-import Quote from '@/models/Quote';
-import Booking from '@/models/Booking';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 export async function POST(request: Request) {
     try {
@@ -17,7 +15,7 @@ export async function POST(request: Request) {
             floors, hasPets, comments,
             moveOutCleaningDate, isDateFlexible, dateFlexibilityRange,
             windowCleaningDate, windowsWithBars, windowsWithoutBars, topHungWindows,
-            windowType, hasGlazedBalcony, windowHomeType, windowFloors, needsLadder,
+            windowType, hasGlazedBalcony, windowFloors, needsLadder,
             constructionWorkType, constructionCleaningIncludes, constructionCleaningDate,
             constructionHomeType, constructionAreaSize, constructionFloors,
             floorCleaningDate, floorCleaningIsDateFlexible, floorCleaningServices, floorCleaningTypes,
@@ -76,33 +74,39 @@ export async function POST(request: Request) {
             }, { status: 500 });
         }
 
-        // Save request in MongoDB (optional - don't block email if DB fails)
+        // Save to Neon Database using Prisma
         let userDoc = null;
         try {
-            await connectMongo();
             const rawEmail = typeof email === 'string' ? email.trim() : '';
             const normalizedEmail = rawEmail ? rawEmail.toLowerCase() : '';
 
+            // Create or update user if email is provided
             if (normalizedEmail) {
-                const userUpdate: Record<string, string> = {};
-                if (name) userUpdate.name = name;
-                if (phone) userUpdate.phone = phone;
-
-                userDoc = await User.findOneAndUpdate(
-                    { email: normalizedEmail },
-                    {
-                        $set: userUpdate,
-                        $setOnInsert: { email: normalizedEmail }
+                userDoc = await prisma.user.upsert({
+                    where: { email: normalizedEmail },
+                    update: {
+                        ...(name && { name }),
+                        ...(phone && { phone }),
                     },
-                    { new: true, upsert: true }
-                );
+                    create: {
+                        email: normalizedEmail,
+                        ...(name && { name }),
+                        ...(phone && { phone }),
+                    },
+                });
+                console.log('✅ User saved/updated:', userDoc.id);
             }
 
+            // Determine if this is a booking or quote
             const submissionKind = requestData.submissionKind === 'booking' ? 'booking' : 'quote';
+            
+            // Prepare submission data
             const submissionPayload = {
-                // User reference and basic contact info
-                user: userDoc?._id,
+                // User reference
+                userId: userDoc?.id || null,
                 userEmail: rawEmail || undefined,
+                
+                // Basic contact info
                 name,
                 phone,
                 email: rawEmail || undefined,
@@ -118,7 +122,7 @@ export async function POST(request: Request) {
                 vatNumber,
                 message,
                 
-                // Common fields for all services
+                // Common fields
                 homeType,
                 cleanAll,
                 areaSize,
@@ -132,12 +136,12 @@ export async function POST(request: Request) {
                 hasPets,
                 comments,
                 
-                // Move-out Cleaning specific fields
+                // Move-out Cleaning
                 moveOutCleaningDate: moveOutCleaningDate ? new Date(moveOutCleaningDate) : undefined,
                 isDateFlexible,
                 dateFlexibilityRange,
                 
-                // Window Cleaning specific fields
+                // Window Cleaning
                 windowCleaningDate: windowCleaningDate ? new Date(windowCleaningDate) : undefined,
                 windowsWithBars,
                 windowsWithoutBars,
@@ -147,7 +151,7 @@ export async function POST(request: Request) {
                 windowFloors,
                 needsLadder,
                 
-                // Construction Cleaning specific fields
+                // Construction Cleaning
                 constructionWorkType: Array.isArray(constructionWorkType) ? constructionWorkType : [],
                 constructionCleaningIncludes: Array.isArray(constructionCleaningIncludes) ? constructionCleaningIncludes : [],
                 constructionCleaningDate: constructionCleaningDate ? new Date(constructionCleaningDate) : undefined,
@@ -155,13 +159,13 @@ export async function POST(request: Request) {
                 constructionAreaSize,
                 constructionFloors,
                 
-                // Floor Cleaning specific fields
+                // Floor Cleaning
                 floorCleaningDate: floorCleaningDate ? new Date(floorCleaningDate) : undefined,
                 floorCleaningIsDateFlexible,
                 floorCleaningServices: Array.isArray(floorCleaningServices) ? floorCleaningServices : [],
                 floorCleaningTypes: Array.isArray(floorCleaningTypes) ? floorCleaningTypes : [],
                 
-                // Office Cleaning specific fields
+                // Office Cleaning
                 officePremisesType,
                 officeCleanAll,
                 officeAreaSize,
@@ -179,7 +183,7 @@ export async function POST(request: Request) {
                 officeHasElevator,
                 officeAdditionalServices: Array.isArray(officeAdditionalServices) ? officeAdditionalServices : [],
                 
-                // Detail Cleaning specific fields
+                // Detail Cleaning
                 detailHomeType,
                 detailCleanAll,
                 detailAreaSize,
@@ -194,7 +198,7 @@ export async function POST(request: Request) {
                 detailFloors,
                 detailAdditionalCleaning: Array.isArray(detailAdditionalCleaning) ? detailAdditionalCleaning : [],
                 
-                // Staircase Cleaning specific fields
+                // Staircase Cleaning
                 staircaseFrequency,
                 staircasePreferredDay,
                 staircasePreferredTime,
@@ -206,17 +210,19 @@ export async function POST(request: Request) {
                 
                 // Metadata
                 source: 'website',
-                details: requestData // Keep full request data for reference
+                details: requestData as Prisma.InputJsonValue, // Store full request data as JSON
             };
 
+            // Save as Booking or Quote
             if (submissionKind === 'booking') {
-                await Booking.create(submissionPayload);
+                await prisma.booking.create({ data: submissionPayload });
+                console.log('✅ Booking saved to database');
             } else {
-                await Quote.create(submissionPayload);
+                await prisma.quote.create({ data: submissionPayload });
+                console.log('✅ Quote saved to database');
             }
-            console.log('Successfully saved to MongoDB');
         } catch (dbError) {
-            console.error('MongoDB save failed (continuing with email):', dbError);
+            console.error('❌ Database save failed (continuing with email):', dbError);
             // Continue with email sending even if DB save fails
         }
 

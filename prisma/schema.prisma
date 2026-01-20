@@ -1,0 +1,267 @@
+// Prisma Schema for Neon DB
+// This file defines your database structure
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique @db.VarChar(255)
+  phone     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  bookings Booking[]
+  quotes   Quote[]
+
+  @@map("users")
+}
+
+model Booking {
+  id        String   @id @default(cuid())
+  
+  // User reference
+  userId    String?  @map("user_id")
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Basic contact info
+  userEmail String?  @map("user_email") @db.VarChar(255)
+  name      String?
+  phone     String?
+  address   String?
+  email     String?  @db.VarChar(255)
+  
+  // Service information
+  serviceType      String?  @map("service_type")
+  selectedService  String?  @map("selected_service")
+  squareMeter      String?  @map("square_meter")
+  city             String?
+  formType         String?  @map("form_type") @db.VarChar(20)
+  company          String?
+  vatNumber       String?  @map("vat_number")
+  message         String?  @db.Text
+  
+  // Common fields
+  homeType         String?  @map("home_type")
+  cleanAll         String?  @map("clean_all")
+  areaSize         String?  @map("area_size")
+  frequency        String?
+  preferredDateTime DateTime? @map("preferred_date_time")
+  numberOfRooms    String?  @map("number_of_rooms") @default("0")
+  bedroom          String?  @default("0")
+  kitchen          String?  @default("0")
+  livingRoom       String?  @map("living_room") @default("0")
+  floors           String?
+  hasPets          String?  @map("has_pets")
+  comments         String?  @db.Text
+  
+  // Move-out Cleaning
+  moveOutCleaningDate      DateTime? @map("move_out_cleaning_date")
+  isDateFlexible          String?   @map("is_date_flexible")
+  dateFlexibilityRange    String?   @map("date_flexibility_range")
+  
+  // Window Cleaning
+  windowCleaningDate      DateTime? @map("window_cleaning_date")
+  windowsWithBars         String?   @map("windows_with_bars") @default("0")
+  windowsWithoutBars      String?   @map("windows_without_bars") @default("0")
+  topHungWindows          String?   @map("top_hung_windows") @default("0")
+  windowType              String[]  @map("window_type") @default([])
+  hasGlazedBalcony        String?   @map("has_glazed_balcony")
+  windowFloors            String?   @map("window_floors")
+  needsLadder             String?   @map("needs_ladder")
+  
+  // Construction Cleaning
+  constructionWorkType         String[] @map("construction_work_type") @default([])
+  constructionCleaningIncludes String[] @map("construction_cleaning_includes") @default([])
+  constructionCleaningDate     DateTime? @map("construction_cleaning_date")
+  constructionHomeType         String?   @map("construction_home_type")
+  constructionAreaSize         String?   @map("construction_area_size")
+  constructionFloors            String?   @map("construction_floors")
+  
+  // Floor Cleaning
+  floorCleaningDate          DateTime? @map("floor_cleaning_date")
+  floorCleaningIsDateFlexible String?  @map("floor_cleaning_is_date_flexible")
+  floorCleaningServices      String[] @map("floor_cleaning_services") @default([])
+  floorCleaningTypes         String[] @map("floor_cleaning_types") @default([])
+  
+  // Office Cleaning
+  officePremisesType    String?  @map("office_premises_type")
+  officeCleanAll        String?  @map("office_clean_all")
+  officeAreaSize        String? @map("office_area_size")
+  officeFrequency       String?  @map("office_frequency")
+  officePreferredDateTime DateTime? @map("office_preferred_date_time")
+  officeSpace           String?  @map("office_space") @default("0")
+  kitchenSpace          String?  @map("kitchen_space") @default("0")
+  diningRoom            String?  @map("dining_room") @default("0")
+  meetingRoom           String?  @map("meeting_room") @default("0")
+  dressingRoom          String?  @map("dressing_room") @default("0")
+  toilet                String?  @default("0")
+  otherRooms            String?  @map("other_rooms") @default("0")
+  officeFloors          String?  @map("office_floors")
+  officeEntranceFloor   String?  @map("office_entrance_floor")
+  officeHasElevator     String?  @map("office_has_elevator")
+  officeAdditionalServices String[] @map("office_additional_services") @default([])
+  
+  // Detail Cleaning
+  detailHomeType         String?  @map("detail_home_type")
+  detailCleanAll         String?  @map("detail_clean_all")
+  detailAreaSize         String?  @map("detail_area_size")
+  detailFrequency        String?  @map("detail_frequency")
+  detailPreferredDay     String?  @map("detail_preferred_day")
+  detailPreferredTime    String?  @map("detail_preferred_time")
+  detailBedroom          String?  @map("detail_bedroom") @default("0")
+  detailKitchen          String?  @map("detail_kitchen") @default("0")
+  detailBathroom         String?  @map("detail_bathroom") @default("0")
+  detailLivingRoom       String?  @map("detail_living_room") @default("0")
+  detailOtherRooms       String?  @map("detail_other_rooms") @default("0")
+  detailFloors           String?  @map("detail_floors")
+  detailAdditionalCleaning String[] @map("detail_additional_cleaning") @default([])
+  
+  // Staircase Cleaning
+  staircaseFrequency          String?  @map("staircase_frequency")
+  staircasePreferredDay       String?  @map("staircase_preferred_day")
+  staircasePreferredTime      String?  @map("staircase_preferred_time")
+  staircaseProperties         String?  @map("staircase_properties")
+  staircaseStairwells         String?  @map("staircase_stairwells")
+  staircaseFloors             String?  @map("staircase_floors")
+  staircaseAdditionalCleaning String[] @map("staircase_additional_cleaning") @default([])
+  staircaseAdditionalServices String[] @map("staircase_additional_services") @default([])
+  
+  // Metadata
+  status  String  @default("pending") @db.VarChar(20)
+  source  String  @default("website")
+  details Json?
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("bookings")
+}
+
+model Quote {
+  id        String   @id @default(cuid())
+  
+  // User reference
+  userId    String?  @map("user_id")
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Basic contact info
+  userEmail String?  @map("user_email") @db.VarChar(255)
+  name      String?
+  phone     String?
+  address   String?
+  email     String?  @db.VarChar(255)
+  
+  // Service information
+  serviceType      String?  @map("service_type")
+  selectedService  String?  @map("selected_service")
+  squareMeter      String?  @map("square_meter")
+  city             String?
+  formType         String?  @map("form_type") @db.VarChar(20)
+  company          String?
+  vatNumber       String?  @map("vat_number")
+  message         String?  @db.Text
+  
+  // Common fields
+  homeType         String?  @map("home_type")
+  cleanAll         String?  @map("clean_all")
+  areaSize         String?  @map("area_size")
+  frequency        String?
+  preferredDateTime DateTime? @map("preferred_date_time")
+  numberOfRooms    String?  @map("number_of_rooms") @default("0")
+  bedroom          String?  @default("0")
+  kitchen          String?  @default("0")
+  livingRoom       String?  @map("living_room") @default("0")
+  floors           String?
+  hasPets          String?  @map("has_pets")
+  comments         String?  @db.Text
+  
+  // Move-out Cleaning
+  moveOutCleaningDate      DateTime? @map("move_out_cleaning_date")
+  isDateFlexible          String?   @map("is_date_flexible")
+  dateFlexibilityRange    String?   @map("date_flexibility_range")
+  
+  // Window Cleaning
+  windowCleaningDate      DateTime? @map("window_cleaning_date")
+  windowsWithBars         String?   @map("windows_with_bars") @default("0")
+  windowsWithoutBars      String?   @map("windows_without_bars") @default("0")
+  topHungWindows          String?   @map("top_hung_windows") @default("0")
+  windowType              String[]  @map("window_type") @default([])
+  hasGlazedBalcony        String?   @map("has_glazed_balcony")
+  windowFloors            String?   @map("window_floors")
+  needsLadder             String?   @map("needs_ladder")
+  
+  // Construction Cleaning
+  constructionWorkType         String[] @map("construction_work_type") @default([])
+  constructionCleaningIncludes String[] @map("construction_cleaning_includes") @default([])
+  constructionCleaningDate     DateTime? @map("construction_cleaning_date")
+  constructionHomeType         String?   @map("construction_home_type")
+  constructionAreaSize         String?   @map("construction_area_size")
+  constructionFloors            String?   @map("construction_floors")
+  
+  // Floor Cleaning
+  floorCleaningDate          DateTime? @map("floor_cleaning_date")
+  floorCleaningIsDateFlexible String?  @map("floor_cleaning_is_date_flexible")
+  floorCleaningServices      String[] @map("floor_cleaning_services") @default([])
+  floorCleaningTypes         String[] @map("floor_cleaning_types") @default([])
+  
+  // Office Cleaning
+  officePremisesType    String?  @map("office_premises_type")
+  officeCleanAll        String?  @map("office_clean_all")
+  officeAreaSize        String? @map("office_area_size")
+  officeFrequency       String?  @map("office_frequency")
+  officePreferredDateTime DateTime? @map("office_preferred_date_time")
+  officeSpace           String?  @map("office_space") @default("0")
+  kitchenSpace          String?  @map("kitchen_space") @default("0")
+  diningRoom            String?  @map("dining_room") @default("0")
+  meetingRoom           String?  @map("meeting_room") @default("0")
+  dressingRoom          String?  @map("dressing_room") @default("0")
+  toilet                String?  @default("0")
+  otherRooms            String?  @map("other_rooms") @default("0")
+  officeFloors          String?  @map("office_floors")
+  officeEntranceFloor   String?  @map("office_entrance_floor")
+  officeHasElevator     String?  @map("office_has_elevator")
+  officeAdditionalServices String[] @map("office_additional_services") @default([])
+  
+  // Detail Cleaning
+  detailHomeType         String?  @map("detail_home_type")
+  detailCleanAll         String?  @map("detail_clean_all")
+  detailAreaSize         String?  @map("detail_area_size")
+  detailFrequency        String?  @map("detail_frequency")
+  detailPreferredDay     String?  @map("detail_preferred_day")
+  detailPreferredTime    String?  @map("detail_preferred_time")
+  detailBedroom          String?  @map("detail_bedroom") @default("0")
+  detailKitchen          String?  @map("detail_kitchen") @default("0")
+  detailBathroom         String?  @map("detail_bathroom") @default("0")
+  detailLivingRoom       String?  @map("detail_living_room") @default("0")
+  detailOtherRooms       String?  @map("detail_other_rooms") @default("0")
+  detailFloors           String?  @map("detail_floors")
+  detailAdditionalCleaning String[] @map("detail_additional_cleaning") @default([])
+  
+  // Staircase Cleaning
+  staircaseFrequency          String?  @map("staircase_frequency")
+  staircasePreferredDay       String?  @map("staircase_preferred_day")
+  staircasePreferredTime      String?  @map("staircase_preferred_time")
+  staircaseProperties         String?  @map("staircase_properties")
+  staircaseStairwells         String?  @map("staircase_stairwells")
+  staircaseFloors             String?  @map("staircase_floors")
+  staircaseAdditionalCleaning String[] @map("staircase_additional_cleaning") @default([])
+  staircaseAdditionalServices String[] @map("staircase_additional_services") @default([])
+  
+  // Metadata
+  status  String  @default("new") @db.VarChar(20)
+  source  String  @default("website")
+  details Json?
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("quotes")
+}
