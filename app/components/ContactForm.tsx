@@ -107,14 +107,51 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
     staircaseAdditionalServices: [] as string[]
   });
 
+  // Validation helper functions
+  const validateArea = (value: string): boolean => {
+    if (!value.trim()) return false;
+    const numValue = parseFloat(value);
+    // Check if it's a valid number, max 4 digits, and between 0-1000
+    return !isNaN(numValue) && numValue >= 0 && numValue <= 1000 && value.replace(/\./g, '').length <= 4;
+  };
+
+  const validateSwedishPhone = (phone: string): boolean => {
+    if (!phone.trim()) return false;
+    // Remove spaces, dashes, and country code if present
+    const cleaned = phone.replace(/[\s\-+46]/g, '');
+    // Swedish phone numbers: 9-11 digits, can start with 0
+    // Mobile numbers typically start with 07 (10 digits total with leading 0)
+    // Landlines can start with 0 followed by area code (9-11 digits)
+    return /^0?\d{9,11}$/.test(cleaned) && cleaned.length <= 11;
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const fieldName = e.target.name;
+    let value = e.target.value;
+    
     // Mark field as touched when user interacts with it
     setTouchedFields(prev => new Set(prev).add(fieldName));
     
+    // Validate and restrict area fields (0-1000, max 4 digits)
+    if (fieldName === 'areaSize' || fieldName === 'constructionAreaSize' || 
+        fieldName === 'officeAreaSize' || fieldName === 'detailAreaSize') {
+      // Remove any non-numeric characters except decimal point
+      value = value.replace(/[^\d.]/g, '');
+      // Limit to 4 digits total (excluding decimal point)
+      const digitsOnly = value.replace(/\./g, '');
+      if (digitsOnly.length > 4) {
+        value = value.slice(0, -(digitsOnly.length - 4));
+      }
+      // Ensure value is within 0-1000 range
+      const numValue = parseFloat(value) || 0;
+      if (numValue > 1000) {
+        value = '1000';
+      }
+    }
+    
     setFormData({
       ...formData,
-      [fieldName]: e.target.value
+      [fieldName]: value
     });
   };
 
@@ -126,7 +163,7 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
       case 'name':
         return value.trim() === '';
       case 'phone':
-        return value.trim() === '';
+        return value.trim() === '' || !validateSwedishPhone(value);
       case 'email':
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return value.trim() === '' || !emailRegex.test(value);
@@ -136,6 +173,11 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
         return formType === 'company' && value.trim() === '';
       case 'vatNumber':
         return formType === 'company' && value.trim() === '';
+      case 'areaSize':
+      case 'constructionAreaSize':
+      case 'officeAreaSize':
+      case 'detailAreaSize':
+        return value.trim() === '' || !validateArea(value);
       default:
         return value.trim() === '';
     }
@@ -148,7 +190,8 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
       case 'name':
         return value.trim() === '' ? 'Name is required' : null;
       case 'phone':
-        return value.trim() === '' ? 'Phone number is required' : null;
+        if (value.trim() === '') return 'Phone number is required';
+        return !validateSwedishPhone(value) ? 'Please enter a valid Swedish phone number (max 11 digits)' : null;
       case 'email':
         if (value.trim() === '') return 'Email address is required';
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -160,6 +203,20 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
         return formType === 'company' && value.trim() === '' ? 'Company name is required' : null;
       case 'vatNumber':
         return formType === 'company' && value.trim() === '' ? 'VAT number is required' : null;
+      case 'areaSize':
+      case 'constructionAreaSize':
+      case 'officeAreaSize':
+      case 'detailAreaSize':
+        if (value.trim() === '') return 'Area size is required';
+        if (!validateArea(value)) {
+          const numValue = parseFloat(value);
+          if (isNaN(numValue)) return 'Please enter a valid number';
+          if (numValue < 0) return 'Area must be 0 or greater';
+          if (numValue > 1000) return 'Area must not exceed 1000 sq m';
+          if (value.replace(/\./g, '').length > 4) return 'Area must not exceed 4 digits';
+          return 'Please enter a valid area size (0-1000 sq m, max 4 digits)';
+        }
+        return null;
       default:
         return null;
     }
@@ -764,6 +821,7 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                   value={formData.phone}
                   onChange={handleChange}
                   onBlur={(e) => setTouchedFields(prev => new Set(prev).add(e.target.name))}
+                  maxLength={11}
                   className={`w-full px-4 py-2 border rounded-lg focus:ring-2 transition-all placeholder:text-black ${
                     isFieldInvalid('phone', formData.phone)
                       ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
@@ -894,10 +952,20 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                   value={formData.areaSize}
                   onChange={handleChange}
                       min="0"
+                      max="1000"
                       step="1"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder:text-black"
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder:text-black ${
+                    isFieldInvalid('areaSize', formData.areaSize)
+                      ? 'border-red-500'
+                      : 'border-gray-300'
+                  }`}
                   placeholder="e.g. 120"
                 />
+                {getFieldError('areaSize', formData.areaSize) && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {getFieldError('areaSize', formData.areaSize)}
+                  </p>
+                )}
               </div>
 
               {/* Frequency Dropdown */}
@@ -2314,11 +2382,21 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                       value={formData.constructionAreaSize}
                       onChange={handleChange}
                       min="0"
+                      max="1000"
                       step="1"
                       required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all ${
+                        isFieldInvalid('constructionAreaSize', formData.constructionAreaSize)
+                          ? 'border-red-500'
+                          : 'border-gray-300'
+                      }`}
                       placeholder="Enter area in square meters"
                     />
+                    {getFieldError('constructionAreaSize', formData.constructionAreaSize) && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {getFieldError('constructionAreaSize', formData.constructionAreaSize)}
+                      </p>
+                    )}
                   </div>
 
                   {/* Construction Floors Dropdown */}
@@ -2803,11 +2881,21 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                       value={formData.officeAreaSize}
                       onChange={handleChange}
                       min="0"
+                      max="1000"
                       step="1"
                       required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white ${
+                        isFieldInvalid('officeAreaSize', formData.officeAreaSize)
+                          ? 'border-red-500'
+                          : 'border-gray-300'
+                      }`}
                       placeholder="Enter area in sq m"
                     />
+                    {getFieldError('officeAreaSize', formData.officeAreaSize) && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {getFieldError('officeAreaSize', formData.officeAreaSize)}
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
@@ -3423,11 +3511,21 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                       value={formData.detailAreaSize}
                       onChange={handleChange}
                       min="0"
+                      max="1000"
                       step="1"
                       required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white ${
+                        isFieldInvalid('detailAreaSize', formData.detailAreaSize)
+                          ? 'border-red-500'
+                          : 'border-gray-300'
+                      }`}
                       placeholder="Enter area in sq m"
                     />
+                    {getFieldError('detailAreaSize', formData.detailAreaSize) && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {getFieldError('detailAreaSize', formData.detailAreaSize)}
+                      </p>
+                    )}
                   </div>
                 </div>
               )}

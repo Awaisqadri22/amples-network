@@ -18,6 +18,7 @@ export default function ContactSection() {
     phone?: string;
     email?: string;
     address?: string;
+    squareMeter?: string;
   }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<{
@@ -37,11 +38,21 @@ export default function ContactSection() {
   ];
 
   const validatePhone = (phone: string): boolean => {
-    // Swedish phone number validation: 9-10 digits, can start with 0 or without leading 0
+    if (!phone.trim()) return false;
+    // Swedish phone number validation: max 11 digits
     // Remove spaces, dashes, and country code if present
     const cleaned = phone.replace(/[\s\-+46]/g, '');
-    // Should be 9-10 digits, mobile numbers start with 07
-    return /^0?[1-9]\d{8,9}$/.test(cleaned) || /^07\d{8}$/.test(cleaned);
+    // Swedish phone numbers: 9-11 digits, can start with 0
+    // Mobile numbers typically start with 07 (10 digits total with leading 0)
+    // Landlines can start with 0 followed by area code (9-11 digits)
+    return /^0?\d{9,11}$/.test(cleaned) && cleaned.length <= 11;
+  };
+
+  const validateArea = (value: string): boolean => {
+    if (!value.trim()) return false;
+    const numValue = parseFloat(value);
+    // Check if it's a valid number, max 4 digits, and between 0-1000
+    return !isNaN(numValue) && numValue >= 0 && numValue <= 1000 && value.replace(/\./g, '').length <= 4;
   };
 
   const validateEmail = (email: string): boolean => {
@@ -58,10 +69,27 @@ export default function ContactSection() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    let processedValue = value;
+    
+    // Validate and restrict area/square meter fields (0-1000, max 4 digits)
+    if (name === 'squareMeter') {
+      // Remove any non-numeric characters except decimal point
+      processedValue = value.replace(/[^\d.]/g, '');
+      // Limit to 4 digits total (excluding decimal point)
+      const digitsOnly = processedValue.replace(/\./g, '');
+      if (digitsOnly.length > 4) {
+        processedValue = processedValue.slice(0, -(digitsOnly.length - 4));
+      }
+      // Ensure value is within 0-1000 range
+      const numValue = parseFloat(processedValue) || 0;
+      if (numValue > 1000) {
+        processedValue = '1000';
+      }
+    }
     
     setFormData({
       ...formData,
-      [name]: value
+      [name]: processedValue
     });
 
     // Clear error when user starts typing
@@ -79,7 +107,7 @@ export default function ContactSection() {
     if (name === 'phone' && value && !validatePhone(value)) {
       setErrors({
         ...errors,
-        phone: 'Please enter a valid Swedish phone number'
+        phone: 'Please enter a valid Swedish phone number (max 11 digits)'
       });
     } else if (name === 'email' && value && !validateEmail(value)) {
       setErrors({
@@ -91,6 +119,22 @@ export default function ContactSection() {
         ...errors,
         address: 'Address must include a 5-digit postal code'
       });
+    } else if (name === 'squareMeter' && value && !validateArea(value)) {
+      const numValue = parseFloat(value);
+      let errorMsg = 'Please enter a valid area size (0-1000 sq m, max 4 digits)';
+      if (isNaN(numValue)) {
+        errorMsg = 'Please enter a valid number';
+      } else if (numValue < 0) {
+        errorMsg = 'Area must be 0 or greater';
+      } else if (numValue > 1000) {
+        errorMsg = 'Area must not exceed 1000 sq m';
+      } else if (value.replace(/\./g, '').length > 4) {
+        errorMsg = 'Area must not exceed 4 digits';
+      }
+      setErrors({
+        ...errors,
+        squareMeter: errorMsg
+      });
     }
   };
 
@@ -100,13 +144,27 @@ export default function ContactSection() {
     // Validate all fields
     const newErrors: typeof errors = {};
     if (formData.phone && !validatePhone(formData.phone)) {
-      newErrors.phone = 'Please enter a valid Swedish phone number';
+      newErrors.phone = 'Please enter a valid Swedish phone number (max 11 digits)';
     }
     if (formData.email && !validateEmail(formData.email)) {
       newErrors.email = 'Please enter a valid email address';
     }
     if (formData.address && !validateAddress(formData.address)) {
       newErrors.address = 'Address must include a 5-digit postal code';
+    }
+    if (formData.squareMeter && !validateArea(formData.squareMeter)) {
+      const numValue = parseFloat(formData.squareMeter);
+      let errorMsg = 'Please enter a valid area size (0-1000 sq m, max 4 digits)';
+      if (isNaN(numValue)) {
+        errorMsg = 'Please enter a valid number';
+      } else if (numValue < 0) {
+        errorMsg = 'Area must be 0 or greater';
+      } else if (numValue > 1000) {
+        errorMsg = 'Area must not exceed 1000 sq m';
+      } else if (formData.squareMeter.replace(/\./g, '').length > 4) {
+        errorMsg = 'Area must not exceed 4 digits';
+      }
+      newErrors.squareMeter = errorMsg;
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -277,6 +335,7 @@ export default function ContactSection() {
                     value={formData.phone}
                     onChange={handleChange}
                     onBlur={handleBlur}
+                    maxLength={11}
                     className={`w-full pl-20 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors placeholder:text-gray-500 ${
                       errors.phone ? 'border-red-500' : 'border-gray-300'
                     }`}
@@ -321,11 +380,19 @@ export default function ContactSection() {
                   name="squareMeter"
                   value={formData.squareMeter}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors placeholder:text-gray-500"
+                  onBlur={handleBlur}
+                  min="0"
+                  max="1000"
+                  step="1"
+                  className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors placeholder:text-gray-500 ${
+                    errors.squareMeter ? 'border-red-500' : 'border-gray-300'
+                  }`}
                   placeholder="e.g. 50"
-                  min="1"
                   required
                 />
+                {errors.squareMeter && (
+                  <p className="mt-1 text-sm text-red-600">{errors.squareMeter}</p>
+                )}
               </div>
 
               <div>

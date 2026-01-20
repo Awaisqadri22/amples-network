@@ -15,6 +15,15 @@ export default function QuoteForm({ idPrefix = 'form', sticky = true }: QuoteFor
     message: ''
   });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [phoneError, setPhoneError] = useState<string>('');
+
+  const validateSwedishPhone = (phone: string): boolean => {
+    if (!phone.trim()) return false;
+    // Remove spaces, dashes, and country code if present
+    const cleaned = phone.replace(/[\s\-+46]/g, '');
+    // Swedish phone numbers: 9-11 digits, can start with 0
+    return /^0?\d{9,11}$/.test(cleaned) && cleaned.length <= 11;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,10 +54,25 @@ export default function QuoteForm({ idPrefix = 'form', sticky = true }: QuoteFor
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
+    
+    // Clear phone error when user starts typing
+    if (name === 'phone' && phoneError) {
+      setPhoneError('');
+    }
+  };
+
+  const handlePhoneBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value && !validateSwedishPhone(value)) {
+      setPhoneError('Please enter a valid Swedish phone number (max 11 digits)');
+    } else {
+      setPhoneError('');
+    }
   };
 
   return (
@@ -89,9 +113,16 @@ export default function QuoteForm({ idPrefix = 'form', sticky = true }: QuoteFor
             required
             value={formData.phone}
             onChange={handleChange}
-            className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder:text-black"
+            onBlur={handlePhoneBlur}
+            maxLength={11}
+            className={`w-full px-4 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder:text-black ${
+              phoneError ? 'border-red-500' : 'border-gray-300'
+            }`}
             placeholder="0764447563"
           />
+          {phoneError && (
+            <p className="mt-1 text-sm text-red-600">{phoneError}</p>
+          )}
         </div>
         <div>
           <label htmlFor={`email-${idPrefix}`} className="block text-sm font-medium text-gray-700 mb-1">
