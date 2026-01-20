@@ -3,6 +3,60 @@ import nodemailer from 'nodemailer';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 
+/**
+ * Calculate price based on square meters (kvm)
+ * Pricing structure:
+ * 0-29 kvm: 1575 kr
+ * 30-39 kvm: 1725 kr (average of 1675-1775)
+ * 40-49 kvm: 1825 kr (average of 1775-1875)
+ * 50-59 kvm: 1925 kr (average of 1875-1975)
+ * 60-69 kvm: 2125 kr (average of 2075-2175)
+ * 70-79 kvm: 2325 kr (average of 2275-2375)
+ * 80-89 kvm: 2450 kr (average of 2400-2500)
+ * 90-100 kvm: 2900 kr (average of 2800-3000)
+ * > 100 kvm: 3000 + (additional 10 kvm blocks * 200 kr)
+ * > 200 kvm: 5000 + (additional kvm * 30 kr/kvm)
+ */
+function calculatePrice(squareMeters: number | string | undefined): { price: number; priceRange?: string } | null {
+    if (!squareMeters) return null;
+    
+    const sqm = typeof squareMeters === 'string' ? parseFloat(squareMeters) : squareMeters;
+    if (isNaN(sqm) || sqm < 0) return null;
+    
+    // Round to nearest integer for calculations
+    const roundedSqm = Math.round(sqm);
+    
+    // Base pricing tiers
+    if (roundedSqm >= 0 && roundedSqm <= 29) {
+        return { price: 1575 };
+    } else if (roundedSqm >= 30 && roundedSqm <= 39) {
+        return { price: 1725, priceRange: '1675-1775' };
+    } else if (roundedSqm >= 40 && roundedSqm <= 49) {
+        return { price: 1825, priceRange: '1775-1875' };
+    } else if (roundedSqm >= 50 && roundedSqm <= 59) {
+        return { price: 1925, priceRange: '1875-1975' };
+    } else if (roundedSqm >= 60 && roundedSqm <= 69) {
+        return { price: 2125, priceRange: '2075-2175' };
+    } else if (roundedSqm >= 70 && roundedSqm <= 79) {
+        return { price: 2325, priceRange: '2275-2375' };
+    } else if (roundedSqm >= 80 && roundedSqm <= 89) {
+        return { price: 2450, priceRange: '2400-2500' };
+    } else if (roundedSqm >= 90 && roundedSqm <= 100) {
+        return { price: 2900, priceRange: '2800-3000' };
+    } else if (roundedSqm > 100 && roundedSqm <= 200) {
+        // For > 100 kvm: 3000 + (additional 10 kvm blocks * 200 kr)
+        const additionalKvm = roundedSqm - 100;
+        const additionalBlocks = Math.ceil(additionalKvm / 10);
+        const price = 3000 + (additionalBlocks * 200);
+        return { price };
+    } else {
+        // For > 200 kvm: 5000 + (additional kvm * 30 kr/kvm)
+        const additionalKvm = roundedSqm - 200;
+        const price = 5000 + (additionalKvm * 30);
+        return { price };
+    }
+}
+
 export async function POST(request: Request) {
     try {
         const requestData = await request.json();
@@ -226,6 +280,10 @@ export async function POST(request: Request) {
             // Continue with email sending even if DB save fails
         }
 
+        // Calculate price estimation early (before constructing email)
+        const squareMeterValue = squareMeter || areaSize || constructionAreaSize || officeAreaSize || detailAreaSize;
+        const priceInfo = calculatePrice(squareMeterValue);
+        
         // Construct Email Content
         let serviceDetails = '';
         const isContactForm = serviceType && squareMeter !== undefined;
@@ -241,13 +299,32 @@ export async function POST(request: Request) {
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Service Type:</strong> <span style="color: #475569;">${serviceType || 'Not specified'}</span></p>
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Square Meter:</strong> <span style="color: #475569;">${squareMeter || 'Not specified'} m²</span></p>
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">City:</strong> <span style="color: #475569;">${city || 'Not specified'}</span></p>
+                  ${priceInfo ? `
+                  <p style="margin: 8px 0;">
+                    <strong style="color: #1e293b;">Price Estimation:</strong> 
+                    <span style="color: #10b981; font-weight: 600; font-size: 16px;">
+                      ${priceInfo.priceRange ? `${priceInfo.priceRange} kr` : `${priceInfo.price} kr`}
+                    </span>
+                    ${priceInfo.priceRange ? ` <span style="color: #64748b; font-size: 12px;">(approx. ${priceInfo.price} kr)</span>` : ''}
+                  </p>
+                  ` : ''}
                 </div>
             `;
         } else if (selectedService === 'Home Cleaning') {
+            const homePriceInfo = calculatePrice(areaSize);
             serviceDetails = `
                 <div style="margin-bottom: 20px;">
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Home Type:</strong> <span style="color: #475569;">${homeType || 'Not specified'}</span></p>
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Area Size:</strong> <span style="color: #475569;">${areaSize ? areaSize + ' sq m' : 'Not specified'}</span></p>
+                  ${homePriceInfo ? `
+                  <p style="margin: 8px 0;">
+                    <strong style="color: #1e293b;">Price Estimation:</strong> 
+                    <span style="color: #10b981; font-weight: 600; font-size: 16px;">
+                      ${homePriceInfo.priceRange ? `${homePriceInfo.priceRange} kr` : `${homePriceInfo.price} kr`}
+                    </span>
+                    ${homePriceInfo.priceRange ? ` <span style="color: #64748b; font-size: 12px;">(approx. ${homePriceInfo.price} kr)</span>` : ''}
+                  </p>
+                  ` : ''}
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Frequency:</strong> <span style="color: #475569;">${frequency || 'Not specified'}</span></p>
                   ${preferredDateTime ? `<p style="margin: 8px 0;"><strong style="color: #1e293b;">Preferred Date & Time:</strong> <span style="color: #475569;">${new Date(preferredDateTime).toLocaleString()}</span></p>` : ''}
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Clean Entire Home:</strong> <span style="color: #475569;">${cleanAll || 'Not specified'}</span></p>
@@ -269,6 +346,7 @@ export async function POST(request: Request) {
                 </div>
             `;
         } else if (selectedService === 'Move-out Cleaning') {
+            const moveOutPriceInfo = calculatePrice(areaSize);
             serviceDetails = `
                 <div style="margin-bottom: 20px;">
                   ${moveOutCleaningDate ? `<p style="margin: 8px 0;"><strong style="color: #1e293b;">Moving-out Cleaning Date:</strong> <span style="color: #475569;">${new Date(moveOutCleaningDate).toLocaleString()}</span></p>` : ''}
@@ -277,6 +355,15 @@ export async function POST(request: Request) {
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Home Type:</strong> <span style="color: #475569;">${homeType || 'Not specified'}</span></p>
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Should Entire Home be Cleaned:</strong> <span style="color: #475569;">${cleanAll || 'Not specified'}</span></p>
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Area Size:</strong> <span style="color: #475569;">${areaSize ? areaSize + ' sq m' : 'Not specified'}</span></p>
+                  ${moveOutPriceInfo ? `
+                  <p style="margin: 8px 0;">
+                    <strong style="color: #1e293b;">Price Estimation:</strong> 
+                    <span style="color: #10b981; font-weight: 600; font-size: 16px;">
+                      ${moveOutPriceInfo.priceRange ? `${moveOutPriceInfo.priceRange} kr` : `${moveOutPriceInfo.price} kr`}
+                    </span>
+                    ${moveOutPriceInfo.priceRange ? ` <span style="color: #64748b; font-size: 12px;">(approx. ${moveOutPriceInfo.price} kr)</span>` : ''}
+                  </p>
+                  ` : ''}
                 </div>
                 <div style="background-color: #ffffff; padding: 15px; border-radius: 6px; margin: 15px 0;">
                   <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Room Details</h4>
@@ -326,11 +413,12 @@ export async function POST(request: Request) {
                 </div>
             `;
         } else if (selectedService === 'Construction Cleaning') {
+            const constructionPriceInfo = calculatePrice(constructionAreaSize);
             serviceDetails = `
                 <div style="background-color: #ffffff; padding: 15px; border-radius: 6px; margin: 15px 0;">
                   <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Work Type</h4>
                   <ul style="margin: 0; padding-left: 20px; color: #475569;">
-                    ${Array.isArray(constructionWorkType) && constructionWorkType.length > 0 
+                    ${Array.isArray(constructionWorkType) && constructionWorkType.length > 0
                       ? constructionWorkType.map((type: string) => `<li style="margin: 6px 0;">${type}</li>`).join('')
                       : '<li style="margin: 6px 0;">Not specified</li>'}
                   </ul>
@@ -338,7 +426,7 @@ export async function POST(request: Request) {
                 <div style="background-color: #ffffff; padding: 15px; border-radius: 6px; margin: 15px 0;">
                   <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">What should be included in the cleaning</h4>
                   <ul style="margin: 0; padding-left: 20px; color: #475569;">
-                    ${Array.isArray(constructionCleaningIncludes) && constructionCleaningIncludes.length > 0 
+                    ${Array.isArray(constructionCleaningIncludes) && constructionCleaningIncludes.length > 0
                       ? constructionCleaningIncludes.map((item: string) => `<li style="margin: 6px 0;">${item}</li>`).join('')
                       : '<li style="margin: 6px 0;">Not specified</li>'}
                   </ul>
@@ -348,6 +436,15 @@ export async function POST(request: Request) {
                   ${constructionCleaningDate ? `<p style="margin: 8px 0;"><strong style="color: #1e293b;">Cleaning Date:</strong> <span style="color: #475569;">${new Date(constructionCleaningDate).toLocaleString()}</span></p>` : ''}
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Home Type:</strong> <span style="color: #475569;">${constructionHomeType || 'Not specified'}</span></p>
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Area Size:</strong> <span style="color: #475569;">${constructionAreaSize ? constructionAreaSize + ' sq m' : 'Not specified'}</span></p>
+                  ${constructionPriceInfo ? `
+                  <p style="margin: 8px 0;">
+                    <strong style="color: #1e293b;">Price Estimation:</strong> 
+                    <span style="color: #10b981; font-weight: 600; font-size: 16px;">
+                      ${constructionPriceInfo.priceRange ? `${constructionPriceInfo.priceRange} kr` : `${constructionPriceInfo.price} kr`}
+                    </span>
+                    ${constructionPriceInfo.priceRange ? ` <span style="color: #64748b; font-size: 12px;">(approx. ${constructionPriceInfo.price} kr)</span>` : ''}
+                  </p>
+                  ` : ''}
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Floors:</strong> <span style="color: #475569;">${constructionFloors || 'Not specified'}</span></p>
                   ${comments ? `<div style="margin-top: 12px; padding: 12px; background-color: #f8fafc; border-left: 3px solid #06b6d4; border-radius: 4px;"><strong style="color: #1e293b;">Comments:</strong> <span style="color: #475569;">${comments}</span></div>` : ''}
                 </div>
@@ -382,11 +479,21 @@ export async function POST(request: Request) {
                 </div>
             `;
         } else if (selectedService === 'Office Cleaning') {
+            const officePriceInfo = calculatePrice(officeAreaSize);
             serviceDetails = `
                 <div style="margin-bottom: 20px;">
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Type of Premises:</strong> <span style="color: #475569;">${officePremisesType || 'Not specified'}</span></p>
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Should Entire Premises be Cleaned:</strong> <span style="color: #475569;">${officeCleanAll || 'Not specified'}</span></p>
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Area Size:</strong> <span style="color: #475569;">${officeAreaSize ? officeAreaSize + ' sq m' : 'Not specified'}</span></p>
+                  ${officePriceInfo ? `
+                  <p style="margin: 8px 0;">
+                    <strong style="color: #1e293b;">Price Estimation:</strong> 
+                    <span style="color: #10b981; font-weight: 600; font-size: 16px;">
+                      ${officePriceInfo.priceRange ? `${officePriceInfo.priceRange} kr` : `${officePriceInfo.price} kr`}
+                    </span>
+                    ${officePriceInfo.priceRange ? ` <span style="color: #64748b; font-size: 12px;">(approx. ${officePriceInfo.price} kr)</span>` : ''}
+                  </p>
+                  ` : ''}
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Frequency:</strong> <span style="color: #475569;">${officeFrequency || 'Not specified'}</span></p>
                   ${officePreferredDateTime ? `<p style="margin: 8px 0;"><strong style="color: #1e293b;">Preferred Date & Time:</strong> <span style="color: #475569;">${new Date(officePreferredDateTime).toLocaleString()}</span></p>` : ''}
                 </div>
@@ -418,6 +525,7 @@ export async function POST(request: Request) {
                 ` : ''}
             `;
         } else if (selectedService === 'Detail Cleaning') {
+            const detailPriceInfo = calculatePrice(detailAreaSize);
             serviceDetails = `
                 <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
                   <h4 style="margin: 0 0 12px 0; color: #06b6d4; font-size: 16px; font-weight: 600; display: flex; align-items: center;">
@@ -427,6 +535,15 @@ export async function POST(request: Request) {
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Home Type:</strong> <span style="color: #475569;">${detailHomeType || 'Not specified'}</span></p>
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Should Entire Home be Cleaned:</strong> <span style="color: #475569;">${detailCleanAll || 'Not specified'}</span></p>
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Area Size:</strong> <span style="color: #475569;">${detailAreaSize ? detailAreaSize + ' sq m' : 'Not specified'}</span></p>
+                  ${detailPriceInfo ? `
+                  <p style="margin: 8px 0;">
+                    <strong style="color: #1e293b;">Price Estimation:</strong> 
+                    <span style="color: #10b981; font-weight: 600; font-size: 16px;">
+                      ${detailPriceInfo.priceRange ? `${detailPriceInfo.priceRange} kr` : `${detailPriceInfo.price} kr`}
+                    </span>
+                    ${detailPriceInfo.priceRange ? ` <span style="color: #64748b; font-size: 12px;">(approx. ${detailPriceInfo.price} kr)</span>` : ''}
+                  </p>
+                  ` : ''}
                 </div>
                 <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
                   <h4 style="margin: 0 0 12px 0; color: #06b6d4; font-size: 16px; font-weight: 600; display: flex; align-items: center;">
@@ -511,7 +628,7 @@ export async function POST(request: Request) {
         const contactSectionUrl = `${siteUrl}/#contacts`;
         const logoUrl = `${siteUrl}/amples%20logo.png`;
         const displayService = serviceType || selectedService || 'Cleaning Service';
-        const displaySquareMeter = squareMeter || areaSize || 'Not specified';
+        const displaySquareMeter = squareMeter || areaSize || constructionAreaSize || officeAreaSize || detailAreaSize || 'Not specified';
         const displayCity = city || 'Not specified';
 
         const adminMailOptions = {
@@ -642,93 +759,75 @@ export async function POST(request: Request) {
       `,
         };
 
+        // Create user confirmation email with price estimation
         const userMailOptions = email && email.trim() ? {
             from: `"Amples" <${process.env.EMAIL_USER}>`,
             replyTo: 'info@amples.com',
             to: email,
-            subject: `We received your ${displayService} request`,
+            subject: `Thank you for your quote request - ${displayService}`,
             html: `
         <!DOCTYPE html>
         <html lang="en">
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>We Received Your Request</title>
+          <title>Quote Confirmation</title>
         </head>
-        <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6; line-height: 1.6;">
-          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f3f4f6; padding: 40px 20px;">
+        <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f7fa; line-height: 1.6;">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f5f7fa; padding: 40px 20px;">
             <tr>
               <td align="center">
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="640" style="max-width: 640px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                  
+                  <!-- Header -->
                   <tr>
-                    <td style="background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); padding: 32px 28px;">
-                      <p style="margin: 0; color: #e0f2fe; font-size: 14px; letter-spacing: 1px; text-transform: uppercase;">Hello dear customer</p>
-                      <h1 style="margin: 8px 0 0 0; color: #ffffff; font-size: 26px; font-weight: 700;">Your request has been received</h1>
+                    <td style="background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); padding: 40px 30px; text-align: center;">
+                      <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">Thank You!</h1>
+                      <p style="margin: 10px 0 0 0; color: #e0f2fe; font-size: 16px; font-weight: 400;">We've received your quote request</p>
                     </td>
                   </tr>
 
+                  <!-- Main Content -->
                   <tr>
-                    <td style="padding: 28px;">
-                      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-                        <p style="margin: 0 0 12px 0; color: #0f172a; font-size: 16px; font-weight: 600;">Request Summary</p>
-                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="color: #475569; font-size: 15px;">
-                          <tr>
-                            <td style="padding: 6px 0; width: 35%;"><strong style="color: #1e293b;">Service</strong></td>
-                            <td style="padding: 6px 0;">${displayService}</td>
-                          </tr>
-                          <tr>
-                            <td style="padding: 6px 0;"><strong style="color: #1e293b;">Square Meter</strong></td>
-                            <td style="padding: 6px 0;">${displaySquareMeter} ${displaySquareMeter === 'Not specified' ? '' : 'm²'}</td>
-                          </tr>
-                          <tr>
-                            <td style="padding: 6px 0;"><strong style="color: #1e293b;">City</strong></td>
-                            <td style="padding: 6px 0;">${displayCity}</td>
-                          </tr>
-                        </table>
+                    <td style="padding: 30px;">
+                      <p style="margin: 0 0 20px 0; color: #475569; font-size: 16px;">Hi ${name},</p>
+                      <p style="margin: 0 0 20px 0; color: #475569; font-size: 16px;">Thank you for requesting a quote for <strong>${displayService}</strong>. We've received your information and will get back to you shortly.</p>
+                      
+                      ${priceInfo ? `
+                      <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-left: 4px solid #10b981; padding: 25px; border-radius: 8px; margin: 25px 0;">
+                        <h2 style="margin: 0 0 12px 0; color: #1e293b; font-size: 20px; font-weight: 600;">Price Estimation</h2>
+                        <div style="margin-bottom: 12px;">
+                          <p style="margin: 0; color: #475569; font-size: 14px;">Service Area:</p>
+                          <p style="margin: 4px 0 0 0; color: #1e293b; font-size: 18px; font-weight: 600;">${displaySquareMeter} m²</p>
+                        </div>
+                        <div style="border-top: 1px solid #86efac; padding-top: 12px; margin-top: 12px;">
+                          <p style="margin: 0; color: #475569; font-size: 14px;">Estimated Price:</p>
+                          <p style="margin: 4px 0 0 0; color: #10b981; font-size: 32px; font-weight: 700;">
+                            ${priceInfo.priceRange ? `${priceInfo.priceRange} kr` : `${priceInfo.price} kr`}
+                          </p>
+                          ${priceInfo.priceRange ? `<p style="margin: 4px 0 0 0; color: #64748b; font-size: 12px;">Approximate: ${priceInfo.price} kr</p>` : ''}
+                        </div>
+                        <p style="margin: 12px 0 0 0; color: #64748b; font-size: 12px; font-style: italic;">* This is an estimated price. Final price may vary based on specific requirements.</p>
+                      </div>
+                      ` : ''}
+                      
+                      <div style="background: #f8fafc; border-left: 4px solid #06b6d4; padding: 16px 18px; border-radius: 10px; color: #334155; font-size: 15px; margin: 25px 0;">
+                        <p style="margin: 0 0 10px 0; font-weight: 600; color: #1e293b;">What happens next?</p>
+                        <ul style="margin: 0; padding-left: 20px; color: #475569;">
+                          <li style="margin: 6px 0;">Our team will review your request</li>
+                          <li style="margin: 6px 0;">We'll contact you within 24 hours</li>
+                          <li style="margin: 6px 0;">We'll provide a detailed quote and answer any questions</li>
+                        </ul>
                       </div>
 
-                      <h2 style="margin: 0 0 16px 0; color: #0f172a; font-size: 20px; font-weight: 700;">At Amples, the following is always included</h2>
-                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom: 24px;">
-                        <tr>
-                          <td style="padding: 8px 0; color: #475569; font-size: 15px;">
-                            <span style="display: inline-block; width: 28px; height: 28px; border-radius: 50%; background-color: #e0f2fe; color: #0284c7; text-align: center; line-height: 28px; margin-right: 10px;">🪟</span>
-                            Window cleaning
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style="padding: 8px 0; color: #475569; font-size: 15px;">
-                            <span style="display: inline-block; width: 28px; height: 28px; border-radius: 50%; background-color: #ecfeff; color: #0ea5e9; text-align: center; line-height: 28px; margin-right: 10px;">🧴</span>
-                            Cleaning supplies
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style="padding: 8px 0; color: #475569; font-size: 15px;">
-                            <span style="display: inline-block; width: 28px; height: 28px; border-radius: 50%; background-color: #dcfce7; color: #16a34a; text-align: center; line-height: 28px; margin-right: 10px;">✅</span>
-                            14 day warranty
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style="padding: 8px 0; color: #475569; font-size: 15px;">
-                            <span style="display: inline-block; width: 28px; height: 28px; border-radius: 50%; background-color: #f0f9ff; color: #0284c7; text-align: center; line-height: 28px; margin-right: 10px;">🔁</span>
-                            Free rebooking
-                          </td>
-                        </tr>
-                      </table>
-
-                      <div style="background: #f8fafc; border-left: 4px solid #10b981; padding: 16px 18px; border-radius: 10px; color: #334155; font-size: 15px; margin-bottom: 24px;">
-                        <p style="margin: 0;">Your moving experience is our focus!</p>
-                        <p style="margin: 10px 0 0 0;">We will guide you through the move and are here to make sure you are 100% satisfied! We are available 8-16 every weekday at <strong>0764447563</strong>. Feel free to contact us!</p>
+                      <div style="text-align: center; margin: 30px 0;">
+                        <a href="${contactSectionUrl}" style="display: inline-block; background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px;">Contact Us</a>
                       </div>
 
-                      <div style="text-align: center; margin-bottom: 24px;">
-                        <img src="${logoUrl}" alt="Amples" style="width: 140px; height: 140px; object-fit: contain; border-radius: 20px; border: 1px solid #e2e8f0; padding: 12px; background-color: #ffffff;" />
-                      </div>
-
-                      <div style="background: #0f172a; border-radius: 14px; padding: 22px; color: #e2e8f0; text-align: center;">
+                      <div style="background: #0f172a; border-radius: 14px; padding: 22px; color: #e2e8f0; text-align: center; margin-top: 30px;">
                         <div style="font-size: 28px; margin-bottom: 6px;">☎️</div>
-                        <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #ffffff;">Contact us</h3>
-                        <p style="margin: 0 0 16px 0; font-size: 14px; color: #cbd5f5;">Haven't found what you're looking for above?</p>
-                        <a href="${contactSectionUrl}" style="display: inline-block; background: #06b6d4; color: #ffffff; text-decoration: none; padding: 12px 22px; border-radius: 999px; font-weight: 600; font-size: 14px;">Contact Amples</a>
+                        <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #ffffff;">Need immediate assistance?</h3>
+                        <p style="margin: 0 0 16px 0; font-size: 14px; color: #cbd5f5;">Call us at <strong>0764447563</strong> or email <strong>info@amples.com</strong></p>
                       </div>
                     </td>
                   </tr>
@@ -746,7 +845,7 @@ export async function POST(request: Request) {
           </table>
         </body>
         </html>
-            `,
+      `,
         } : null;
 
         console.log('Attempting to send email...');

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 type ServiceType = 'Move-out Cleaning' | 'Home Cleaning' | 'Detail Cleaning' | 'Office Cleaning' | 'Floor Cleaning' | 'Window Cleaning' | 'Staircase Cleaning' | 'Construction Cleaning';
@@ -11,6 +11,7 @@ interface ContactFormProps {
 
 export default function ContactForm({ defaultService = null }: ContactFormProps = {}) {
   const router = useRouter();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [formType, setFormType] = useState<'private' | 'company'>('private');
   const [selectedService, setSelectedService] = useState<ServiceType | null>(defaultService);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
