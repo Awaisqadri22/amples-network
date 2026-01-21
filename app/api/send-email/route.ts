@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
+import { randomBytes } from 'crypto';
 
 /**
  * Calculate price based on square meters (kvm)
@@ -59,6 +60,43 @@ function calculatePrice(squareMeters: number | string | undefined): { price: num
 
 export async function POST(request: Request) {
     try {
+        // Get the base URL from request (works for both localhost and production)
+        const getBaseUrl = () => {
+            // Check environment variable first (highest priority)
+            if (process.env.NEXT_PUBLIC_SITE_URL) {
+                console.log('Using NEXT_PUBLIC_SITE_URL:', process.env.NEXT_PUBLIC_SITE_URL);
+                return process.env.NEXT_PUBLIC_SITE_URL;
+            }
+            if (process.env.SITE_URL) {
+                console.log('Using SITE_URL:', process.env.SITE_URL);
+                return process.env.SITE_URL;
+            }
+            
+            // Try to get from request URL (most reliable)
+            try {
+                const url = new URL(request.url);
+                const baseUrl = `${url.protocol}//${url.host}`;
+                console.log('Using request URL:', baseUrl);
+                return baseUrl;
+            } catch {
+                // If URL parsing fails, try headers
+                const host = request.headers.get('host');
+                const protocol = request.headers.get('x-forwarded-proto') || 
+                              request.headers.get('x-forwarded-protocol') ||
+                              (host?.includes('localhost') || host?.includes('127.0.0.1') ? 'http' : 'https');
+                
+                if (host) {
+                    const baseUrl = `${protocol}://${host}`;
+                    console.log('Using headers URL:', baseUrl);
+                    return baseUrl;
+                }
+            }
+            
+            // Last resort fallback
+            console.warn('⚠️ Could not determine base URL, using fallback');
+            return 'https://amples.se';
+        };
+
         const requestData = await request.json();
         const {
             name, phone, email, address, message,
@@ -128,8 +166,18 @@ export async function POST(request: Request) {
             }, { status: 500 });
         }
 
+        // Generate unique confirmation token
+        const generateConfirmationToken = (): string => {
+            return randomBytes(32).toString('hex');
+        };
+
+        // Set token expiration (7 days from now)
+        const tokenExpiresAt = new Date();
+        tokenExpiresAt.setDate(tokenExpiresAt.getDate() + 7);
+
         // Save to Neon Database using Prisma
         let userDoc = null;
+        let savedRecord: { id: string; confirmationToken: string | null } | null = null;
         try {
             const rawEmail = typeof email === 'string' ? email.trim() : '';
             const normalizedEmail = rawEmail ? rawEmail.toLowerCase() : '';
@@ -150,6 +198,9 @@ export async function POST(request: Request) {
                 });
                 console.log('✅ User saved/updated:', userDoc.id);
             }
+
+            // Generate confirmation token
+            const confirmationToken = generateConfirmationToken();
 
             // Determine if this is a booking or quote
             const submissionKind = requestData.submissionKind === 'booking' ? 'booking' : 'quote';
@@ -265,15 +316,26 @@ export async function POST(request: Request) {
                 // Metadata
                 source: 'website',
                 details: requestData as Prisma.InputJsonValue, // Store full request data as JSON
+                
+                // Confirmation fields
+                confirmationToken,
+                tokenExpiresAt,
+                status: 'price-sent', // Set status to 'price-sent' when email is sent
             };
 
             // Save as Booking or Quote
             if (submissionKind === 'booking') {
-                await prisma.booking.create({ data: submissionPayload });
-                console.log('✅ Booking saved to database');
+                await prisma.booking.create({ 
+                    data: submissionPayload
+                });
+                savedRecord = { id: 'temp', confirmationToken: confirmationToken };
+                console.log('✅ Booking saved to database with confirmation token');
             } else {
-                await prisma.quote.create({ data: submissionPayload });
-                console.log('✅ Quote saved to database');
+                await prisma.quote.create({ 
+                    data: submissionPayload
+                });
+                savedRecord = { id: 'temp', confirmationToken: confirmationToken };
+                console.log('✅ Quote saved to database with confirmation token');
             }
         } catch (dbError) {
             console.error('❌ Database save failed (continuing with email):', dbError);
@@ -624,12 +686,18 @@ export async function POST(request: Request) {
             serviceDetails = `<div style="margin-bottom: 20px;"><h3 style="margin: 0; color: #1e293b; font-size: 18px; font-weight: 600;">Service: ${selectedService}</h3></div>`;
         }
 
-        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || 'https://amples.se';
+        const siteUrl = getBaseUrl();
         const contactSectionUrl = `${siteUrl}/#contacts`;
-        const logoUrl = `${siteUrl}/amples%20logo.png`;
+        // const logoUrl = `${siteUrl}/amples%20logo.png`;
         const displayService = serviceType || selectedService || 'Cleaning Service';
         const displaySquareMeter = squareMeter || areaSize || constructionAreaSize || officeAreaSize || detailAreaSize || 'Not specified';
-        const displayCity = city || 'Not specified';
+        // const displayCity = city || 'Not specified';
+        
+        // Generate confirmation link
+        const confirmationToken = savedRecord?.confirmationToken || '';
+        const confirmationUrl = confirmationToken ? `${siteUrl}/confirm/${confirmationToken}` : null;
+        
+        console.log('🔗 Confirmation URL generated:', confirmationUrl);
 
         const adminMailOptions = {
             from: `"${name}" <${process.env.EMAIL_USER}>`, // Use authenticated email as sender, but display user's name
@@ -820,6 +888,15 @@ export async function POST(request: Request) {
                         </ul>
                       </div>
 
+                      ${confirmationUrl ? `
+                      <div style="text-align: center; margin: 30px 0;">
+                        <a href="${confirmationUrl}" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-weight: 600; font-size: 18px; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);">
+                          ✅ Confirm Your Booking
+                        </a>
+                        <p style="margin: 12px 0 0 0; color: #64748b; font-size: 14px;">Click the button above to confirm your booking and provide any additional details</p>
+                      </div>
+                      ` : ''}
+                      
                       <div style="text-align: center; margin: 30px 0;">
                         <a href="${contactSectionUrl}" style="display: inline-block; background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px;">Contact Us</a>
                       </div>

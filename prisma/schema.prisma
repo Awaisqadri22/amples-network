@@ -135,9 +135,13 @@ model Booking {
   staircaseAdditionalServices String[] @map("staircase_additional_services") @default([])
   
   // Metadata
-  status  String  @default("pending") @db.VarChar(20)
+  status  String  @default("pending") @db.VarChar(20) // 'pending' | 'price-sent' | 'confirmed' | 'cancelled'
   source  String  @default("website")
   details Json?
+  
+  // Confirmation fields
+  confirmationToken String? @unique @map("confirmation_token")
+  tokenExpiresAt    DateTime? @map("token_expires_at")
   
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -256,9 +260,13 @@ model Quote {
   staircaseAdditionalServices String[] @map("staircase_additional_services") @default([])
   
   // Metadata
-  status  String  @default("new") @db.VarChar(20)
+  status  String  @default("new") @db.VarChar(20) // 'new' | 'price-sent' | 'confirmed' | 'cancelled'
   source  String  @default("website")
   details Json?
+  
+  // Confirmation fields
+  confirmationToken String? @unique @map("confirmation_token")
+  tokenExpiresAt    DateTime? @map("token_expires_at")
   
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
