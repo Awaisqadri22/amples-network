@@ -98,7 +98,7 @@ export default function QuoteForm({ idPrefix = 'form', sticky = true }: QuoteFor
             required
             value={formData.name}
             onChange={handleChange}
-            className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder:text-black"
+            className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder:text-gray-500"
             placeholder="Your name"
           />
         </div>
@@ -115,7 +115,7 @@ export default function QuoteForm({ idPrefix = 'form', sticky = true }: QuoteFor
             onChange={handleChange}
             onBlur={handlePhoneBlur}
             maxLength={11}
-            className={`w-full px-4 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder:text-black ${
+            className={`w-full px-4 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder:text-gray-500 ${
               phoneError ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="0764447563"
@@ -135,7 +135,7 @@ export default function QuoteForm({ idPrefix = 'form', sticky = true }: QuoteFor
             required
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder:text-black"
+            className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder:text-gray-500"
             placeholder="your@email.com"
           />
         </div>

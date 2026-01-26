@@ -797,7 +797,7 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                   value={formData.name}
                   onChange={handleChange}
                   onBlur={(e) => setTouchedFields(prev => new Set(prev).add(e.target.name))}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 transition-all placeholder:text-black ${
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 transition-all placeholder:text-gray-500 ${
                     isFieldInvalid('name', formData.name)
                       ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
                       : 'border-gray-300 focus:ring-cyan-500 focus:border-transparent'
@@ -823,7 +823,7 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                   onChange={handleChange}
                   onBlur={(e) => setTouchedFields(prev => new Set(prev).add(e.target.name))}
                   maxLength={11}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 transition-all placeholder:text-black ${
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 transition-all placeholder:text-gray-500 ${
                     isFieldInvalid('phone', formData.phone)
                       ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
                       : 'border-gray-300 focus:ring-cyan-500 focus:border-transparent'
@@ -849,7 +849,7 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                 value={formData.email}
                 onChange={handleChange}
                 onBlur={(e) => setTouchedFields(prev => new Set(prev).add(e.target.name))}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 transition-all placeholder:text-black ${
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 transition-all placeholder:text-gray-500 ${
                   isFieldInvalid('email', formData.email)
                     ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
                     : 'border-gray-300 focus:ring-cyan-500 focus:border-transparent'
@@ -874,7 +874,7 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                 value={formData.address}
                 onChange={handleChange}
                 onBlur={(e) => setTouchedFields(prev => new Set(prev).add(e.target.name))}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 transition-all placeholder:text-black ${
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 transition-all placeholder:text-gray-500 ${
                   isFieldInvalid('address', formData.address)
                     ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
                     : 'border-gray-300 focus:ring-cyan-500 focus:border-transparent'
@@ -955,7 +955,7 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                       min="0"
                       max="1000"
                       step="1"
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder:text-black ${
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder:text-gray-500 ${
                     isFieldInvalid('areaSize', formData.areaSize)
                       ? 'border-red-500'
                       : 'border-gray-300'
