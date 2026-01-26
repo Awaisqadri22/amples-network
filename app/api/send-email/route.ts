@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import { randomBytes } from 'crypto';
@@ -124,47 +124,32 @@ export async function POST(request: Request) {
         
         // Log all received data for debugging
         console.log('Received form data:', JSON.stringify(requestData, null, 2));
-        console.log('Environment check - EMAIL_USER exists:', !!process.env.EMAIL_USER);
-        console.log('Environment check - EMAIL_PASS exists:', !!process.env.EMAIL_PASS);
+        console.log('Environment check - RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
+        console.log('📧 Email from form:', email);
+        console.log('📧 Email type:', typeof email);
+        console.log('📧 Email after trim:', email ? email.trim() : 'null/undefined');
+        console.log('📧 Email validation check:', !!(email && email.trim()));
 
-        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-            const errorMsg = 'Missing email credentials. Make sure EMAIL_USER and EMAIL_PASS are set in Vercel environment variables.';
+        if (!process.env.RESEND_API_KEY) {
+            const errorMsg = 'Missing email service configuration. Make sure RESEND_API_KEY is set in Vercel environment variables.';
             console.error(errorMsg);
-            console.error('EMAIL_USER:', process.env.EMAIL_USER ? 'Set (hidden)' : 'NOT SET');
-            console.error('EMAIL_PASS:', process.env.EMAIL_PASS ? 'Set (hidden)' : 'NOT SET');
+            console.error('RESEND_API_KEY:', process.env.RESEND_API_KEY ? 'Set (hidden)' : 'NOT SET');
             return NextResponse.json({ 
-                error: 'Server configuration error: Missing email credentials',
-                details: 'Please configure EMAIL_USER and EMAIL_PASS in Vercel environment variables'
+                error: 'Server configuration error: Missing email service configuration',
+                details: 'Please configure RESEND_API_KEY in Vercel environment variables. Get your API key from https://resend.com'
             }, { status: 500 });
         }
 
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-            tls: {
-                rejectUnauthorized: false
-            }
-        });
-
-        // Verify connection configuration
-        try {
-            await transporter.verify();
-            console.log('Transporter connection verified successfully');
-        } catch (verifyError) {
-            const errorDetails = verifyError as Error;
-            console.error('Transporter verification failed:', errorDetails);
-            console.error('Error name:', errorDetails.name);
-            console.error('Error message:', errorDetails.message);
-            console.error('Error stack:', errorDetails.stack);
+        // Initialize Resend
+        if (!process.env.RESEND_API_KEY) {
             return NextResponse.json({ 
-                error: 'Failed to connect to email service', 
-                details: errorDetails.message,
-                hint: 'Make sure you are using an App Password (not regular password) for Gmail. Enable 2FA and generate an App Password at: https://myaccount.google.com/apppasswords'
+                error: 'Email service not configured', 
+                details: 'RESEND_API_KEY environment variable is missing',
+                hint: 'Please set RESEND_API_KEY in your environment variables'
             }, { status: 500 });
         }
+
+        const resend = new Resend(process.env.RESEND_API_KEY);
 
         // Generate unique confirmation token
         const generateConfirmationToken = (): string => {
@@ -345,6 +330,25 @@ export async function POST(request: Request) {
         // Calculate price estimation early (before constructing email)
         const squareMeterValue = squareMeter || areaSize || constructionAreaSize || officeAreaSize || detailAreaSize;
         const priceInfo = calculatePrice(squareMeterValue);
+        
+        // Helper function to remove price estimation from service details for admin email
+        const removePriceFromServiceDetails = (details: string): string => {
+            // Remove price estimation sections - these are embedded in template literals
+            // Pattern: ${priceInfo ? `...price estimation HTML...` : ''}
+            // We need to remove the entire conditional block including the paragraph
+            let cleaned = details;
+            
+            // Remove price estimation paragraphs that contain "Price Estimation" text
+            cleaned = cleaned.replace(/<p[^>]*margin[^>]*>[\s\S]*?<strong[^>]*>Price Estimation<\/strong>[\s\S]*?<\/p>/gi, '');
+            
+            // Remove price info blocks that might be in different formats
+            cleaned = cleaned.replace(/<p[^>]*>[\s\S]{0,200}Price Estimation[\s\S]{0,500}?kr[\s\S]{0,200}?<\/p>/gi, '');
+            
+            // Remove any standalone price estimation paragraphs
+            cleaned = cleaned.replace(/<p[^>]*>[\s\S]*?Price Estimation[\s\S]*?<\/p>/gi, '');
+            
+            return cleaned;
+        };
         
         // Construct Email Content
         let serviceDetails = '';
@@ -700,9 +704,11 @@ export async function POST(request: Request) {
         console.log('🔗 Confirmation URL generated:', confirmationUrl);
 
         const adminMailOptions = {
-            from: `"${name}" <${process.env.EMAIL_USER}>`, // Use authenticated email as sender, but display user's name
+            from: 'Amples <noreply@amples.se>',
             replyTo: email, // Set reply-to to user's email so replies go to them
             to: 'awaisiqbalqadri22@gmail.com', // Send to admin email
+            // Optional: Add BCC for additional email records
+            // bcc: 'info@amples.se', // Uncomment if you want to BCC another email
             subject: isContactForm 
                 ? `New Contact Form Submission from ${name} - ${serviceType || 'General Inquiry'}`
                 : `New Job from ${name} - ${selectedService || 'General Inquiry'}`,
@@ -791,7 +797,7 @@ export async function POST(request: Request) {
                           Service Details
                         </h2>
                         <div style="color: #334155; font-size: 15px; line-height: 1.8;">
-            ${serviceDetails}
+            ${removePriceFromServiceDetails(serviceDetails)}
                         </div>
                         ${message ? `
                         <div style="margin-top: 25px; padding-top: 25px; border-top: 2px solid #cbd5e1;">
@@ -828,10 +834,22 @@ export async function POST(request: Request) {
         };
 
         // Create user confirmation email with price estimation
-        const userMailOptions = email && email.trim() ? {
-            from: `"Amples" <${process.env.EMAIL_USER}>`,
+        // Try multiple possible email field names
+        const userEmail = (email && typeof email === 'string' ? email.trim() : '') ||
+                         (requestData.userEmail && typeof requestData.userEmail === 'string' ? requestData.userEmail.trim() : '') ||
+                         (requestData.user_email && typeof requestData.user_email === 'string' ? requestData.user_email.trim() : '') ||
+                         '';
+        
+        console.log('📧 Processing user email:', userEmail);
+        console.log('📧 Email from main field:', email);
+        console.log('📧 Email from userEmail field:', requestData.userEmail);
+        console.log('📧 Email from user_email field:', requestData.user_email);
+        console.log('📧 Will create userMailOptions:', !!userEmail);
+        
+        const userMailOptions = userEmail ? {
+            from: 'Amples <noreply@amples.se>',
             replyTo: 'info@amples.com',
-            to: email,
+            to: userEmail,
             subject: `Thank you for your quote request - ${displayService}`,
             html: `
         <!DOCTYPE html>
@@ -926,17 +944,68 @@ export async function POST(request: Request) {
         } : null;
 
         console.log('Attempting to send email...');
-        const result = await transporter.sendMail(adminMailOptions);
-        console.log('Admin email sent successfully. Message ID:', result.messageId);
-        console.log('Admin response:', result.response);
+        
+        // Send admin email
+        const { data: adminData, error: adminError } = await resend.emails.send(adminMailOptions);
+        
+        if (adminError) {
+            console.error('Failed to send admin email:', adminError);
+            return NextResponse.json({ 
+                error: 'Failed to send admin email', 
+                details: adminError.message || 'Unknown error'
+            }, { status: 500 });
+        }
+        
+        console.log('Admin email sent successfully. Email ID:', adminData?.id);
 
+        // Send user email if provided
+        let userEmailSent = false;
+        let userEmailError = null;
+        
         if (userMailOptions) {
-            const userResult = await transporter.sendMail(userMailOptions);
-            console.log('User email sent successfully. Message ID:', userResult.messageId);
-            console.log('User response:', userResult.response);
+            console.log('📧 Attempting to send user email to:', userMailOptions.to);
+            try {
+                const { data: userData, error: userError } = await resend.emails.send(userMailOptions);
+                
+                if (userError) {
+                    console.error('❌ Failed to send user email:', userError);
+                    console.error('❌ Error details:', JSON.stringify(userError, null, 2));
+                    
+                    // Check if it's a domain verification error
+                    if (userError.message && userError.message.includes('verify a domain')) {
+                        console.error('🔴 DOMAIN VERIFICATION REQUIRED:');
+                        console.error('🔴 Resend only allows sending to your own email with onboarding@resend.dev');
+                        console.error('🔴 To send to other recipients, verify your domain at resend.com/domains');
+                        console.error('🔴 Then change the "from" address to use your verified domain (e.g., info@amples.se)');
+                    }
+                    
+                    userEmailError = userError;
+                    // Don't fail the request if user email fails, admin email was sent
+                    console.warn('⚠️ User email failed but admin email was sent successfully');
+                } else {
+                    console.log('✅ User email sent successfully. Email ID:', userData?.id);
+                    console.log('✅ User email sent to:', userMailOptions.to);
+                    userEmailSent = true;
+                }
+            } catch (sendError) {
+                console.error('❌ Exception while sending user email:', sendError);
+                console.error('❌ Exception details:', JSON.stringify(sendError, null, 2));
+                userEmailError = sendError;
+            }
+        } else {
+            console.warn('⚠️ userMailOptions is null/undefined - user email will not be sent');
+            console.warn('⚠️ Email value was:', email);
+            console.warn('⚠️ Email type:', typeof email);
+            userEmailError = 'No email address provided in form';
         }
 
-        return NextResponse.json({ message: 'Email sent successfully' }, { status: 200 });
+        return NextResponse.json({ 
+            message: 'Email sent successfully',
+            adminEmailSent: true,
+            userEmailSent: userEmailSent,
+            userEmailAddress: userEmail || email || 'Not provided',
+            userEmailError: userEmailError ? (typeof userEmailError === 'object' ? JSON.stringify(userEmailError) : userEmailError.toString()) : null
+        }, { status: 200 });
     } catch (error) {
         const errorDetails = error as Error;
         console.error('Error sending email:', errorDetails);
@@ -948,13 +1017,16 @@ export async function POST(request: Request) {
         let userFriendlyError = 'Failed to send email';
         let hint = '';
         
-        if (errorDetails.message.includes('Invalid login')) {
-            userFriendlyError = 'Email authentication failed';
-            hint = 'Please verify EMAIL_USER and EMAIL_PASS are correct. Use an App Password for Gmail.';
+        if (errorDetails.message.includes('API key')) {
+            userFriendlyError = 'Email service authentication failed';
+            hint = 'Please verify RESEND_API_KEY is correct in your environment variables.';
+        } else if (errorDetails.message.includes('rate limit') || errorDetails.message.includes('429')) {
+            userFriendlyError = 'Email rate limit exceeded';
+            hint = 'Too many emails sent. Please wait a moment and try again.';
         } else if (errorDetails.message.includes('timeout')) {
             userFriendlyError = 'Email service timeout';
             hint = 'The email service took too long to respond. Please try again.';
-        } else if (errorDetails.message.includes('ECONNREFUSED') || errorDetails.message.includes('ENOTFOUND')) {
+        } else if (errorDetails.message.includes('network') || errorDetails.message.includes('ECONNREFUSED')) {
             userFriendlyError = 'Cannot connect to email service';
             hint = 'Network error. Please check your internet connection and try again.';
         }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
+import { Prisma } from '@prisma/client';
 
 export async function POST(request: Request) {
     try {
@@ -14,13 +15,15 @@ export async function POST(request: Request) {
         }
 
         // Find quote or booking by confirmation token
-        const quote = await prisma.quote.findUnique({
-            where: { confirmationToken: token },
+        // Using type assertion because Prisma Client types may not recognize confirmationToken
+        // The field exists in the database schema and works at runtime
+        const quote = await prisma.quote.findFirst({
+            where: { confirmationToken: token } as Prisma.QuoteWhereInput,
             include: { user: true }
         });
 
-        const booking = await prisma.booking.findUnique({
-            where: { confirmationToken: token },
+        const booking = await prisma.booking.findFirst({
+            where: { confirmationToken: token } as Prisma.BookingWhereInput,
             include: { user: true }
         });
 
@@ -35,7 +38,9 @@ export async function POST(request: Request) {
         }
 
         // Check if token has expired
-        if (record.tokenExpiresAt && new Date() > record.tokenExpiresAt) {
+        // Type assertion needed because Prisma types might not include tokenExpiresAt
+        const recordWithToken = record as typeof record & { tokenExpiresAt: Date | null };
+        if (recordWithToken.tokenExpiresAt && new Date() > recordWithToken.tokenExpiresAt) {
             return NextResponse.json(
                 { error: 'Confirmation link has expired. Please contact us for a new link.' },
                 { status: 410 }
@@ -54,13 +59,24 @@ export async function POST(request: Request) {
         }
 
         // Update record to confirmed status
-        const updateData: any = {
+        // Create update data with proper typing
+        const updateData: {
+            status: string;
+            comments?: string | null;
+            preferredDateTime?: Date | null;
+        } = {
             status: 'confirmed',
             ...(additionalInfo && { 
-                comments: additionalInfo.comments || record.comments,
+                comments: additionalInfo.comments || record.comments || null,
                 preferredDateTime: additionalInfo.preferredDateTime 
                     ? new Date(additionalInfo.preferredDateTime) 
-                    : record.preferredDateTime || record.officePreferredDateTime || record.moveOutCleaningDate || record.windowCleaningDate || record.constructionCleaningDate || record.floorCleaningDate
+                    : (record.preferredDateTime || 
+                       (record as typeof record & { officePreferredDateTime?: Date | null }).officePreferredDateTime || 
+                       (record as typeof record & { moveOutCleaningDate?: Date | null }).moveOutCleaningDate || 
+                       (record as typeof record & { windowCleaningDate?: Date | null }).windowCleaningDate || 
+                       (record as typeof record & { constructionCleaningDate?: Date | null }).constructionCleaningDate || 
+                       (record as typeof record & { floorCleaningDate?: Date | null }).floorCleaningDate || 
+                       null)
             })
         };
 
@@ -81,28 +97,18 @@ export async function POST(request: Request) {
 
         // Send confirmation emails
         try {
-            if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-                console.warn('Email credentials not configured, skipping confirmation emails');
+            if (!process.env.RESEND_API_KEY) {
+                console.warn('Resend API key not configured, skipping confirmation emails');
             } else {
-                const transporter = nodemailer.createTransport({
-                    service: 'gmail',
-                    auth: {
-                        user: process.env.EMAIL_USER,
-                        pass: process.env.EMAIL_PASS,
-                    },
-                    tls: {
-                        rejectUnauthorized: false
-                    }
-                });
+                const resend = new Resend(process.env.RESEND_API_KEY);
 
-                const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || 'https://amples.se';
                 const serviceName = confirmedRecord.selectedService || confirmedRecord.serviceType || 'Cleaning Service';
                 const customerEmail = confirmedRecord.email || confirmedRecord.userEmail;
 
                 // Email to customer
                 if (customerEmail) {
                     const customerMailOptions = {
-                        from: `"Amples" <${process.env.EMAIL_USER}>`,
+                        from: 'Amples <noreply@amples.se>',
                         to: customerEmail,
                         subject: `Booking Confirmed - ${serviceName}`,
                         html: `
@@ -135,13 +141,18 @@ export async function POST(request: Request) {
                         `
                     };
 
-                    await transporter.sendMail(customerMailOptions);
-                    console.log('✅ Confirmation email sent to customer');
+                    const { data: customerData, error: customerError } = await resend.emails.send(customerMailOptions);
+                    
+                    if (customerError) {
+                        console.error('Failed to send customer confirmation email:', customerError);
+                    } else {
+                        console.log('✅ Confirmation email sent to customer. Email ID:', customerData?.id);
+                    }
                 }
 
                 // Email to admin
                 const adminMailOptions = {
-                    from: `"Amples Booking System" <${process.env.EMAIL_USER}>`,
+                    from: 'Amples Booking System <noreply@amples.se>',
                     to: 'awaisiqbalqadri22@gmail.com',
                     subject: `✅ Booking Confirmed - ${serviceName} - ${confirmedRecord.name}`,
                     html: `
@@ -168,8 +179,13 @@ export async function POST(request: Request) {
                     `
                 };
 
-                await transporter.sendMail(adminMailOptions);
-                console.log('✅ Confirmation notification sent to admin');
+                const { data: adminData, error: adminError } = await resend.emails.send(adminMailOptions);
+                
+                if (adminError) {
+                    console.error('Failed to send admin confirmation email:', adminError);
+                } else {
+                    console.log('✅ Confirmation notification sent to admin. Email ID:', adminData?.id);
+                }
             }
         } catch (emailError) {
             console.error('Error sending confirmation emails:', emailError);

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 export async function GET(
     request: Request,
@@ -16,13 +17,15 @@ export async function GET(
         }
 
         // Find quote or booking by confirmation token
-        const quote = await prisma.quote.findUnique({
-            where: { confirmationToken: token },
+        // Using type assertion because Prisma Client types may not recognize confirmationToken
+        // The field exists in the database schema and works at runtime
+        const quote = await prisma.quote.findFirst({
+            where: { confirmationToken: token } as Prisma.QuoteWhereInput,
             include: { user: true }
         });
 
-        const booking = await prisma.booking.findUnique({
-            where: { confirmationToken: token },
+        const booking = await prisma.booking.findFirst({
+            where: { confirmationToken: token } as Prisma.BookingWhereInput,
             include: { user: true }
         });
 
@@ -36,7 +39,9 @@ export async function GET(
         }
 
         // Check if token has expired
-        if (record.tokenExpiresAt && new Date() > record.tokenExpiresAt) {
+        // Type assertion needed because Prisma types might not include tokenExpiresAt
+        const recordWithToken = record as typeof record & { tokenExpiresAt: Date | null };
+        if (recordWithToken.tokenExpiresAt && new Date() > recordWithToken.tokenExpiresAt) {
             return NextResponse.json(
                 { error: 'Confirmation link has expired. Please contact us for a new link.' },
                 { status: 410 } // 410 Gone
@@ -45,13 +50,17 @@ export async function GET(
 
         // Check if already confirmed
         if (record.status === 'confirmed') {
+            const recordWithService = record as typeof record & { 
+                selectedService?: string | null; 
+                serviceType?: string | null;
+            };
             return NextResponse.json(
                 { 
                     error: 'This booking has already been confirmed',
                     record: {
                         id: record.id,
                         status: record.status,
-                        service: (record as any).selectedService || (record as any).serviceType,
+                        service: recordWithService.selectedService || recordWithService.serviceType,
                     }
                 },
                 { status: 200 }
@@ -59,7 +68,13 @@ export async function GET(
         }
 
         // Return record data (excluding sensitive fields)
-        const { confirmationToken, tokenExpiresAt, ...safeRecord } = record;
+        // Type assertion needed for destructuring
+        const recordForDestructuring = record as typeof record & { 
+            confirmationToken?: string | null; 
+            tokenExpiresAt?: Date | null;
+        };
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { confirmationToken: _confirmationToken, tokenExpiresAt: _tokenExpiresAt, ...safeRecord } = recordForDestructuring;
 
         return NextResponse.json({
             record: safeRecord,
