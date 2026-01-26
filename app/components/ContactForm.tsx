@@ -343,13 +343,15 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
       if (currentStep === 1) {
         // Step 1 validation for Move-out Cleaning
         return formData.moveOutCleaningDate !== '' && 
+               formData.areaSize !== '' &&
+               validateArea(formData.areaSize) &&
                formData.isDateFlexible !== '' &&
                (formData.isDateFlexible === 'No' || formData.dateFlexibilityRange !== '');
       }
       
       if (currentStep === 2) {
-        // Step 2 validation - room fields are always filled (default '0')
-        return true;
+        // Step 2 validation - room fields are always filled (default '0'), but homeType is required
+        return formData.homeType !== '';
       }
       
       if (currentStep === 3) {
@@ -451,11 +453,13 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
       // Step 1 validation
       const step1Valid = 
         formData.moveOutCleaningDate !== '' &&
+        formData.areaSize !== '' &&
+        validateArea(formData.areaSize) &&
         formData.isDateFlexible !== '' &&
         (formData.isDateFlexible === 'No' || formData.dateFlexibilityRange !== '');
       
-      // Step 2 validation - room fields are always filled (default '0')
-      const step2Valid = true;
+      // Step 2 validation - room fields are always filled (default '0'), but homeType is required
+      const step2Valid = formData.homeType !== '';
       
       // Step 3 validation
       const step3Valid = 
@@ -814,22 +818,28 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
                   Phone Number *
                 </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  required
-                  value={formData.phone}
-                  onChange={handleChange}
-                  onBlur={(e) => setTouchedFields(prev => new Set(prev).add(e.target.name))}
-                  maxLength={11}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 transition-all placeholder:text-gray-500 ${
-                    isFieldInvalid('phone', formData.phone)
-                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
-                      : 'border-gray-300 focus:ring-cyan-500 focus:border-transparent'
-                  }`}
-                  placeholder="0764447563"
-                />
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2 z-10">
+                    <span className="text-2xl">🇸🇪</span>
+                    <span className="text-gray-600 font-medium">+46</span>
+                  </div>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    required
+                    value={formData.phone}
+                    onChange={handleChange}
+                    onBlur={(e) => setTouchedFields(prev => new Set(prev).add(e.target.name))}
+                    maxLength={11}
+                    className={`w-full pl-20 pr-4 py-2 border rounded-lg focus:ring-2 transition-all placeholder:text-gray-500 ${
+                      isFieldInvalid('phone', formData.phone)
+                        ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                        : 'border-gray-300 focus:ring-cyan-500 focus:border-transparent'
+                    }`}
+                    placeholder="70 123 45 67"
+                  />
+                </div>
                 {getFieldError('phone', formData.phone) && (
                   <p className="mt-1 text-sm text-red-600">
                     {getFieldError('phone', formData.phone)}
@@ -1392,21 +1402,66 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                     Step 1: Move-out Cleaning Details
                   </h3>
 
-                  {/* Move-out Cleaning Date/Time Picker */}
+                  {/* Move-out Cleaning Date Picker */}
                   <div className="form-group">
                     <label htmlFor="moveOutCleaningDate" className="block text-sm font-medium text-gray-700 mb-1">
                       When will the moving-out cleaning take place? *
                     </label>
                     <input
-                      type="datetime-local"
+                      type="date"
                       id="moveOutCleaningDate"
                       name="moveOutCleaningDate"
                       value={formData.moveOutCleaningDate}
                       onChange={handleChange}
-                      min={getCurrentDateTime()}
+                      min={getCurrentDate()}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
                     />
+                  </div>
+
+                  {/* Area Size Input */}
+                  <div className="form-group border-t border-gray-200 pt-4">
+                    <label htmlFor="areaSize" className="block text-sm font-medium text-gray-700 mb-1">
+                      Approximately how large an area should be? (sq m) *
+                    </label>
+                    <input
+                      type="number"
+                      id="areaSize"
+                      name="areaSize"
+                      value={formData.areaSize}
+                      onChange={handleChange}
+                      onBlur={(e) => {
+                        setTouchedFields(prev => new Set(prev).add(e.target.name));
+                        // Restrict to max 4 digits and max 1000
+                        const value = e.target.value;
+                        if (value && (parseFloat(value) > 1000 || value.replace(/\./g, '').length > 4)) {
+                          const numValue = parseFloat(value);
+                          if (numValue > 1000) {
+                            e.target.value = '1000';
+                            handleChange({ target: { name: 'areaSize', value: '1000' } } as React.ChangeEvent<HTMLInputElement>);
+                          } else if (value.replace(/\./g, '').length > 4) {
+                            const restricted = value.slice(0, 4);
+                            e.target.value = restricted;
+                            handleChange({ target: { name: 'areaSize', value: restricted } } as React.ChangeEvent<HTMLInputElement>);
+                          }
+                        }
+                      }}
+                      min="0"
+                      max="1000"
+                      step="0.1"
+                      required
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 transition-all placeholder:text-gray-500 ${
+                        isFieldInvalid('areaSize', formData.areaSize)
+                          ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:ring-cyan-500 focus:border-transparent'
+                      }`}
+                      placeholder="Enter area in square meters (0-1000)"
+                    />
+                    {getFieldError('areaSize', formData.areaSize) && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {getFieldError('areaSize', formData.areaSize)}
+                      </p>
+                    )}
                   </div>
 
                   {/* Is Date Flexible Radio */}
@@ -1481,6 +1536,29 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                     </svg>
                     Step 2: Room Details
                   </h3>
+
+                  {/* Type of Accommodation Dropdown */}
+                  <div className="form-group">
+                    <label htmlFor="homeType" className="block text-sm font-medium text-gray-700 mb-1">
+                      Type of accommodation *
+                    </label>
+                    <select
+                      id="homeType"
+                      name="homeType"
+                      value={formData.homeType}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">Select accommodation type</option>
+                      <option value="villa">Villa</option>
+                      <option value="apartment">Apartment</option>
+                      <option value="town house">Town house</option>
+                      <option value="holiday home">Holiday home</option>
+                      <option value="terraced house">Terraced house</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
 
                   {/* Number of Rooms Input - Increment/Decrement */}
                   <div className="form-group">

@@ -106,20 +106,26 @@ export default function QuoteForm({ idPrefix = 'form', sticky = true }: QuoteFor
           <label htmlFor={`phone-${idPrefix}`} className="block text-sm font-medium text-gray-700 mb-1">
             Phone Number *
           </label>
-          <input
-            type="tel"
-            id={`phone-${idPrefix}`}
-            name="phone"
-            required
-            value={formData.phone}
-            onChange={handleChange}
-            onBlur={handlePhoneBlur}
-            maxLength={11}
-            className={`w-full px-4 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder:text-gray-500 ${
-              phoneError ? 'border-red-500' : 'border-gray-300'
-            }`}
-            placeholder="0764447563"
-          />
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2 z-10">
+              <span className="text-2xl">🇸🇪</span>
+              <span className="text-gray-600 font-medium">+46</span>
+            </div>
+            <input
+              type="tel"
+              id={`phone-${idPrefix}`}
+              name="phone"
+              required
+              value={formData.phone}
+              onChange={handleChange}
+              onBlur={handlePhoneBlur}
+              maxLength={11}
+              className={`w-full pl-20 pr-4 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder:text-gray-500 ${
+                phoneError ? 'border-red-500' : 'border-gray-300'
+              }`}
+              placeholder="70 123 45 67"
+            />
+          </div>
           {phoneError && (
             <p className="mt-1 text-sm text-red-600">{phoneError}</p>
           )}

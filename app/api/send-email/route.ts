@@ -415,7 +415,7 @@ export async function POST(request: Request) {
             const moveOutPriceInfo = calculatePrice(areaSize);
             serviceDetails = `
                 <div style="margin-bottom: 20px;">
-                  ${moveOutCleaningDate ? `<p style="margin: 8px 0;"><strong style="color: #1e293b;">Moving-out Cleaning Date:</strong> <span style="color: #475569;">${new Date(moveOutCleaningDate).toLocaleString()}</span></p>` : ''}
+                  ${moveOutCleaningDate ? `<p style="margin: 8px 0;"><strong style="color: #1e293b;">Moving-out Cleaning Date:</strong> <span style="color: #475569;">${new Date(moveOutCleaningDate).toLocaleDateString()}</span></p>` : ''}
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Is Date Flexible:</strong> <span style="color: #475569;">${isDateFlexible || 'Not specified'}</span></p>
                   ${isDateFlexible === 'Yes' && dateFlexibilityRange ? `<p style="margin: 8px 0;"><strong style="color: #1e293b;">Date Flexibility Range:</strong> <span style="color: #475569;">${dateFlexibilityRange}</span></p>` : ''}
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Home Type:</strong> <span style="color: #475569;">${homeType || 'Not specified'}</span></p>
