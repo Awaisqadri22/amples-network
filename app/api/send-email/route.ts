@@ -131,12 +131,16 @@ export async function POST(request: Request) {
         console.log('📧 Email validation check:', !!(email && email.trim()));
 
         if (!process.env.RESEND_API_KEY) {
-            const errorMsg = 'Missing email service configuration. Make sure RESEND_API_KEY is set in Vercel environment variables.';
+            const errorMsg = 'Missing email service configuration. RESEND_API_KEY is not set.';
             console.error(errorMsg);
             console.error('RESEND_API_KEY:', process.env.RESEND_API_KEY ? 'Set (hidden)' : 'NOT SET');
+            const hint = typeof window === 'undefined' && !process.env.VERCEL
+                ? 'For local dev: add RESEND_API_KEY to .env.local in the project root, then restart the dev server (npm run dev).'
+                : 'For Vercel: add RESEND_API_KEY in Project Settings → Environment Variables.';
             return NextResponse.json({ 
                 error: 'Server configuration error: Missing email service configuration',
-                details: 'Please configure RESEND_API_KEY in Vercel environment variables. Get your API key from https://resend.com'
+                details: 'RESEND_API_KEY is required. Get your API key from https://resend.com/api-keys',
+                hint
             }, { status: 500 });
         }
 
