@@ -91,6 +91,17 @@ export async function POST(request: Request) {
                 data: updateData,
                 include: { user: true }
             });
+            // Create a Booking from the confirmed Quote so the bookings table is populated
+            const quoteData = confirmedRecord as Record<string, unknown>;
+            const { id: _quoteId, createdAt: _qCreated, updatedAt: _qUpdated, user: _qUser, ...quoteScalars } = quoteData;
+            await prisma.booking.create({
+                data: {
+                    ...quoteScalars,
+                    status: 'confirmed',
+                    confirmationToken: null,
+                    tokenExpiresAt: null,
+                } as Prisma.BookingUncheckedCreateInput,
+            });
         } else {
             confirmedRecord = await prisma.booking.update({
                 where: { id: record.id },
