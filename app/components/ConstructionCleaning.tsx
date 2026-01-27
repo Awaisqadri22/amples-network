@@ -65,7 +65,7 @@ export default function ConstructionCleaning() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 lg:gap-12">
             {/* Left side - 70% Text Content */}
-            <div className="lg:col-span-7">
+            <div className="lg:col-span-6">
               <h2 className="text-3xl font-bold text-gray-900 mb-6">
                 Professional Construction Cleaning Services
               </h2>
@@ -96,7 +96,7 @@ export default function ConstructionCleaning() {
             </div>
 
             {/* Right side - 30% Form */}
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-4">
               <ContactForm defaultService="Construction Cleaning" />
             </div>
           </div>

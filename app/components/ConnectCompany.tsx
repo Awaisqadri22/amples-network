@@ -19,7 +19,9 @@ const services = [
 
 export default function ConnectCompany() {
   const [formData, setFormData] = useState({
+    nameOfBusiness: '',
     placeOfBusiness: '',
+    organizationNumber: '',
     phone: '',
     email: '',
     agreeToPrivacy: false
@@ -31,10 +33,15 @@ export default function ConnectCompany() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    });
+    if (name === 'organizationNumber') {
+      const digitsOnly = value.replace(/\D/g, '').slice(0, 12);
+      setFormData({ ...formData, [name]: digitsOnly });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: type === 'checkbox' ? checked : value
+      });
+    }
     setError('');
   };
 
@@ -47,13 +54,33 @@ export default function ConnectCompany() {
     return /^0?[1-9]\d{8,9}$/.test(cleaned) || /^07\d{8}$/.test(cleaned);
   };
 
+  const validateOrganizationNumber = (val: string): boolean => {
+    const digits = val.replace(/\D/g, '');
+    return digits.length >= 10 && digits.length <= 12;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     // Validation
+    if (!formData.nameOfBusiness.trim()) {
+      setError('Please enter the name of your business');
+      return;
+    }
+
     if (!formData.placeOfBusiness.trim()) {
       setError('Please enter your place of business');
+      return;
+    }
+
+    if (!formData.organizationNumber.trim()) {
+      setError('Please enter your organization number');
+      return;
+    }
+
+    if (!validateOrganizationNumber(formData.organizationNumber)) {
+      setError('Organization number must be 10–12 digits');
       return;
     }
 
@@ -91,13 +118,16 @@ export default function ConnectCompany() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: formData.placeOfBusiness,
+          name: formData.nameOfBusiness,
+          company: formData.nameOfBusiness,
+          placeOfBusiness: formData.placeOfBusiness,
+          organizationNumber: formData.organizationNumber,
           phone: formData.phone,
           email: formData.email,
           serviceType: 'Company Partnership',
           selectedService: 'Office Cleaning',
           formType: 'company',
-          message: `Company Partnership Interest - Place of Business: ${formData.placeOfBusiness}`,
+          message: `Company Partnership Interest - Name of Business: ${formData.nameOfBusiness}, Place of Business: ${formData.placeOfBusiness}, Organization number: ${formData.organizationNumber}`,
           submissionKind: 'quote'
         }),
       });
@@ -105,7 +135,9 @@ export default function ConnectCompany() {
       if (response.ok) {
         setStatus('success');
         setFormData({
+          nameOfBusiness: '',
           placeOfBusiness: '',
+          organizationNumber: '',
           phone: '',
           email: '',
           agreeToPrivacy: false
@@ -170,7 +202,7 @@ export default function ConnectCompany() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 lg:gap-12">
             {/* Left side - 70% Text Content */}
-            <div className="lg:col-span-7">
+            <div className="lg:col-span-6">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
                 We help you get more customers and grow
               </h2>
@@ -248,12 +280,28 @@ export default function ConnectCompany() {
             </div>
 
             {/* Right side - 30% Form */}
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-4">
               <div className="bg-white rounded-2xl shadow-2xl p-6 sticky top-24">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
                   Would you like to know more? Register your interest!
                 </h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label htmlFor="nameOfBusiness" className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Name of business
+                    </label>
+                    <input
+                      type="text"
+                      id="nameOfBusiness"
+                      name="nameOfBusiness"
+                      value={formData.nameOfBusiness}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors placeholder:text-gray-500"
+                      placeholder="Enter your business name"
+                      required
+                    />
+                  </div>
+
                   <div>
                     <label htmlFor="placeOfBusiness" className="block text-sm font-medium text-gray-700 mb-1.5">
                       Place of business
@@ -268,6 +316,25 @@ export default function ConnectCompany() {
                       placeholder="Enter your business location"
                       required
                     />
+                  </div>
+
+                  <div>
+                    <label htmlFor="organizationNumber" className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Organization number
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      id="organizationNumber"
+                      name="organizationNumber"
+                      value={formData.organizationNumber}
+                      onChange={handleChange}
+                      maxLength={12}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors placeholder:text-gray-500"
+                      placeholder="10–12 digits"
+                      required
+                    />
+                    <p className="mt-1 text-xs text-gray-500">10–12 digits</p>
                   </div>
 
                   <div>

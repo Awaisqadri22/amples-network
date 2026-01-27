@@ -1,7 +1,15 @@
+'use client';
+
+import { useState } from 'react';
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
 
 export default function Checklist() {
+  const [extraServicesOpen, setExtraServicesOpen] = useState(false);
+  const [importantInfoOpen, setImportantInfoOpen] = useState(false);
+  const [whatsNotIncludedOpen, setWhatsNotIncludedOpen] = useState(false);
+  const [preMoveChecklistOpen, setPreMoveChecklistOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
@@ -289,194 +297,237 @@ export default function Checklist() {
             </div>
           </div>
 
-          {/* Full Width Section with Animation */}
-          <div className="w-full mt-16 px-4 sm:px-8 lg:px-16 xl:px-24">
-            <div className="relative bg-gradient-to-br from-white via-cyan-50/30 to-emerald-50/30 rounded-2xl border-2 border-cyan-300/50 shadow-2xl p-8 md:p-12 animate-fade-in-up animate-border-glow overflow-hidden">
-              {/* Animated border gradient overlay */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/0 via-cyan-500/5 to-cyan-500/0 opacity-50"></div>
-              
-              {/* Content */}
-              <div className="relative z-10">
-                <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">
+          {/* Four collapsible sections in 2x2 grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-16 px-4 sm:px-8 lg:px-16 xl:px-24">
+          {/* Extra Services (Collapsible) */}
+          <div className="w-full">
+            <div className="relative bg-gradient-to-br from-white via-cyan-50/30 to-emerald-50/30 rounded-2xl border-2 border-cyan-300/50 shadow-2xl overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setExtraServicesOpen(!extraServicesOpen)}
+                className="w-full flex items-center justify-between p-6 md:p-8 text-left hover:bg-cyan-50/50 transition-colors"
+                aria-expanded={extraServicesOpen}
+              >
+                <h3 className="text-2xl md:text-3xl font-bold text-gray-900 pr-4">
                   Extra Services You Can Add to Your Move-Out Cleaning with Amples
                 </h3>
-                
-                <div className="space-y-6 max-w-3xl mx-auto">
-                  {/* Cleaning of Basement / Storage Room / Garage / Balcony */}
-                  <div className="text-center">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-3">
-                      Cleaning of Basement / Storage Room / Garage / Balcony
-                    </h4>
-                    <ul className="space-y-2">
-                      <li className="flex items-center justify-center">
-                        <span className="text-cyan-600 mr-3 flex-shrink-0">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                        </span>
-                        <span className="text-gray-700 text-base leading-relaxed">Rough sweeping of floors, shelves, cobwebs, and windows</span>
-                      </li>
-                    </ul>
-                  </div>
+                <svg
+                  className={`w-8 h-8 text-cyan-600 flex-shrink-0 transition-transform duration-200 ${extraServicesOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${extraServicesOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}
+              >
+                <div className="relative z-10 px-6 md:px-8 pb-6 md:pb-8 pt-0 border-t border-cyan-200/50">
+                  <div className="space-y-6 max-w-3xl mx-auto pt-6">
+                    {/* Cleaning of Basement / Storage Room / Garage / Balcony */}
+                    <div className="text-center">
+                      <h4 className="text-lg font-semibold text-gray-800 mb-3">
+                        Cleaning of Basement / Storage Room / Garage / Balcony
+                      </h4>
+                      <ul className="space-y-2">
+                        <li className="flex items-center justify-center">
+                          <span className="text-cyan-600 mr-3 flex-shrink-0">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          </span>
+                          <span className="text-gray-700 text-base leading-relaxed">Rough sweeping of floors, shelves, cobwebs, and windows</span>
+                        </li>
+                      </ul>
+                    </div>
 
-                  {/* Cleaning of Glazed Balcony / Patio */}
-                  <div className="text-center">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-3">
-                      Cleaning of Glazed Balcony / Patio
-                    </h4>
-                    <ul className="space-y-2">
-                      <li className="flex items-center justify-center">
-                        <span className="text-cyan-600 mr-3 flex-shrink-0">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                        </span>
-                        <span className="text-gray-700 text-base leading-relaxed">Cleaning of windows and frames</span>
-                      </li>
-                      <li className="flex items-center justify-center">
-                        <span className="text-cyan-600 mr-3 flex-shrink-0">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                        </span>
-                        <span className="text-gray-700 text-base leading-relaxed">Cleaning of doors and moldings</span>
-                      </li>
-                      <li className="flex items-center justify-center">
-                        <span className="text-cyan-600 mr-3 flex-shrink-0">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                        </span>
-                        <span className="text-gray-700 text-base leading-relaxed">Rough sweeping of floors</span>
-                      </li>
-                    </ul>
-                  </div>
+                    {/* Cleaning of Glazed Balcony / Patio */}
+                    <div className="text-center">
+                      <h4 className="text-lg font-semibold text-gray-800 mb-3">
+                        Cleaning of Glazed Balcony / Patio
+                      </h4>
+                      <ul className="space-y-2">
+                        <li className="flex items-center justify-center">
+                          <span className="text-cyan-600 mr-3 flex-shrink-0">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          </span>
+                          <span className="text-gray-700 text-base leading-relaxed">Cleaning of windows and frames</span>
+                        </li>
+                        <li className="flex items-center justify-center">
+                          <span className="text-cyan-600 mr-3 flex-shrink-0">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          </span>
+                          <span className="text-gray-700 text-base leading-relaxed">Cleaning of doors and moldings</span>
+                        </li>
+                        <li className="flex items-center justify-center">
+                          <span className="text-cyan-600 mr-3 flex-shrink-0">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          </span>
+                          <span className="text-gray-700 text-base leading-relaxed">Rough sweeping of floors</span>
+                        </li>
+                      </ul>
+                    </div>
 
-                  {/* Cleaning the Water Trap */}
-                  <div className="text-center">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-3">
-                      Cleaning the Water Trap
-                    </h4>
-                    <ul className="space-y-2">
-                      <li className="flex items-center justify-center">
-                        <span className="text-cyan-600 mr-3 flex-shrink-0">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                        </span>
-                        <span className="text-gray-700 text-base leading-relaxed">Includes disassembly and reassembly</span>
-                      </li>
-                    </ul>
-                  </div>
+                    {/* Cleaning the Water Trap */}
+                    <div className="text-center">
+                      <h4 className="text-lg font-semibold text-gray-800 mb-3">
+                        Cleaning the Water Trap
+                      </h4>
+                      <ul className="space-y-2">
+                        <li className="flex items-center justify-center">
+                          <span className="text-cyan-600 mr-3 flex-shrink-0">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          </span>
+                          <span className="text-gray-700 text-base leading-relaxed">Includes disassembly and reassembly</span>
+                        </li>
+                      </ul>
+                    </div>
 
-                  {/* Dusting and Cleaning of Blinds */}
-                  <div className="text-center">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-3">
-                      Dusting and Cleaning of Blinds
-                    </h4>
-                    <ul className="space-y-2">
-                      <li className="flex items-center justify-center">
-                        <span className="text-cyan-600 mr-3 flex-shrink-0">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                        </span>
-                        <div className="flex flex-col items-center">
-                          <span className="text-gray-700 text-base leading-relaxed">Cleaning of blinds</span>
-                          <p className="text-sm text-gray-500 italic mt-2">(Note: For older blinds, the customer is responsible for any damage that may occur during cleaning.)</p>
-                        </div>
-                      </li>
-                    </ul>
+                    {/* Dusting and Cleaning of Blinds */}
+                    <div className="text-center">
+                      <h4 className="text-lg font-semibold text-gray-800 mb-3">
+                        Dusting and Cleaning of Blinds
+                      </h4>
+                      <ul className="space-y-2">
+                        <li className="flex items-center justify-center">
+                          <span className="text-cyan-600 mr-3 flex-shrink-0">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          </span>
+                          <div className="flex flex-col items-center">
+                            <span className="text-gray-700 text-base leading-relaxed">Cleaning of blinds</span>
+                            <p className="text-sm text-gray-500 italic mt-2">(Note: For older blinds, the customer is responsible for any damage that may occur during cleaning.)</p>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Second Full Width Section - Important Information */}
-          <div className="w-full mt-16 px-4 sm:px-8 lg:px-16 xl:px-24">
-            <div className="relative bg-gradient-to-br from-white via-cyan-50/30 to-emerald-50/30 rounded-2xl border-2 border-cyan-300/50 shadow-2xl p-8 md:p-12 animate-fade-in-up animate-border-glow overflow-hidden">
-              {/* Animated border gradient overlay */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/0 via-cyan-500/5 to-cyan-500/0 opacity-50"></div>
-              
-              {/* Content */}
-              <div className="relative z-10">
-                <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">
+          {/* Important Information (Collapsible) */}
+          <div className="w-full">
+            <div className="relative bg-gradient-to-br from-white via-cyan-50/30 to-emerald-50/30 rounded-2xl border-2 border-cyan-300/50 shadow-2xl overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setImportantInfoOpen(!importantInfoOpen)}
+                className="w-full flex items-center justify-between p-6 md:p-8 text-left hover:bg-cyan-50/50 transition-colors"
+                aria-expanded={importantInfoOpen}
+              >
+                <h3 className="text-2xl md:text-3xl font-bold text-gray-900 pr-4">
                   Amples Move-Out Cleaning Checklist – Important Information
                 </h3>
-                
-                <div className="space-y-6 max-w-3xl mx-auto text-center">
-                  <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-                    This checklist also serves as a guide for move-in cleaning for both apartments (rental and condominium) and villas.
-                  </p>
+                <svg
+                  className={`w-8 h-8 text-cyan-600 flex-shrink-0 transition-transform duration-200 ${importantInfoOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${importantInfoOpen ? 'max-h-[1200px] opacity-100' : 'max-h-0 opacity-0'}`}
+              >
+                <div className="relative z-10 px-6 md:px-8 pb-6 md:pb-8 pt-0 border-t border-cyan-200/50">
+                  <div className="space-y-6 max-w-3xl mx-auto text-center pt-6">
+                    <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+                      This checklist also serves as a guide for move-in cleaning for both apartments (rental and condominium) and villas.
+                    </p>
 
-                  <div className="mt-8">
-                    <h4 className="text-xl font-semibold text-gray-800 mb-6">
-                      Things to Keep in Mind:
-                    </h4>
-                    <ul className="space-y-4 text-left">
-                      <li className="flex items-start">
-                        <span className="text-cyan-600 mr-3 mt-1 flex-shrink-0">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                        </span>
-                        <span className="text-gray-700 text-base leading-relaxed">
-                          There are no standardized rules for how a move-out cleaning must be carried out. That&apos;s why it&apos;s smart to review different cleaning companies&apos; checklists — they can vary. Always ensure the cleaning company follows the Swedish Real Estate Association&apos;s guidelines for move-out cleaning to guarantee a thorough job.
-                        </span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-cyan-600 mr-3 mt-1 flex-shrink-0">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                        </span>
-                        <span className="text-gray-700 text-base leading-relaxed">
-                          When comparing quotes from cleaning companies, don&apos;t just look at the price. Check carefully what is included.
-                        </span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-cyan-600 mr-3 mt-1 flex-shrink-0">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                        </span>
-                        <span className="text-gray-700 text-base leading-relaxed">
-                          At Amples, window cleaning and final delivery are included in the service. Cleaning materials are also provided by us — we use trained staff and maintain strict standards for cleaning products.
-                        </span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-cyan-600 mr-3 mt-1 flex-shrink-0">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                        </span>
-                        <span className="text-gray-700 text-base leading-relaxed">
-                          In cases where extra-heavy cleaning is required beyond the ordinary, additional fees may apply — but we will always contact you first.
-                        </span>
-                      </li>
-                    </ul>
+                    <div className="mt-8">
+                      <h4 className="text-xl font-semibold text-gray-800 mb-6">
+                        Things to Keep in Mind:
+                      </h4>
+                      <ul className="space-y-4 text-left">
+                        <li className="flex items-start">
+                          <span className="text-cyan-600 mr-3 mt-1 flex-shrink-0">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          </span>
+                          <span className="text-gray-700 text-base leading-relaxed">
+                            There are no standardized rules for how a move-out cleaning must be carried out. That&apos;s why it&apos;s smart to review different cleaning companies&apos; checklists — they can vary. Always ensure the cleaning company follows the Swedish Real Estate Association&apos;s guidelines for move-out cleaning to guarantee a thorough job.
+                          </span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-cyan-600 mr-3 mt-1 flex-shrink-0">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          </span>
+                          <span className="text-gray-700 text-base leading-relaxed">
+                            When comparing quotes from cleaning companies, don&apos;t just look at the price. Check carefully what is included.
+                          </span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-cyan-600 mr-3 mt-1 flex-shrink-0">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          </span>
+                          <span className="text-gray-700 text-base leading-relaxed">
+                            At Amples, window cleaning and final delivery are included in the service. Cleaning materials are also provided by us — we use trained staff and maintain strict standards for cleaning products.
+                          </span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-cyan-600 mr-3 mt-1 flex-shrink-0">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          </span>
+                          <span className="text-gray-700 text-base leading-relaxed">
+                            In cases where extra-heavy cleaning is required beyond the ordinary, additional fees may apply — but we will always contact you first.
+                          </span>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Third Full Width Section - What's Not Included */}
-          <div className="w-full mt-16 px-4 sm:px-8 lg:px-16 xl:px-24">
-            <div className="relative bg-gradient-to-br from-white via-cyan-50/30 to-emerald-50/30 rounded-2xl border-2 border-cyan-300/50 shadow-2xl p-8 md:p-12 animate-fade-in-up animate-border-glow overflow-hidden">
-              {/* Animated border gradient overlay */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/0 via-cyan-500/5 to-cyan-500/0 opacity-50"></div>
-              
-              {/* Content */}
-              <div className="relative z-10">
-                <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">
+          {/* What's Not Included (Collapsible) */}
+          <div className="w-full">
+            <div className="relative bg-gradient-to-br from-white via-cyan-50/30 to-emerald-50/30 rounded-2xl border-2 border-cyan-300/50 shadow-2xl overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setWhatsNotIncludedOpen(!whatsNotIncludedOpen)}
+                className="w-full flex items-center justify-between p-6 md:p-8 text-left hover:bg-cyan-50/50 transition-colors"
+                aria-expanded={whatsNotIncludedOpen}
+              >
+                <h3 className="text-2xl md:text-3xl font-bold text-gray-900 pr-4">
                   What&apos;s Not Included in Amples&apos; Move-Out Cleaning
                 </h3>
-                
-                <div className="space-y-4 max-w-3xl mx-auto">
-                  <ul className="space-y-4 text-left">
-                    <li className="flex items-start">
+                <svg
+                  className={`w-8 h-8 text-cyan-600 flex-shrink-0 transition-transform duration-200 ${whatsNotIncludedOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${whatsNotIncludedOpen ? 'max-h-[1200px] opacity-100' : 'max-h-0 opacity-0'}`}
+              >
+                <div className="relative z-10 px-6 md:px-8 pb-6 md:pb-8 pt-0 border-t border-cyan-200/50">
+                  <div className="space-y-4 max-w-3xl mx-auto pt-6">
+                    <ul className="space-y-4 text-left">
+                      <li className="flex items-start">
                       <span className="text-cyan-600 mr-3 mt-1 flex-shrink-0">
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -547,28 +598,42 @@ export default function Checklist() {
                       </span>
                     </li>
                   </ul>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Fourth Full Width Section - Pre-Move Cleaning Checklist */}
-          <div className="w-full mt-16 px-4 sm:px-8 lg:px-16 xl:px-24">
-            <div className="relative bg-gradient-to-br from-white via-cyan-50/30 to-emerald-50/30 rounded-2xl border-2 border-cyan-300/50 shadow-2xl p-8 md:p-12 animate-fade-in-up animate-border-glow overflow-hidden">
-              {/* Animated border gradient overlay */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/0 via-cyan-500/5 to-cyan-500/0 opacity-50"></div>
-              
-              {/* Content */}
-              <div className="relative z-10">
-                <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 text-center">
+          {/* Pre-Move Cleaning Checklist (Collapsible) */}
+          <div className="w-full">
+            <div className="relative bg-gradient-to-br from-white via-cyan-50/30 to-emerald-50/30 rounded-2xl border-2 border-cyan-300/50 shadow-2xl overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setPreMoveChecklistOpen(!preMoveChecklistOpen)}
+                className="w-full flex items-center justify-between p-6 md:p-8 text-left hover:bg-cyan-50/50 transition-colors"
+                aria-expanded={preMoveChecklistOpen}
+              >
+                <h3 className="text-2xl md:text-3xl font-bold text-gray-900 pr-4">
                   Pre-Move Cleaning Checklist
                 </h3>
-                <p className="text-lg font-semibold text-gray-700 mb-8 text-center">
-                  Important steps to complete before your move-out cleaning with Amples
-                </p>
-                
-                <div className="space-y-6 max-w-3xl mx-auto">
-                  <p className="text-base md:text-lg text-gray-700 leading-relaxed text-center">
+                <svg
+                  className={`w-8 h-8 text-cyan-600 flex-shrink-0 transition-transform duration-200 ${preMoveChecklistOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${preMoveChecklistOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}
+              >
+                <div className="relative z-10 px-6 md:px-8 pb-6 md:pb-8 pt-0 border-t border-cyan-200/50">
+                  <div className="space-y-6 max-w-3xl mx-auto pt-6">
+                    <p className="text-lg font-semibold text-gray-700 text-center">
+                      Important steps to complete before your move-out cleaning with Amples
+                    </p>
+                    <p className="text-base md:text-lg text-gray-700 leading-relaxed text-center">
                     When you&apos;re preparing to move, there&apos;s a lot to organize — packing, storage clearing, and more. Whether you&apos;re moving yourself or hiring a cleaning company, it&apos;s crucial to be ready before cleaning day. Follow this checklist to ensure a smooth process:
                   </p>
 
@@ -687,50 +752,12 @@ export default function Checklist() {
                         Notify us about any heavily soiled areas in advance. Standard move-out cleaning assumes the property is in normally maintained condition. Additional cleaning hours may be needed for heavily soiled surfaces.
                       </span>
                     </li>
-                    <li className="flex items-start">
-                      <span className="text-cyan-600 mr-3 mt-1 flex-shrink-0">
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                      </span>
-                      <span className="text-gray-700 text-base leading-relaxed">
-                        Dusting of walls and ceilings is included. Wet wiping is only done on tiled or wet-room wallpapered surfaces unless otherwise ordered. <span className="italic">(Please note: the customer assumes responsibility for any damage when wet-wiping non-tiled walls or ceilings.)</span>
-                      </span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-cyan-600 mr-3 mt-1 flex-shrink-0">
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                      </span>
-                      <span className="text-gray-700 text-base leading-relaxed">
-                        Ensure electricity and hot water are available during the cleaning.
-                      </span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-cyan-600 mr-3 mt-1 flex-shrink-0">
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                      </span>
-                      <span className="text-gray-700 text-base leading-relaxed">
-                        Inform us about any items that should not be discarded before cleaning begins.
-                      </span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-cyan-600 mr-3 mt-1 flex-shrink-0">
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                      </span>
-                      <span className="text-gray-700 text-base leading-relaxed">
-                        Book your cleaning inspection well in advance of your move-out or lease expiration date.
-                      </span>
-                    </li>
                   </ul>
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </div>

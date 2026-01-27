@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
 
 const services = [
   { name: 'Move-out Cleaning', href: '/move-out-cleaning' },
@@ -12,8 +11,7 @@ const services = [
   { name: 'Deep/Heavy-duty Cleaning', href: '/deep-cleaning' },
   { name: 'Window Cleaning', href: '/window-cleaning' },
   { name: 'Staircase Cleaning', href: '/stairwell-cleaning' },
-  { name: 'Construction Cleaning', href: '/construction-cleaning' },
-  { name: 'Gym Cleaning', href: '/gym-cleaning' }
+  { name: 'Construction Cleaning', href: '/construction-cleaning' }
 ];
 
 const cities = [
@@ -21,6 +19,7 @@ const cities = [
   'Göteborg',
   'Malmö',
   'Uppsala',
+  'Gävle',
   'Västerås',
   'Örebro',
   'Linköping',
@@ -32,41 +31,7 @@ const cities = [
 ];
 
 export default function Footer() {
-  const [showNotification, setShowNotification] = useState(false);
-
-  const handleTermsDownload = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // Create a temporary anchor element to trigger download
-    const link = document.createElement('a');
-    link.href = '/villkor.pdf';
-    link.download = 'villkor.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    // Show notification
-    setShowNotification(true);
-    
-    // Hide notification after 3 seconds
-    setTimeout(() => {
-      setShowNotification(false);
-    }, 3000);
-  };
-
   return (
-    <>
-      {/* Notification Toast */}
-      {showNotification && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-[100] animate-fade-in-up">
-          <div className="bg-gradient-to-r from-cyan-500 to-emerald-500 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 min-w-[300px] max-w-md">
-            <svg className="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <p className="text-sm font-medium">Terms and conditions are downloaded. Please read it.</p>
-          </div>
-        </div>
-      )}
-      
     <footer className="bg-gradient-to-br from-gray-800 via-gray-900 to-gray-800 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Main Footer Content - 3 Columns */}
@@ -103,6 +68,7 @@ export default function Footer() {
               {cities.map((city) => {
                 const cityHref = city === 'Stockholm' ? '/stockholm' 
                   : city === 'Uppsala' ? '/uppsala' 
+                  : city === 'Gävle' ? '/gavle' 
                   : city === 'Örebro' ? '/orebro' 
                   : city === 'Göteborg' ? '/gothenburg' 
                   : city === 'Malmö' ? '/malmo' 
@@ -192,7 +158,6 @@ export default function Footer() {
             
             {/* Links */}
             <div className="flex space-x-6 mb-4 md:mb-0">
-              <button onClick={handleTermsDownload} className="text-gray-400 hover:text-cyan-400 transition-colors">Terms</button>
               <a href="#privacy" className="text-gray-400 hover:text-cyan-400 transition-colors">Privacy Policy</a>
             </div>
           </div>
@@ -209,7 +174,6 @@ export default function Footer() {
         </div>
       </div>
     </footer>
-    </>
   );
 }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 type ServiceType = 'Move-out Cleaning' | 'Home Cleaning' | 'Detail Cleaning' | 'Office Cleaning' | 'Floor Cleaning' | 'Window Cleaning' | 'Staircase Cleaning' | 'Construction Cleaning';
@@ -18,6 +18,8 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
   const [currentStep, setCurrentStep] = useState(1);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
+  const [minDate, setMinDate] = useState('2000-01-01');
+  const [minDateTime, setMinDateTime] = useState('2000-01-01T00:00');
 
   // Form State new
   const [formData, setFormData] = useState({
@@ -107,6 +109,21 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
     staircaseAdditionalCleaning: [] as string[],
     staircaseAdditionalServices: [] as string[]
   });
+
+  // Hydration fix: min values must match on server and client; update to "now" only after mount.
+  useEffect(() => {
+    const id = setTimeout(() => {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      const h = String(now.getHours()).padStart(2, '0');
+      const min = String(now.getMinutes()).padStart(2, '0');
+      setMinDate(`${y}-${m}-${d}`);
+      setMinDateTime(`${y}-${m}-${d}T${h}:${min}`);
+    }, 0);
+    return () => clearTimeout(id);
+  }, []);
 
   // Validation helper functions
   const validateArea = (value: string): boolean => {
@@ -273,26 +290,6 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
     // Matches 5 consecutive digits (with optional spaces/dashes before or after)
     const postalCodeRegex = /\b\d{5}\b/;
     return postalCodeRegex.test(address);
-  };
-
-  // Helper function to get current date-time in format for datetime-local input
-  const getCurrentDateTime = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-  };
-
-  // Helper function to get current date in format for date input
-  const getCurrentDate = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
   };
 
   // Validation function to check if contact info is valid
@@ -1013,7 +1010,7 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                     name="preferredDateTime"
                     value={formData.preferredDateTime}
                     onChange={handleChange}
-                    min={getCurrentDateTime()}
+                    min={minDateTime}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
                   />
                 </div>
@@ -1065,7 +1062,7 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                     name="preferredDateTime"
                     value={formData.preferredDateTime}
                     onChange={handleChange}
-                    min={getCurrentDateTime()}
+                    min={minDateTime}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
                   />
                 </div>
@@ -1413,7 +1410,7 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                       name="moveOutCleaningDate"
                       value={formData.moveOutCleaningDate}
                       onChange={handleChange}
-                      min={getCurrentDate()}
+                      min={minDate}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
                     />
@@ -1890,7 +1887,7 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                       name="windowCleaningDate"
                       value={formData.windowCleaningDate}
                       onChange={handleChange}
-                      min={getCurrentDateTime()}
+                      min={minDateTime}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
                     />
@@ -2422,7 +2419,7 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                       name="constructionCleaningDate"
                       value={formData.constructionCleaningDate}
                       onChange={handleChange}
-                      min={getCurrentDateTime()}
+                      min={minDateTime}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
                     />
@@ -2598,7 +2595,7 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                       name="floorCleaningDate"
                       value={formData.floorCleaningDate}
                       onChange={handleChange}
-                      min={getCurrentDate()}
+                      min={minDate}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
                     />
@@ -3022,7 +3019,7 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                       name="officePreferredDateTime"
                       value={formData.officePreferredDateTime}
                       onChange={handleChange}
-                      min={getCurrentDateTime()}
+                      min={minDateTime}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
                     />

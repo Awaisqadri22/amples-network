@@ -29,7 +29,7 @@ export default function MoveOutCleaningPrice() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 lg:gap-12">
             {/* Main Content - 70% */}
-            <div className="lg:col-span-7">
+            <div className="lg:col-span-6">
               <h1 className="text-4xl font-bold text-gray-900 mb-8">
                 Moving cleaning price
               </h1>
@@ -128,7 +128,7 @@ export default function MoveOutCleaningPrice() {
             </div>
 
             {/* Sidebar - 30% */}
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-4">
               <div className="sticky top-24">
                 <QuoteForm idPrefix="price" />
               </div>

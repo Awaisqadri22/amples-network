@@ -97,7 +97,7 @@ export default function DetailCleaning() {
             </div>
 
             {/* Right side - 30% Form */}
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-4">
               <ContactForm defaultService="Detail Cleaning" />
             </div>
           </div>

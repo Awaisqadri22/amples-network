@@ -36,6 +36,7 @@ export default function ConfirmPage() {
         preferredDateTime: '',
         comments: ''
     });
+    const [minDateTime, setMinDateTime] = useState('2000-01-01T00:00');
 
     useEffect(() => {
         if (!token) return;
@@ -78,9 +79,29 @@ export default function ConfirmPage() {
         };
     }, [token]);
 
+    // Hydration fix: min must match on server and client; update to "now" only after mount.
+    useEffect(() => {
+        const id = setTimeout(() => {
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            const h = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+            setMinDateTime(`${y}-${m}-${d}T${h}:${min}`);
+        }, 0);
+        return () => clearTimeout(id);
+    }, []);
+
     const handleConfirm = async () => {
         setSubmitting(true);
         setError(null);
+
+        if (additionalInfo.preferredDateTime && new Date(additionalInfo.preferredDateTime) < new Date()) {
+            setError('Preferred date & time cannot be in the past. Please select a current or future date.');
+            setSubmitting(false);
+            return;
+        }
 
         try {
             const response = await fetch('/api/confirm', {
@@ -283,8 +304,10 @@ export default function ConfirmPage() {
                                         id="preferredDateTime"
                                         value={additionalInfo.preferredDateTime}
                                         onChange={(e) => setAdditionalInfo({ ...additionalInfo, preferredDateTime: e.target.value })}
+                                        min={minDateTime}
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                                     />
+                                    <p className="mt-1 text-xs text-gray-500">Select a date and time today or in the future</p>
                                 </div>
                                 <div>
                                     <label htmlFor="comments" className="block text-sm font-medium text-gray-700 mb-2">
@@ -300,6 +323,20 @@ export default function ConfirmPage() {
                                     />
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="flex justify-center mb-4">
+                            <a
+                                href="https://www.skatteverket.se/privat/sjalvservice/svarpavanligafragor/rotochrutarbete/privatrotochrutarbetefaq/hurmycketmastejagtjanaforattkunnautnyttjamaximalskattereduktionforrotochrutarbete.5.5fc8c94513259a4ba1d800034104.html"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-50 border-2 border-cyan-400 text-cyan-700 font-semibold rounded-lg hover:bg-cyan-100 hover:border-cyan-500 transition-colors shadow-sm"
+                            >
+                                Calculate Rutavdrag
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                            </a>
                         </div>
 
                         {/* Confirm Button */}

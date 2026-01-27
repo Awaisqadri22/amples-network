@@ -74,8 +74,8 @@ export default function HomeCleaning() {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 lg:gap-12">
-            {/* Left side - 70% Text Content */}
-            <div className="lg:col-span-7">
+            {/* Left side - 60% Text Content */}
+            <div className="lg:col-span-6">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
                 Home cleaning – a simpler everyday life
               </h2>
@@ -464,7 +464,7 @@ export default function HomeCleaning() {
             </div>
 
             {/* Right side - 30% Form */}
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-4">
               <ContactForm defaultService="Home Cleaning" />
             </div>
           </div>

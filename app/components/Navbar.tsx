@@ -9,6 +9,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
   const [citiesDropdownOpen, setCitiesDropdownOpen] = useState(false);
+  const [showTermsNotification, setShowTermsNotification] = useState(false);
   const pathname = usePathname();
   const isHomePage = pathname === '/';
 
@@ -16,6 +17,19 @@ export default function Navbar() {
     setMobileMenuOpen(false);
     setServicesDropdownOpen(false);
     setCitiesDropdownOpen(false);
+  };
+
+  const handleTermsDownload = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const link = document.createElement('a');
+    link.href = '/villkor.pdf';
+    link.download = 'villkor.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setShowTermsNotification(true);
+    setTimeout(() => setShowTermsNotification(false), 3000);
+    closeMobileMenu();
   };
 
   return (
@@ -87,8 +101,8 @@ export default function Navbar() {
                   <div className="px-4 py-2 text-sm font-semibold text-gray-500 border-b border-gray-100">
                     Major Cities
                   </div>
-                    {['Stockholm', 'Göteborg', 'Malmö', 'Uppsala', 'Västerås', 'Örebro', 'Linköping', 'Helsingborg', 'Jönköping', 'Norrköping', 'Lund', 'Umeå'].map((city) => {
-                      const cityHref = city === 'Stockholm' ? '/stockholm' : city === 'Uppsala' ? '/uppsala' : city === 'Örebro' ? '/orebro' : city === 'Göteborg' ? '/gothenburg' : city === 'Malmö' ? '/malmo' : city === 'Västerås' ? '/vasteras' : city === 'Linköping' ? '/linkoping' : city === 'Helsingborg' ? '/helsingborg' : city === 'Jönköping' ? '/jonkoping' : city === 'Norrköping' ? '/norrkoping' : city === 'Lund' ? '/lund' : city === 'Umeå' ? '/umea' : `#${city.toLowerCase().replace('ö', 'o').replace('å', 'a').replace('ä', 'a')}`;
+                    {['Stockholm', 'Göteborg', 'Malmö', 'Uppsala', 'Gävle', 'Västerås', 'Örebro', 'Linköping', 'Helsingborg', 'Jönköping', 'Norrköping', 'Lund', 'Umeå'].map((city) => {
+                      const cityHref = city === 'Stockholm' ? '/stockholm' : city === 'Uppsala' ? '/uppsala' : city === 'Gävle' ? '/gavle' : city === 'Örebro' ? '/orebro' : city === 'Göteborg' ? '/gothenburg' : city === 'Malmö' ? '/malmo' : city === 'Västerås' ? '/vasteras' : city === 'Linköping' ? '/linkoping' : city === 'Helsingborg' ? '/helsingborg' : city === 'Jönköping' ? '/jonkoping' : city === 'Norrköping' ? '/norrkoping' : city === 'Lund' ? '/lund' : city === 'Umeå' ? '/umea' : `#${city.toLowerCase().replace('ö', 'o').replace('å', 'a').replace('ä', 'a')}`;
                       return (
                         <a
                           key={city}
@@ -104,6 +118,7 @@ export default function Navbar() {
             </div>
             <Link href="/move-out-cleaning/checklist" className="text-gray-700 hover:text-cyan-500 transition-colors">Moving Cleaning Checklist</Link>
             <Link href="/connect-company" className="text-gray-700 hover:text-cyan-500 transition-colors">Connect Company</Link>
+            <button type="button" onClick={handleTermsDownload} className="text-gray-700 hover:text-cyan-500 transition-colors">Terms</button>
             <Link href={isHomePage ? "#contacts" : "/#contacts"} className="text-gray-700 hover:text-cyan-500 transition-colors">Contact US</Link>
           </div>
           {/* Mobile menu button */}
@@ -221,8 +236,8 @@ export default function Navbar() {
                 </button>
                 {citiesDropdownOpen && (
                   <div className="pl-4 space-y-2 mt-2">
-                    {['Stockholm', 'Göteborg', 'Malmö', 'Uppsala', 'Västerås', 'Örebro', 'Linköping', 'Helsingborg', 'Jönköping', 'Norrköping', 'Lund', 'Umeå'].map((city) => {
-                      const cityHref = city === 'Stockholm' ? '/stockholm' : city === 'Uppsala' ? '/uppsala' : city === 'Örebro' ? '/orebro' : city === 'Göteborg' ? '/gothenburg' : city === 'Malmö' ? '/malmo' : city === 'Västerås' ? '/vasteras' : city === 'Linköping' ? '/linkoping' : city === 'Helsingborg' ? '/helsingborg' : city === 'Jönköping' ? '/jonkoping' : city === 'Norrköping' ? '/norrkoping' : city === 'Lund' ? '/lund' : city === 'Umeå' ? '/umea' : `#${city.toLowerCase().replace('ö', 'o').replace('å', 'a').replace('ä', 'a')}`;
+                    {['Stockholm', 'Göteborg', 'Malmö', 'Uppsala', 'Gävle', 'Västerås', 'Örebro', 'Linköping', 'Helsingborg', 'Jönköping', 'Norrköping', 'Lund', 'Umeå'].map((city) => {
+                      const cityHref = city === 'Stockholm' ? '/stockholm' : city === 'Uppsala' ? '/uppsala' : city === 'Gävle' ? '/gavle' : city === 'Örebro' ? '/orebro' : city === 'Göteborg' ? '/gothenburg' : city === 'Malmö' ? '/malmo' : city === 'Västerås' ? '/vasteras' : city === 'Linköping' ? '/linkoping' : city === 'Helsingborg' ? '/helsingborg' : city === 'Jönköping' ? '/jonkoping' : city === 'Norrköping' ? '/norrkoping' : city === 'Lund' ? '/lund' : city === 'Umeå' ? '/umea' : `#${city.toLowerCase().replace('ö', 'o').replace('å', 'a').replace('ä', 'a')}`;
                       return (
                         <a
                           key={city}
@@ -260,6 +275,17 @@ export default function Navbar() {
                 </Link>
               </div>
 
+              {/* Terms */}
+              <div className="border-b border-gray-100 pb-4 space-y-2">
+                <button
+                  type="button"
+                  onClick={handleTermsDownload}
+                  className="block w-full text-left py-3 text-gray-700 hover:text-cyan-600 transition-colors"
+                >
+                  Terms
+                </button>
+              </div>
+
               {/* Contact */}
               <div className="border-b border-gray-100 pb-4 space-y-2">
                 <Link 
@@ -271,6 +297,18 @@ export default function Navbar() {
                 </Link>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Terms download notification toast */}
+      {showTermsNotification && (
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-[100] animate-fade-in-up">
+          <div className="bg-gradient-to-r from-cyan-500 to-emerald-500 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 min-w-[300px] max-w-md">
+            <svg className="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-sm font-medium">Terms and conditions are downloaded. Please read it.</p>
           </div>
         </div>
       )}
