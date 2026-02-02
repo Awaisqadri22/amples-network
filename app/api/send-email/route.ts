@@ -1068,7 +1068,8 @@ export async function POST(request: Request) {
                         console.log('Contractor email sent to', toEmail);
                         try {
                             const jobId = randomUUID();
-                            await prisma.$executeRaw`
+                            const dateExpr = jobDateIso != null ? Prisma.sql`${jobDateIso}::timestamp` : Prisma.sql`NULL`;
+                            await prisma.$executeRaw(Prisma.sql`
                                 INSERT INTO jobs (id, contractor_id, job_type, address, area, date, price, status, created_at, updated_at)
                                 VALUES (
                                     ${jobId},
@@ -1076,13 +1077,13 @@ export async function POST(request: Request) {
                                     ${jobType},
                                     ${displayAddress === 'Not specified' ? null : displayAddress},
                                     ${squareMeterValue},
-                                    ${jobDateIso},
+                                    ${dateExpr},
                                     ${contractorPriceKr},
                                     'active',
                                     now(),
                                     now()
                                 )
-                            `;
+                            `);
                         } catch (jobErr) {
                             console.error('Failed to save job for contractor', contractor.id, jobErr);
                         }
