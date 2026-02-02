@@ -118,6 +118,14 @@ export default function Navbar() {
             </div>
             <Link href="/move-out-cleaning/checklist" className="text-gray-700 hover:text-cyan-500 transition-colors">Moving Cleaning Checklist</Link>
             <Link href="/connect-company" className="text-gray-700 hover:text-cyan-500 transition-colors">Connect Company</Link>
+            <a
+              href="https://www.skatteverket.se/privat/sjalvservice/svarpavanligafragor/rotochrutarbete/privatrotochrutarbetefaq/hurmycketmastejagtjanaforattkunnautnyttjamaximalskattereduktionforrotochrutarbete.5.5fc8c94513259a4ba1d800034104.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-700 hover:text-cyan-500 transition-colors"
+            >
+              RUTAVDRAG
+            </a>
             <button type="button" onClick={handleTermsDownload} className="text-gray-700 hover:text-cyan-500 transition-colors">Terms</button>
             <Link href={isHomePage ? "#contacts" : "/#contacts"} className="text-gray-700 hover:text-cyan-500 transition-colors">Contact US</Link>
           </div>
@@ -273,6 +281,19 @@ export default function Navbar() {
                 >
                   Connect Company
                 </Link>
+              </div>
+
+              {/* RUTAVDRAG */}
+              <div className="border-b border-gray-100 pb-4 space-y-2">
+                <a
+                  href="https://www.skatteverket.se/privat/sjalvservice/svarpavanligafragor/rotochrutarbete/privatrotochrutarbetefaq/hurmycketmastejagtjanaforattkunnautnyttjamaximalskattereduktionforrotochrutarbete.5.5fc8c94513259a4ba1d800034104.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={closeMobileMenu}
+                  className="block py-3 text-gray-700 hover:text-cyan-600 transition-colors"
+                >
+                  RUTAVDRAG
+                </a>
               </div>
 
               {/* Terms */}

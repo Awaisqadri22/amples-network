@@ -1003,12 +1003,83 @@ export async function POST(request: Request) {
             userEmailError = 'No email address provided in form';
         }
 
+        // Send email to all contractors (job type, address, date only)
+        let contractorEmailsSent = 0;
+        const contractorEmailsErrors: string[] = [];
+        try {
+            const contractors = await prisma.$queryRaw<{ email: string; name: string }[]>`
+                SELECT email, name FROM contractors
+            `;
+            const jobType = selectedService || serviceType || 'Cleaning Service';
+            const displayAddress = address || 'Not specified';
+            const dateValue = preferredDateTime || moveOutCleaningDate || windowCleaningDate
+                || constructionCleaningDate || floorCleaningDate || officePreferredDateTime
+                || (detailPreferredDay && detailPreferredTime ? `${detailPreferredDay} ${detailPreferredTime}` : null)
+                || (staircasePreferredDay && staircasePreferredTime ? `${staircasePreferredDay} ${staircasePreferredTime}` : null);
+            const displayDate = dateValue
+                ? (typeof dateValue === 'string' && dateValue.match(/^\d{4}-\d{2}-\d{2}/)
+                    ? new Date(dateValue).toLocaleDateString('sv-SE', { dateStyle: 'medium' })
+                    : String(dateValue))
+                : 'Not specified';
+
+            const customerPrice = priceInfo?.price;
+            const contractorPriceKr = customerPrice != null ? Math.round(customerPrice * 0.75) : null;
+            const displayContractorPrice = contractorPriceKr != null ? `${contractorPriceKr.toLocaleString('sv-SE')} kr` : 'Not specified';
+
+            const contractorHtml = `
+                <!DOCTYPE html>
+                <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 500px; margin: 0 auto; padding: 20px;">
+                    <div style="background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+                        <h1 style="color: #fff; margin: 0; font-size: 20px;">New Job Opportunity</h1>
+                    </div>
+                    <div style="background: #fff; padding: 24px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
+                        <p style="margin: 0 0 16px 0;"><strong>Job type:</strong> ${jobType}</p>
+                        <p style="margin: 0 0 16px 0;"><strong>Address:</strong> ${displayAddress}</p>
+                        <p style="margin: 0 0 16px 0;"><strong>Date:</strong> ${displayDate}</p>
+                        <p style="margin: 0;"><strong>Price (your rate, 25% below customer quote):</strong> ${displayContractorPrice}</p>
+                    </div>
+                    <p style="margin-top: 20px; font-size: 12px; color: #64748b;">Amples – this is an automated notification.</p>
+                </body>
+                </html>
+            `;
+
+            for (const contractor of contractors) {
+                const toEmail = contractor.email?.trim();
+                if (!toEmail) continue;
+                try {
+                    const { error: contractorErr } = await resend.emails.send({
+                        from: 'Amples <noreply@amples.se>',
+                        to: toEmail,
+                        subject: `New job: ${jobType} – ${displayAddress}`,
+                        html: contractorHtml
+                    });
+                    if (contractorErr) {
+                        console.error('Contractor email failed for', toEmail, contractorErr);
+                        contractorEmailsErrors.push(`${toEmail}: ${contractorErr.message}`);
+                    } else {
+                        contractorEmailsSent++;
+                        console.log('Contractor email sent to', toEmail);
+                    }
+                } catch (err) {
+                    const msg = err instanceof Error ? err.message : String(err);
+                    console.error('Contractor email exception for', toEmail, err);
+                    contractorEmailsErrors.push(`${toEmail}: ${msg}`);
+                }
+            }
+        } catch (dbErr) {
+            console.error('Failed to fetch contractors for email:', dbErr);
+            contractorEmailsErrors.push('Could not load contractors from database');
+        }
+
         return NextResponse.json({ 
             message: 'Email sent successfully',
             adminEmailSent: true,
             userEmailSent: userEmailSent,
             userEmailAddress: userEmail || email || 'Not provided',
-            userEmailError: userEmailError ? (typeof userEmailError === 'object' ? JSON.stringify(userEmailError) : userEmailError.toString()) : null
+            userEmailError: userEmailError ? (typeof userEmailError === 'object' ? JSON.stringify(userEmailError) : userEmailError.toString()) : null,
+            contractorEmailsSent,
+            contractorEmailsErrors: contractorEmailsErrors.length > 0 ? contractorEmailsErrors : null
         }, { status: 200 });
     } catch (error) {
         const errorDetails = error as Error;

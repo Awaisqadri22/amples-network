@@ -273,3 +273,17 @@ model Quote {
 
   @@map("quotes")
 }
+
+model Contractor {
+  id            String   @id @default(cuid())
+  name          String   @db.VarChar(255)
+  email         String   @unique @db.VarChar(255)
+  area          String?  @db.VarChar(255)
+  bids          Int?
+  acceptedBids  Int?     @map("accepted_bids")
+  totalBids     Int?     @map("total_bids")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("contractors")
+}
