@@ -285,5 +285,26 @@ model Contractor {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
+  jobs          Job[]
+
   @@map("contractors")
+}
+
+model Job {
+  id            String   @id @default(cuid())
+  contractorId  String   @map("contractor_id")
+  contractor    Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+
+  jobType       String?  @map("job_type")
+  address       String?  @db.VarChar(500)
+  area          String?  @db.VarChar(100)
+  date          DateTime? @map("date")
+  price         Int?     @map("price")
+
+  status        String   @default("active") @db.VarChar(20)
+
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("jobs")
 }

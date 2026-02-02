@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
-import { randomBytes } from 'crypto';
+import { randomBytes, randomUUID } from 'crypto';
 
 /**
  * Calculate price based on square meters (kvm)
@@ -1007,8 +1007,8 @@ export async function POST(request: Request) {
         let contractorEmailsSent = 0;
         const contractorEmailsErrors: string[] = [];
         try {
-            const contractors = await prisma.$queryRaw<{ email: string; name: string }[]>`
-                SELECT email, name FROM contractors
+            const contractors = await prisma.$queryRaw<{ id: string; email: string; name: string }[]>`
+                SELECT id, email, name FROM contractors
             `;
             const jobType = selectedService || serviceType || 'Cleaning Service';
             const displayAddress = address || 'Not specified';
@@ -1037,12 +1037,18 @@ export async function POST(request: Request) {
                         <p style="margin: 0 0 16px 0;"><strong>Job type:</strong> ${jobType}</p>
                         <p style="margin: 0 0 16px 0;"><strong>Address:</strong> ${displayAddress}</p>
                         <p style="margin: 0 0 16px 0;"><strong>Date:</strong> ${displayDate}</p>
-                        <p style="margin: 0;"><strong>Price (your rate, 25% below customer quote):</strong> ${displayContractorPrice}</p>
+                        <p style="margin: 0;"><strong>Price:</strong> ${displayContractorPrice}</p>
                     </div>
                     <p style="margin-top: 20px; font-size: 12px; color: #64748b;">Amples – this is an automated notification.</p>
                 </body>
                 </html>
             `;
+
+            const squareMeterValue = squareMeter || areaSize || constructionAreaSize || officeAreaSize || detailAreaSize || null;
+            const jobDate = dateValue
+                ? (typeof dateValue === 'string' ? new Date(dateValue) : dateValue)
+                : null;
+            const jobDateIso = jobDate ? jobDate.toISOString() : null;
 
             for (const contractor of contractors) {
                 const toEmail = contractor.email?.trim();
@@ -1060,6 +1066,26 @@ export async function POST(request: Request) {
                     } else {
                         contractorEmailsSent++;
                         console.log('Contractor email sent to', toEmail);
+                        try {
+                            const jobId = randomUUID();
+                            await prisma.$executeRaw`
+                                INSERT INTO jobs (id, contractor_id, job_type, address, area, date, price, status, created_at, updated_at)
+                                VALUES (
+                                    ${jobId},
+                                    ${contractor.id},
+                                    ${jobType},
+                                    ${displayAddress === 'Not specified' ? null : displayAddress},
+                                    ${squareMeterValue},
+                                    ${jobDateIso},
+                                    ${contractorPriceKr},
+                                    'active',
+                                    now(),
+                                    now()
+                                )
+                            `;
+                        } catch (jobErr) {
+                            console.error('Failed to save job for contractor', contractor.id, jobErr);
+                        }
                     }
                 } catch (err) {
                     const msg = err instanceof Error ? err.message : String(err);
