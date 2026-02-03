@@ -37,6 +37,7 @@ model Booking {
   phone     String?
   address   String?
   email     String?  @db.VarChar(255)
+  personalNumber String? @map("personal_number") @db.VarChar(20)
   
   // Service information
   serviceType      String?  @map("service_type")
@@ -162,6 +163,7 @@ model Quote {
   phone     String?
   address   String?
   email     String?  @db.VarChar(255)
+  personalNumber String? @map("personal_number") @db.VarChar(20)
   
   // Service information
   serviceType      String?  @map("service_type")
@@ -302,6 +304,10 @@ model Job {
   price         Int?     @map("price")
 
   status        String   @default("active") @db.VarChar(20)
+
+  confirmationToken String? @unique @map("confirmation_token")
+  tokenExpiresAt    DateTime? @map("token_expires_at")
+  batchId           String?   @map("batch_id")
 
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")

@@ -33,6 +33,7 @@ export default function ConfirmPage() {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
     const [additionalInfo, setAdditionalInfo] = useState({
+        personalNumber: '',
         preferredDateTime: '',
         comments: ''
     });
@@ -97,6 +98,19 @@ export default function ConfirmPage() {
         setSubmitting(true);
         setError(null);
 
+        const personalNumber = additionalInfo.personalNumber.trim();
+        if (!personalNumber) {
+            setError('Personal Number is required.');
+            setSubmitting(false);
+            return;
+        }
+        const digitsOnly = personalNumber.replace(/\D/g, '');
+        if (digitsOnly.length < 10 || digitsOnly.length > 12) {
+            setError('Personal Number must be 10 to 12 digits.');
+            setSubmitting(false);
+            return;
+        }
+
         if (additionalInfo.preferredDateTime && new Date(additionalInfo.preferredDateTime) < new Date()) {
             setError('Preferred date & time cannot be in the past. Please select a current or future date.');
             setSubmitting(false);
@@ -112,6 +126,7 @@ export default function ConfirmPage() {
                 body: JSON.stringify({
                     token,
                     additionalInfo: {
+                        personalNumber: digitsOnly,
                         preferredDateTime: additionalInfo.preferredDateTime || undefined,
                         comments: additionalInfo.comments || undefined
                     }
@@ -288,6 +303,31 @@ export default function ConfirmPage() {
                                         <span className="font-semibold text-gray-900">{quoteData.address}</span>
                                     </div>
                                 )}
+                            </div>
+                        </div>
+
+                        {/* Required: Personal Number */}
+                        <div className="mb-8">
+                            <h2 className="text-xl font-semibold text-gray-900 mb-4">Required</h2>
+                            <div className="space-y-4">
+                                <div>
+                                    <label htmlFor="personalNumber" className="block text-sm font-medium text-gray-700 mb-2">
+                                        Personal Number <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        inputMode="numeric"
+                                        id="personalNumber"
+                                        value={additionalInfo.personalNumber}
+                                        onChange={(e) => setAdditionalInfo({ ...additionalInfo, personalNumber: e.target.value.replace(/\D/g, '').slice(0, 12) })}
+                                        placeholder="10–12 digits"
+                                        minLength={10}
+                                        maxLength={12}
+                                        required
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                                    />
+                                    <p className="mt-1 text-xs text-gray-500">Enter your personal number (10–12 digits). Required to confirm.</p>
+                                </div>
                             </div>
                         </div>
 
