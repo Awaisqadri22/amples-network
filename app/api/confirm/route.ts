@@ -191,6 +191,8 @@ export async function POST(request: Request) {
                 const totalPriceLineAdmin = totalPriceKr
                     ? `<p><strong>Confirmed total price (new final price):</strong> ${totalPriceKr} kr${extrasLabel}</p>`
                     : '';
+                const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || (() => { try { return new URL(request.url).origin; } catch { return 'https://amples.se'; } })();
+                const checklistUrl = `${baseUrl}/move-out-cleaning/checklist`;
 
                 if (customerEmail) {
                     await resend.emails.send({
@@ -234,6 +236,7 @@ export async function POST(request: Request) {
                                             </td></tr>
                                         </table>
                                         ${totalPriceKr ? `<p style="font-size: 13px; color: #059669; margin: 16px 0 0 0;">This is your final price for this booking.</p>` : ''}
+                                        <p style="font-size: 15px; color: #374151; margin: 24px 0 0 0; line-height: 1.6;">Thank you for your booking! We hereby confirm that our cleaning team will come to you on <strong>${(rec.address as string) || 'your address'}</strong> on your desired date <strong>${dateTimeStr}</strong>. If there is any change in the time, we will notify you at least one day in advance. Please review the checklist and the preparations you should make before the team arrives: <a href="${checklistUrl}" style="color: #059669; font-weight: 600; text-decoration: none;">Moving cleaning checklist</a>.</p>
                                         <p style="font-size: 14px; color: #6b7280; margin: 24px 0 0 0;">If you have any questions, reply to this email or contact us.</p>
                                         <p style="font-size: 14px; color: #374151; margin: 16px 0 0 0;"><strong>Best regards,</strong><br>The Amples Team</p>
                                     </div>
