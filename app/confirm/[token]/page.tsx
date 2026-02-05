@@ -55,7 +55,7 @@ export default function ConfirmPage() {
     });
     const [agreeToTerms, setAgreeToTerms] = useState(false);
     const [selectedExtraIds, setSelectedExtraIds] = useState<string[]>([]);
-    const [minDateTime, setMinDateTime] = useState('2000-01-01T00:00');
+    const [minDate, setMinDate] = useState('2000-01-01');
 
     const toggleExtra = (id: string) => {
         if (id === 'none') return;
@@ -105,16 +105,14 @@ export default function ConfirmPage() {
         };
     }, [token]);
 
-    // Hydration fix: min must match on server and client; update to "now" only after mount.
+    // Hydration fix: min must match on server and client; update to "today" only after mount.
     useEffect(() => {
         const id = setTimeout(() => {
             const now = new Date();
             const y = now.getFullYear();
             const m = String(now.getMonth() + 1).padStart(2, '0');
             const d = String(now.getDate()).padStart(2, '0');
-            const h = String(now.getHours()).padStart(2, '0');
-            const min = String(now.getMinutes()).padStart(2, '0');
-            setMinDateTime(`${y}-${m}-${d}T${h}:${min}`);
+            setMinDate(`${y}-${m}-${d}`);
         }, 0);
         return () => clearTimeout(id);
     }, []);
@@ -143,7 +141,7 @@ export default function ConfirmPage() {
         }
 
         if (additionalInfo.preferredDateTime && new Date(additionalInfo.preferredDateTime) < new Date()) {
-            setError('Preferred date & time cannot be in the past. Please select a current or future date.');
+            setError('Preferred date cannot be in the past. Please select today or a future date.');
             setSubmitting(false);
             return;
         }
@@ -420,21 +418,21 @@ export default function ConfirmPage() {
 
                         {/* Additional Information */}
                         <div className="mb-8">
-                            <h2 className="text-xl font-semibold text-gray-900 mb-4">Additional Information (Optional)</h2>
+                            <h2 className="text-xl font-semibold text-gray-900 mb-4">Additional Information</h2>
                             <div className="space-y-4">
                                 <div>
                                     <label htmlFor="preferredDateTime" className="block text-sm font-medium text-gray-700 mb-2">
-                                        Preferred Date & Time
+                                        Preferred Date
                                     </label>
                                     <input
-                                        type="datetime-local"
+                                        type="date"
                                         id="preferredDateTime"
                                         value={additionalInfo.preferredDateTime}
                                         onChange={(e) => setAdditionalInfo({ ...additionalInfo, preferredDateTime: e.target.value })}
-                                        min={minDateTime}
+                                        min={minDate}
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                                     />
-                                    <p className="mt-1 text-xs text-gray-500">Select a date and time today or in the future</p>
+                                    <p className="mt-1 text-xs text-gray-500">Select a date today or in the future</p>
                                 </div>
                                 <div>
                                     <label htmlFor="comments" className="block text-sm font-medium text-gray-700 mb-2">
