@@ -36,6 +36,9 @@ export default function ConnectCompany() {
     if (name === 'organizationNumber') {
       const digitsOnly = value.replace(/\D/g, '').slice(0, 12);
       setFormData({ ...formData, [name]: digitsOnly });
+    } else if (name === 'phone') {
+      const digitsOnly = value.replace(/\D/g, '').slice(0, 9);
+      setFormData({ ...formData, [name]: digitsOnly });
     } else {
       setFormData({
         ...formData,
@@ -50,8 +53,8 @@ export default function ConnectCompany() {
   };
 
   const validatePhone = (phone: string): boolean => {
-    const cleaned = phone.replace(/[\s\-+46]/g, '');
-    return /^0?[1-9]\d{8,9}$/.test(cleaned) || /^07\d{8}$/.test(cleaned);
+    const digits = phone.replace(/\D/g, '');
+    return digits.length === 9;
   };
 
   const validateOrganizationNumber = (val: string): boolean => {
@@ -90,7 +93,7 @@ export default function ConnectCompany() {
     }
 
     if (!validatePhone(formData.phone)) {
-      setError('Please enter a valid Swedish phone number');
+      setError('Phone number must be exactly 9 digits (numbers only)');
       return;
     }
 
@@ -353,7 +356,8 @@ export default function ConnectCompany() {
                         value={formData.phone}
                         onChange={handleChange}
                         className="w-full pl-20 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors placeholder:text-gray-500"
-                        placeholder="70 123 45 67"
+                        placeholder="701234567"
+                        maxLength={9}
                         required
                       />
                     </div>

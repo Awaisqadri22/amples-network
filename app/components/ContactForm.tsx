@@ -135,12 +135,8 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
 
   const validateSwedishPhone = (phone: string): boolean => {
     if (!phone.trim()) return false;
-    // Remove spaces, dashes, and country code if present
-    const cleaned = phone.replace(/[\s\-+46]/g, '');
-    // Swedish phone numbers: 9-11 digits, can start with 0
-    // Mobile numbers typically start with 07 (10 digits total with leading 0)
-    // Landlines can start with 0 followed by area code (9-11 digits)
-    return /^0?\d{9,11}$/.test(cleaned) && cleaned.length <= 11;
+    const digits = phone.replace(/\D/g, '');
+    return digits.length === 9;
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -150,6 +146,10 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
     // Mark field as touched when user interacts with it
     setTouchedFields(prev => new Set(prev).add(fieldName));
     
+    // Restrict phone to digits only, max 9
+    if (fieldName === 'phone') {
+      value = value.replace(/\D/g, '').slice(0, 9);
+    }
     // Validate and restrict area fields (0-1000, max 4 digits)
     if (fieldName === 'areaSize' || fieldName === 'constructionAreaSize' || 
         fieldName === 'officeAreaSize' || fieldName === 'detailAreaSize') {
@@ -209,7 +209,7 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
         return value.trim() === '' ? 'Name is required' : null;
       case 'phone':
         if (value.trim() === '') return 'Phone number is required';
-        return !validateSwedishPhone(value) ? 'Please enter a valid Swedish phone number (max 11 digits)' : null;
+        return !validateSwedishPhone(value) ? 'Phone number must be exactly 9 digits (numbers only)' : null;
       case 'email':
         if (value.trim() === '') return 'Email address is required';
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -828,13 +828,13 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
                     value={formData.phone}
                     onChange={handleChange}
                     onBlur={(e) => setTouchedFields(prev => new Set(prev).add(e.target.name))}
-                    maxLength={11}
+                    maxLength={9}
                     className={`w-full pl-20 pr-4 py-2 border rounded-lg focus:ring-2 transition-all placeholder:text-gray-500 ${
                       isFieldInvalid('phone', formData.phone)
                         ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
                         : 'border-gray-300 focus:ring-cyan-500 focus:border-transparent'
                     }`}
-                    placeholder="70 123 45 67"
+                    placeholder="701234567"
                   />
                 </div>
                 {getFieldError('phone', formData.phone) && (

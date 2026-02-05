@@ -39,13 +39,8 @@ export default function ContactSection() {
 
   const validatePhone = (phone: string): boolean => {
     if (!phone.trim()) return false;
-    // Swedish phone number validation: max 11 digits
-    // Remove spaces, dashes, and country code if present
-    const cleaned = phone.replace(/[\s\-+46]/g, '');
-    // Swedish phone numbers: 9-11 digits, can start with 0
-    // Mobile numbers typically start with 07 (10 digits total with leading 0)
-    // Landlines can start with 0 followed by area code (9-11 digits)
-    return /^0?\d{9,11}$/.test(cleaned) && cleaned.length <= 11;
+    const digits = phone.replace(/\D/g, '');
+    return digits.length === 9;
   };
 
   const validateArea = (value: string): boolean => {
@@ -71,6 +66,10 @@ export default function ContactSection() {
     const { name, value } = e.target;
     let processedValue = value;
     
+    // Restrict phone to digits only, max 9
+    if (name === 'phone') {
+      processedValue = value.replace(/\D/g, '').slice(0, 9);
+    }
     // Validate and restrict area/square meter fields (0-1000, max 4 digits)
     if (name === 'squareMeter') {
       // Remove any non-numeric characters except decimal point
@@ -107,7 +106,7 @@ export default function ContactSection() {
     if (name === 'phone' && value && !validatePhone(value)) {
       setErrors({
         ...errors,
-        phone: 'Please enter a valid Swedish phone number (max 11 digits)'
+        phone: 'Phone number must be exactly 9 digits (numbers only)'
       });
     } else if (name === 'email' && value && !validateEmail(value)) {
       setErrors({
@@ -144,7 +143,7 @@ export default function ContactSection() {
     // Validate all fields
     const newErrors: typeof errors = {};
     if (formData.phone && !validatePhone(formData.phone)) {
-      newErrors.phone = 'Please enter a valid Swedish phone number (max 11 digits)';
+      newErrors.phone = 'Phone number must be exactly 9 digits (numbers only)';
     }
     if (formData.email && !validateEmail(formData.email)) {
       newErrors.email = 'Please enter a valid email address';
@@ -335,11 +334,11 @@ export default function ContactSection() {
                     value={formData.phone}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    maxLength={11}
+                    maxLength={9}
                     className={`w-full pl-20 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-colors placeholder:text-gray-500 ${
                       errors.phone ? 'border-red-500' : 'border-gray-300'
                     }`}
-                    placeholder="70 123 45 67"
+                    placeholder="701234567"
                     required
                   />
                 </div>

@@ -881,7 +881,7 @@ export async function POST(request: Request) {
                   <tr>
                     <td style="padding: 30px;">
                       <p style="margin: 0 0 20px 0; color: #475569; font-size: 16px;">Hi ${name},</p>
-                      <p style="margin: 0 0 20px 0; color: #475569; font-size: 16px;">Thank you for requesting a quote for <strong>${displayService}</strong>. We've received your information and will get back to you shortly.</p>
+                      <p style="margin: 0 0 20px 0; color: #475569; font-size: 16px;">Thank you for requesting a quote for <strong>${displayService}</strong>.</p>
                       
                       ${priceInfo ? `
                       <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-left: 4px solid #10b981; padding: 25px; border-radius: 8px; margin: 25px 0;">
@@ -891,7 +891,7 @@ export async function POST(request: Request) {
                           <p style="margin: 4px 0 0 0; color: #1e293b; font-size: 18px; font-weight: 600;">${displaySquareMeter} m²</p>
                         </div>
                         <div style="border-top: 1px solid #86efac; padding-top: 12px; margin-top: 12px;">
-                          <p style="margin: 0; color: #475569; font-size: 14px;">Estimated Price:</p>
+                          <p style="margin: 0; color: #475569; font-size: 14px;">Price:</p>
                           <p style="margin: 4px 0 0 0; color: #10b981; font-size: 32px; font-weight: 700;">
                             ${priceInfo.priceRange ? `${priceInfo.priceRange} kr` : `${priceInfo.price} kr`}
                           </p>
@@ -900,15 +900,6 @@ export async function POST(request: Request) {
                         <p style="margin: 12px 0 0 0; color: #64748b; font-size: 12px; font-style: italic;">* This is an estimated price. Final price may vary based on specific requirements.</p>
                       </div>
                       ` : ''}
-                      
-                      <div style="background: #f8fafc; border-left: 4px solid #06b6d4; padding: 16px 18px; border-radius: 10px; color: #334155; font-size: 15px; margin: 25px 0;">
-                        <p style="margin: 0 0 10px 0; font-weight: 600; color: #1e293b;">What happens next?</p>
-                        <ul style="margin: 0; padding-left: 20px; color: #475569;">
-                          <li style="margin: 6px 0;">Our team will review your request</li>
-                          <li style="margin: 6px 0;">We'll contact you within 24 hours</li>
-                          <li style="margin: 6px 0;">We'll provide a detailed quote and answer any questions</li>
-                        </ul>
-                      </div>
 
                       ${confirmationUrl ? `
                       <div style="text-align: center; margin: 30px 0;">

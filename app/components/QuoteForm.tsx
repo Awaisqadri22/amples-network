@@ -19,10 +19,8 @@ export default function QuoteForm({ idPrefix = 'form', sticky = true }: QuoteFor
 
   const validateSwedishPhone = (phone: string): boolean => {
     if (!phone.trim()) return false;
-    // Remove spaces, dashes, and country code if present
-    const cleaned = phone.replace(/[\s\-+46]/g, '');
-    // Swedish phone numbers: 9-11 digits, can start with 0
-    return /^0?\d{9,11}$/.test(cleaned) && cleaned.length <= 11;
+    const digits = phone.replace(/\D/g, '');
+    return digits.length === 9;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,9 +53,10 @@ export default function QuoteForm({ idPrefix = 'form', sticky = true }: QuoteFor
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    const nextValue = name === 'phone' ? value.replace(/\D/g, '').slice(0, 9) : value;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: nextValue
     });
     
     // Clear phone error when user starts typing
@@ -69,7 +68,7 @@ export default function QuoteForm({ idPrefix = 'form', sticky = true }: QuoteFor
   const handlePhoneBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (value && !validateSwedishPhone(value)) {
-      setPhoneError('Please enter a valid Swedish phone number (max 11 digits)');
+      setPhoneError('Phone number must be exactly 9 digits (numbers only)');
     } else {
       setPhoneError('');
     }
@@ -119,11 +118,11 @@ export default function QuoteForm({ idPrefix = 'form', sticky = true }: QuoteFor
               value={formData.phone}
               onChange={handleChange}
               onBlur={handlePhoneBlur}
-              maxLength={11}
+              maxLength={9}
               className={`w-full pl-20 pr-4 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder:text-gray-500 ${
                 phoneError ? 'border-red-500' : 'border-gray-300'
               }`}
-              placeholder="70 123 45 67"
+              placeholder="701234567"
             />
           </div>
           {phoneError && (
