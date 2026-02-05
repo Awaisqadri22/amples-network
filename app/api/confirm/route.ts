@@ -165,17 +165,31 @@ export async function POST(request: Request) {
         try {
             if (process.env.RESEND_API_KEY) {
                 const resend = new Resend(process.env.RESEND_API_KEY);
-                const serviceName = confirmedRecord.selectedService || confirmedRecord.serviceType || 'Cleaning Service';
-                const customerEmail = confirmedRecord.email ?? (confirmedRecord as typeof confirmedRecord & { userEmail?: string | null }).userEmail;
-                const confDetails = (confirmedRecord as { details?: { confirmedTotalPriceKr?: number; confirmedExtraLabels?: string[] } }).details;
+                const rec = confirmedRecord as Record<string, unknown>;
+                const serviceName = (rec.selectedService as string) || (rec.serviceType as string) || 'Cleaning Service';
+                const customerEmail = (rec.email as string) ?? (rec.userEmail as string) ?? '';
+                const confDetails = rec.details as { confirmedTotalPriceKr?: number; confirmedExtraLabels?: string[] } | undefined;
+                const preferredDt = rec.preferredDateTime as Date | string | null | undefined;
+                const dateTimeStr = preferredDt
+                    ? new Date(preferredDt).toLocaleString('sv-SE', { dateStyle: 'long', timeStyle: 'short' })
+                    : (rec.moveOutCleaningDate
+                        ? new Date(rec.moveOutCleaningDate as Date).toLocaleString('sv-SE', { dateStyle: 'long', timeStyle: 'short' })
+                        : rec.windowCleaningDate
+                            ? new Date(rec.windowCleaningDate as Date).toLocaleString('sv-SE', { dateStyle: 'long', timeStyle: 'short' })
+                            : rec.constructionCleaningDate
+                                ? new Date(rec.constructionCleaningDate as Date).toLocaleString('sv-SE', { dateStyle: 'long', timeStyle: 'short' })
+                                : 'To be agreed');
+                const houseType = (rec.homeType as string) || (rec.constructionHomeType as string) || (rec.detailHomeType as string) || (rec.officePremisesType as string) || '—';
+                const areaStr = (rec.squareMeter as string) || (rec.areaSize as string) || (rec.constructionAreaSize as string) || (rec.officeAreaSize as string) || (rec.detailAreaSize as string) || '—';
+                const extrasList = Array.isArray(confDetails?.confirmedExtraLabels) && confDetails.confirmedExtraLabels.length > 0
+                    ? confDetails.confirmedExtraLabels.map((l: string) => `<li style="margin: 4px 0;">${l}</li>`).join('')
+                    : '<li style="margin: 4px 0; color: #6b7280;">None</li>';
+                const totalPriceKr = confDetails?.confirmedTotalPriceKr;
                 const extrasLabel = Array.isArray(confDetails?.confirmedExtraLabels) && confDetails.confirmedExtraLabels.length > 0
                     ? ` (includes ${confDetails.confirmedExtraLabels.join(', ')})`
                     : '';
-                const totalPriceLine = confDetails?.confirmedTotalPriceKr
-                    ? `<p style="font-size: 16px;"><strong>Your confirmed total price:</strong> ${confDetails.confirmedTotalPriceKr} kr${extrasLabel}</p><p style="font-size: 14px; color: #059669;">This is your new final price for this booking.</p>`
-                    : '';
-                const totalPriceLineAdmin = confDetails?.confirmedTotalPriceKr
-                    ? `<p><strong>Confirmed total price (new final price):</strong> ${confDetails.confirmedTotalPriceKr} kr${extrasLabel}</p>`
+                const totalPriceLineAdmin = totalPriceKr
+                    ? `<p><strong>Confirmed total price (new final price):</strong> ${totalPriceKr} kr${extrasLabel}</p>`
                     : '';
 
                 if (customerEmail) {
@@ -186,16 +200,43 @@ export async function POST(request: Request) {
                         html: `
                             <!DOCTYPE html>
                             <html>
-                            <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-                            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-                                <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                                    <h1 style="color: #ffffff; margin: 0; font-size: 28px;">✅ Booking Confirmed!</h1>
-                                </div>
-                                <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
-                                    <p style="font-size: 16px;">Hi ${confirmedRecord.name || 'there'},</p>
-                                    <p style="font-size: 16px;">Your booking for <strong>${serviceName}</strong> has been confirmed.</p>
-                                    ${totalPriceLine}
-                                    <p style="font-size: 14px; color: #6b7280;">Best regards,<br>The Amples Team</p>
+                            <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Booking Confirmed</title></head>
+                            <body style="margin: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f0fdf4; padding: 24px;">
+                                <div style="max-width: 560px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
+                                    <div style="background: linear-gradient(135deg, #059669 0%, #047857 100%); padding: 32px 24px; text-align: center;">
+                                        <div style="font-size: 40px; margin-bottom: 8px;">✅</div>
+                                        <h1 style="color: #ffffff; margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.02em;">Booking Confirmed</h1>
+                                        <p style="color: #a7f3d0; margin: 8px 0 0 0; font-size: 15px;">Thank you for confirming with Amples</p>
+                                    </div>
+                                    <div style="padding: 28px 24px;">
+                                        <p style="font-size: 16px; color: #374151; margin: 0 0 20px 0;">Hi ${(rec.name as string) || 'there'},</p>
+                                        <p style="font-size: 15px; color: #6b7280; margin: 0 0 24px 0; line-height: 1.5;">Your booking is confirmed. Here are the details:</p>
+                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background: #f9fafb; border-radius: 12px; border-collapse: separate; border-spacing: 0;">
+                                            <tr><td style="padding: 20px; border-radius: 12px;">
+                                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                                    <tr><td style="padding: 8px 0;"><span style="color: #6b7280; font-size: 13px;">Service</span></td><td style="text-align: right; font-weight: 600; color: #111827;">${serviceName}</td></tr>
+                                                    <tr><td colspan="2" style="border-bottom: 1px solid #e5e7eb; padding: 4px 0;"></td></tr>
+                                                    <tr><td style="padding: 8px 0;"><span style="color: #6b7280; font-size: 13px;">Date & time</span></td><td style="text-align: right; font-weight: 500; color: #111827;">${dateTimeStr}</td></tr>
+                                                    <tr><td colspan="2" style="border-bottom: 1px solid #e5e7eb; padding: 4px 0;"></td></tr>
+                                                    <tr><td style="padding: 8px 0;"><span style="color: #6b7280; font-size: 13px;">Name</span></td><td style="text-align: right; color: #111827;">${(rec.name as string) || '—'}</td></tr>
+                                                    <tr><td colspan="2" style="border-bottom: 1px solid #e5e7eb; padding: 4px 0;"></td></tr>
+                                                    <tr><td style="padding: 8px 0;"><span style="color: #6b7280; font-size: 13px;">Telephone</span></td><td style="text-align: right; color: #111827;">${(rec.phone as string) || '—'}</td></tr>
+                                                    <tr><td colspan="2" style="border-bottom: 1px solid #e5e7eb; padding: 4px 0;"></td></tr>
+                                                    <tr><td style="padding: 8px 0;"><span style="color: #6b7280; font-size: 13px;">Address</span></td><td style="text-align: right; color: #111827;">${(rec.address as string) || '—'}</td></tr>
+                                                    <tr><td colspan="2" style="border-bottom: 1px solid #e5e7eb; padding: 4px 0;"></td></tr>
+                                                    <tr><td style="padding: 8px 0;"><span style="color: #6b7280; font-size: 13px;">Type of house</span></td><td style="text-align: right; color: #111827;">${houseType}</td></tr>
+                                                    <tr><td colspan="2" style="border-bottom: 1px solid #e5e7eb; padding: 4px 0;"></td></tr>
+                                                    <tr><td style="padding: 8px 0;"><span style="color: #6b7280; font-size: 13px;">Area</span></td><td style="text-align: right; color: #111827;">${areaStr === '—' ? '—' : `${areaStr} m²`}</td></tr>
+                                                    <tr><td colspan="2" style="border-bottom: 1px solid #e5e7eb; padding: 4px 0;"></td></tr>
+                                                    <tr><td style="padding: 8px 0; vertical-align: top;"><span style="color: #6b7280; font-size: 13px;">Extra's</span></td><td style="text-align: right; color: #111827;"><ul style="margin: 0; padding-left: 16px; list-style: disc;">${extrasList}</ul></td></tr>
+                                                    ${totalPriceKr ? `<tr><td colspan="2" style="border-top: 2px solid #10b981; padding-top: 12px; margin-top: 8px;"></td></tr><tr><td style="padding: 8px 0;"><span style="color: #059669; font-weight: 700; font-size: 15px;">Total price</span></td><td style="text-align: right; font-weight: 700; font-size: 18px; color: #059669;">${totalPriceKr} kr</td></tr>` : ''}
+                                                </table>
+                                            </td></tr>
+                                        </table>
+                                        ${totalPriceKr ? `<p style="font-size: 13px; color: #059669; margin: 16px 0 0 0;">This is your final price for this booking.</p>` : ''}
+                                        <p style="font-size: 14px; color: #6b7280; margin: 24px 0 0 0;">If you have any questions, reply to this email or contact us.</p>
+                                        <p style="font-size: 14px; color: #374151; margin: 16px 0 0 0;"><strong>Best regards,</strong><br>The Amples Team</p>
+                                    </div>
                                 </div>
                             </body>
                             </html>
