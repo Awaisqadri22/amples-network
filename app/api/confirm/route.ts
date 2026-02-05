@@ -30,8 +30,8 @@ export async function POST(request: Request) {
                 personalNumber?: string;
                 preferredDateTime?: string;
                 comments?: string;
-                selectedExtraId?: string;
-                selectedExtraLabel?: string;
+                selectedExtraIds?: string[];
+                selectedExtraLabels?: string[];
                 extraPriceKr?: number;
                 totalPriceKr?: number;
             };
@@ -104,12 +104,13 @@ export async function POST(request: Request) {
 
         // Build update payload
         const existingDetails = (record as { details?: unknown }).details as Record<string, unknown> | null | undefined;
-        const confirmedExtra = additionalInfo?.selectedExtraId && additionalInfo.selectedExtraId !== 'none'
+        const hasExtras = Array.isArray(additionalInfo?.selectedExtraIds) && additionalInfo.selectedExtraIds.length > 0;
+        const confirmedExtra = hasExtras
             ? {
-                confirmedExtraId: additionalInfo.selectedExtraId,
-                confirmedExtraLabel: additionalInfo.selectedExtraLabel ?? null,
-                confirmedExtraPriceKr: additionalInfo.extraPriceKr ?? 0,
-                confirmedTotalPriceKr: additionalInfo.totalPriceKr ?? null,
+                confirmedExtraIds: additionalInfo!.selectedExtraIds,
+                confirmedExtraLabels: Array.isArray(additionalInfo?.selectedExtraLabels) ? additionalInfo.selectedExtraLabels : [],
+                confirmedExtraPriceKr: additionalInfo?.extraPriceKr ?? 0,
+                confirmedTotalPriceKr: additionalInfo?.totalPriceKr ?? null,
             }
             : {};
         const updateData: {
@@ -142,6 +143,7 @@ export async function POST(request: Request) {
             });
             // Create a Booking from the confirmed Quote so the bookings table is populated
             const quoteData = confirmedRecord as Record<string, unknown>;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars -- omit quote-only fields when creating booking
             const { id: _quoteId, createdAt: _qCreated, updatedAt: _qUpdated, user: _qUser, ...quoteScalars } = quoteData;
             await prisma.booking.create({
                 data: {
@@ -165,12 +167,15 @@ export async function POST(request: Request) {
                 const resend = new Resend(process.env.RESEND_API_KEY);
                 const serviceName = confirmedRecord.selectedService || confirmedRecord.serviceType || 'Cleaning Service';
                 const customerEmail = confirmedRecord.email ?? (confirmedRecord as typeof confirmedRecord & { userEmail?: string | null }).userEmail;
-                const confDetails = (confirmedRecord as { details?: { confirmedTotalPriceKr?: number; confirmedExtraLabel?: string } }).details;
+                const confDetails = (confirmedRecord as { details?: { confirmedTotalPriceKr?: number; confirmedExtraLabels?: string[] } }).details;
+                const extrasLabel = Array.isArray(confDetails?.confirmedExtraLabels) && confDetails.confirmedExtraLabels.length > 0
+                    ? ` (includes ${confDetails.confirmedExtraLabels.join(', ')})`
+                    : '';
                 const totalPriceLine = confDetails?.confirmedTotalPriceKr
-                    ? `<p style="font-size: 16px;"><strong>Total price:</strong> ${confDetails.confirmedTotalPriceKr} kr${confDetails.confirmedExtraLabel ? ` (includes ${confDetails.confirmedExtraLabel})` : ''}</p>`
+                    ? `<p style="font-size: 16px;"><strong>Your confirmed total price:</strong> ${confDetails.confirmedTotalPriceKr} kr${extrasLabel}</p><p style="font-size: 14px; color: #059669;">This is your new final price for this booking.</p>`
                     : '';
                 const totalPriceLineAdmin = confDetails?.confirmedTotalPriceKr
-                    ? `<p><strong>Total price:</strong> ${confDetails.confirmedTotalPriceKr} kr${confDetails.confirmedExtraLabel ? ` (includes ${confDetails.confirmedExtraLabel})` : ''}</p>`
+                    ? `<p><strong>Confirmed total price (new final price):</strong> ${confDetails.confirmedTotalPriceKr} kr${extrasLabel}</p>`
                     : '';
 
                 if (customerEmail) {

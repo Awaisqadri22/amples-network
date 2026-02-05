@@ -27,6 +27,15 @@ const EXTRAS_OPTIONS = [
     { id: 'balcony-dusting', label: 'Balcony dusting +200 kr', price: 200 },
     { id: 'balcony-dusting-glazed', label: 'Balcony dusting glazed +300 kr', price: 300 },
     { id: 'balcony-window', label: 'Balcony window cleaning +500 kr', price: 500 },
+    { id: 'garage-dusting', label: 'Garage dusting +300 kr', price: 300 },
+    { id: 'outdoors-10kvm', label: 'Outdoors/10 kvm +200 kr', price: 200 },
+    { id: 'basement-10kvm', label: 'Basement/10 kvm +200 kr', price: 200 },
+    { id: 'dusting-blinds-10', label: 'Dusting blinds/10 pieces +200 kr', price: 200 },
+    { id: 'water-trap-cleaning', label: 'Water trap cleaning +150 kr', price: 150 },
+    { id: 'sauna-dusting', label: 'Dusting/wet wiping of sauna +400 kr', price: 400 },
+    { id: 'spa-dusting', label: 'Dusting/wet wiping of spa +500 kr', price: 500 },
+    { id: 'rough-cleaning-15min', label: 'Rough cleaning, more difficult stains, sanitation (started 15 min) +200 kr', price: 200 },
+    { id: 'other-cleaning-hour', label: 'All other cleaning/man/started hour +500 kr', price: 500 },
 ] as const;
 
 export default function ConfirmPage() {
@@ -45,8 +54,15 @@ export default function ConfirmPage() {
         comments: ''
     });
     const [agreeToTerms, setAgreeToTerms] = useState(false);
-    const [selectedExtraId, setSelectedExtraId] = useState<string>('none');
+    const [selectedExtraIds, setSelectedExtraIds] = useState<string[]>([]);
     const [minDateTime, setMinDateTime] = useState('2000-01-01T00:00');
+
+    const toggleExtra = (id: string) => {
+        if (id === 'none') return;
+        setSelectedExtraIds((prev) =>
+            prev.includes(id) ? prev.filter((e) => e !== id) : [...prev, id]
+        );
+    };
 
     useEffect(() => {
         if (!token) return;
@@ -144,10 +160,10 @@ export default function ConfirmPage() {
                         personalNumber: digitsOnly,
                         preferredDateTime: additionalInfo.preferredDateTime || undefined,
                         comments: additionalInfo.comments || undefined,
-                        selectedExtraId: selectedExtraId,
-                        selectedExtraLabel: selectedExtraId !== 'none' ? EXTRAS_OPTIONS.find((e) => e.id === selectedExtraId)?.label : undefined,
-                        extraPriceKr: selectedExtraId !== 'none' ? EXTRAS_OPTIONS.find((e) => e.id === selectedExtraId)?.price ?? 0 : 0,
-                        totalPriceKr: (priceInfo?.price ?? 0) + (selectedExtraId !== 'none' ? EXTRAS_OPTIONS.find((e) => e.id === selectedExtraId)?.price ?? 0 : 0),
+                        selectedExtraIds: selectedExtraIds,
+                        selectedExtraLabels: selectedExtraIds.map((id) => EXTRAS_OPTIONS.find((e) => e.id === id)?.label).filter(Boolean),
+                        extraPriceKr: selectedExtraIds.reduce((sum, id) => sum + (EXTRAS_OPTIONS.find((e) => e.id === id)?.price ?? 0), 0),
+                        totalPriceKr: (priceInfo?.price ?? 0) + selectedExtraIds.reduce((sum, id) => sum + (EXTRAS_OPTIONS.find((e) => e.id === id)?.price ?? 0), 0),
                     }
                 }),
             });
@@ -245,8 +261,8 @@ export default function ConfirmPage() {
     const squareMeter = quoteData.squareMeter || quoteData.areaSize || quoteData.constructionAreaSize || quoteData.officeAreaSize || quoteData.detailAreaSize;
     const priceInfo = calculatePrice(squareMeter);
     const basePrice = priceInfo?.price ?? 0;
-    const selectedExtra = EXTRAS_OPTIONS.find((e) => e.id === selectedExtraId);
-    const extraPrice = selectedExtra?.price ?? 0;
+    const selectedExtras = EXTRAS_OPTIONS.filter((e) => e.id !== 'none' && selectedExtraIds.includes(e.id));
+    const extraPrice = selectedExtras.reduce((sum, e) => sum + e.price, 0);
     const totalPrice = basePrice + extraPrice;
 
     return (
@@ -279,12 +295,12 @@ export default function ConfirmPage() {
                                             {priceInfo.priceRange && <span className="text-sm font-normal text-gray-500 ml-1">(approx. {priceInfo.price} kr)</span>}
                                         </span>
                                     </div>
-                                    {selectedExtraId !== 'none' && selectedExtra && (
-                                        <div className="flex justify-between items-baseline pt-2 border-t border-green-200">
-                                            <span className="text-gray-600">{selectedExtra.label.replace(/\s*\+\d+\s*kr\s*$/, '')}</span>
-                                            <span className="font-semibold text-gray-800">+{selectedExtra.price} kr</span>
+                                    {selectedExtras.length > 0 && selectedExtras.map((extra) => (
+                                        <div key={extra.id} className="flex justify-between items-baseline pt-2 border-t border-green-200">
+                                            <span className="text-gray-600">{extra.label.replace(/\s*\+\d+\s*kr\s*$/, '')}</span>
+                                            <span className="font-semibold text-gray-800">+{extra.price} kr</span>
                                         </div>
-                                    )}
+                                    ))}
                                     <div className="flex justify-between items-baseline pt-3 border-t-2 border-green-300 mt-2">
                                         <span className="font-semibold text-gray-800">Total</span>
                                         <span className="text-2xl font-bold text-green-700">{totalPrice} kr</span>
@@ -296,18 +312,23 @@ export default function ConfirmPage() {
                         {/* Add some Extra's */}
                         <div className="mb-8">
                             <h2 className="text-xl font-semibold text-gray-900 mb-3">Add some Extra&apos;s</h2>
-                            <select
-                                value={selectedExtraId}
-                                onChange={(e) => setSelectedExtraId(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-white text-gray-900 font-medium"
-                            >
-                                {EXTRAS_OPTIONS.map((opt) => (
-                                    <option key={opt.id} value={opt.id}>
-                                        {opt.label}
-                                    </option>
+                            <p className="text-sm text-gray-500 mb-4">Select one or more extras. The total price above will update automatically.</p>
+                            <div className="grid gap-2 sm:grid-cols-2">
+                                {EXTRAS_OPTIONS.filter((opt) => opt.id !== 'none').map((opt) => (
+                                    <label
+                                        key={opt.id}
+                                        className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-cyan-400 hover:bg-cyan-50/50 cursor-pointer transition-colors"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedExtraIds.includes(opt.id)}
+                                            onChange={() => toggleExtra(opt.id)}
+                                            className="h-5 w-5 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                                        />
+                                        <span className="text-gray-800 font-medium">{opt.label}</span>
+                                    </label>
                                 ))}
-                            </select>
-                            <p className="mt-2 text-sm text-gray-500">Select an extra to add to your booking. The total price above will update automatically.</p>
+                            </div>
                         </div>
 
                         {/* Service Details */}
