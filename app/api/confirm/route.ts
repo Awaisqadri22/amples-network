@@ -26,7 +26,15 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { token, additionalInfo } = body as {
             token?: string;
-            additionalInfo?: { personalNumber?: string; preferredDateTime?: string; comments?: string };
+            additionalInfo?: {
+                personalNumber?: string;
+                preferredDateTime?: string;
+                comments?: string;
+                selectedExtraId?: string;
+                selectedExtraLabel?: string;
+                extraPriceKr?: number;
+                totalPriceKr?: number;
+            };
         };
 
         if (!token) {
@@ -95,14 +103,25 @@ export async function POST(request: Request) {
         }
 
         // Build update payload
+        const existingDetails = (record as { details?: unknown }).details as Record<string, unknown> | null | undefined;
+        const confirmedExtra = additionalInfo?.selectedExtraId && additionalInfo.selectedExtraId !== 'none'
+            ? {
+                confirmedExtraId: additionalInfo.selectedExtraId,
+                confirmedExtraLabel: additionalInfo.selectedExtraLabel ?? null,
+                confirmedExtraPriceKr: additionalInfo.extraPriceKr ?? 0,
+                confirmedTotalPriceKr: additionalInfo.totalPriceKr ?? null,
+            }
+            : {};
         const updateData: {
             status: string;
             personalNumber?: string | null;
             comments?: string | null;
             preferredDateTime?: Date | null;
+            details?: Prisma.InputJsonValue;
         } = {
             status: 'confirmed',
-            personalNumber: personalNumberDigits
+            personalNumber: personalNumberDigits,
+            details: { ...(existingDetails || {}), ...confirmedExtra } as Prisma.InputJsonValue
         };
 
         if (additionalInfo) {
@@ -146,6 +165,13 @@ export async function POST(request: Request) {
                 const resend = new Resend(process.env.RESEND_API_KEY);
                 const serviceName = confirmedRecord.selectedService || confirmedRecord.serviceType || 'Cleaning Service';
                 const customerEmail = confirmedRecord.email ?? (confirmedRecord as typeof confirmedRecord & { userEmail?: string | null }).userEmail;
+                const confDetails = (confirmedRecord as { details?: { confirmedTotalPriceKr?: number; confirmedExtraLabel?: string } }).details;
+                const totalPriceLine = confDetails?.confirmedTotalPriceKr
+                    ? `<p style="font-size: 16px;"><strong>Total price:</strong> ${confDetails.confirmedTotalPriceKr} kr${confDetails.confirmedExtraLabel ? ` (includes ${confDetails.confirmedExtraLabel})` : ''}</p>`
+                    : '';
+                const totalPriceLineAdmin = confDetails?.confirmedTotalPriceKr
+                    ? `<p><strong>Total price:</strong> ${confDetails.confirmedTotalPriceKr} kr${confDetails.confirmedExtraLabel ? ` (includes ${confDetails.confirmedExtraLabel})` : ''}</p>`
+                    : '';
 
                 if (customerEmail) {
                     await resend.emails.send({
@@ -163,6 +189,7 @@ export async function POST(request: Request) {
                                 <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
                                     <p style="font-size: 16px;">Hi ${confirmedRecord.name || 'there'},</p>
                                     <p style="font-size: 16px;">Your booking for <strong>${serviceName}</strong> has been confirmed.</p>
+                                    ${totalPriceLine}
                                     <p style="font-size: 14px; color: #6b7280;">Best regards,<br>The Amples Team</p>
                                 </div>
                             </body>
@@ -188,6 +215,7 @@ export async function POST(request: Request) {
                                 <p><strong>Service:</strong> ${serviceName}</p>
                                 <p><strong>Email:</strong> ${customerEmail || 'N/A'}</p>
                                 <p><strong>Phone:</strong> ${confirmedRecord.phone || 'N/A'}</p>
+                                ${totalPriceLineAdmin}
                                 ${additionalInfo?.comments ? `<p><strong>Additional Comments:</strong> ${additionalInfo.comments}</p>` : ''}
                             </div>
                         </body>
@@ -220,7 +248,8 @@ export async function POST(request: Request) {
                 : 'Not specified';
             const squareMeterValue = (rec.squareMeter as string) || (rec.areaSize as string) || (rec.constructionAreaSize as string) || (rec.officeAreaSize as string) || (rec.detailAreaSize as string) || null;
             const priceInfo = calculatePrice(squareMeterValue ?? undefined);
-            const customerPrice = priceInfo?.price;
+            const detailsObj = rec.details as { confirmedTotalPriceKr?: number } | null | undefined;
+            const customerPrice = detailsObj?.confirmedTotalPriceKr ?? priceInfo?.price;
             const contractorPriceKr = customerPrice != null ? Math.round(customerPrice * 0.75) : null;
             const displayContractorPrice = contractorPriceKr != null ? `${contractorPriceKr.toLocaleString('sv-SE')} kr` : 'Not specified';
             const jobDate = dateValue ? (typeof dateValue === 'string' ? new Date(dateValue) : dateValue) : null;

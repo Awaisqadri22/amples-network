@@ -22,6 +22,13 @@ interface QuoteData {
     [key: string]: unknown;
 }
 
+const EXTRAS_OPTIONS = [
+    { id: 'none', label: 'No extra', price: 0 },
+    { id: 'balcony-dusting', label: 'Balcony dusting +200 kr', price: 200 },
+    { id: 'balcony-dusting-glazed', label: 'Balcony dusting glazed +300 kr', price: 300 },
+    { id: 'balcony-window', label: 'Balcony window cleaning +500 kr', price: 500 },
+] as const;
+
 export default function ConfirmPage() {
     const params = useParams();
     const router = useRouter();
@@ -37,6 +44,8 @@ export default function ConfirmPage() {
         preferredDateTime: '',
         comments: ''
     });
+    const [agreeToTerms, setAgreeToTerms] = useState(false);
+    const [selectedExtraId, setSelectedExtraId] = useState<string>('none');
     const [minDateTime, setMinDateTime] = useState('2000-01-01T00:00');
 
     useEffect(() => {
@@ -98,6 +107,12 @@ export default function ConfirmPage() {
         setSubmitting(true);
         setError(null);
 
+        if (!agreeToTerms) {
+            setError('You must agree to the terms and conditions to confirm your booking.');
+            setSubmitting(false);
+            return;
+        }
+
         const personalNumber = additionalInfo.personalNumber.trim();
         if (!personalNumber) {
             setError('Personal Number is required.');
@@ -128,7 +143,11 @@ export default function ConfirmPage() {
                     additionalInfo: {
                         personalNumber: digitsOnly,
                         preferredDateTime: additionalInfo.preferredDateTime || undefined,
-                        comments: additionalInfo.comments || undefined
+                        comments: additionalInfo.comments || undefined,
+                        selectedExtraId: selectedExtraId,
+                        selectedExtraLabel: selectedExtraId !== 'none' ? EXTRAS_OPTIONS.find((e) => e.id === selectedExtraId)?.label : undefined,
+                        extraPriceKr: selectedExtraId !== 'none' ? EXTRAS_OPTIONS.find((e) => e.id === selectedExtraId)?.price ?? 0 : 0,
+                        totalPriceKr: (priceInfo?.price ?? 0) + (selectedExtraId !== 'none' ? EXTRAS_OPTIONS.find((e) => e.id === selectedExtraId)?.price ?? 0 : 0),
                     }
                 }),
             });
@@ -225,6 +244,10 @@ export default function ConfirmPage() {
     const serviceName = quoteData.selectedService || quoteData.serviceType || 'Cleaning Service';
     const squareMeter = quoteData.squareMeter || quoteData.areaSize || quoteData.constructionAreaSize || quoteData.officeAreaSize || quoteData.detailAreaSize;
     const priceInfo = calculatePrice(squareMeter);
+    const basePrice = priceInfo?.price ?? 0;
+    const selectedExtra = EXTRAS_OPTIONS.find((e) => e.id === selectedExtraId);
+    const extraPrice = selectedExtra?.price ?? 0;
+    const totalPrice = basePrice + extraPrice;
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-emerald-50 py-12 px-4">
@@ -243,6 +266,49 @@ export default function ConfirmPage() {
                                 {error}
                             </div>
                         )}
+
+                        {/* Price offered */}
+                        {priceInfo && (
+                            <div className="mb-8 p-5 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200">
+                                <p className="text-sm font-medium text-gray-600 mb-1">Price offered</p>
+                                <div className="space-y-1">
+                                    <div className="flex justify-between items-baseline">
+                                        <span className="text-gray-600">Base price</span>
+                                        <span className="font-semibold text-gray-800">
+                                            {priceInfo.priceRange ? `${priceInfo.priceRange} kr` : `${priceInfo.price} kr`}
+                                            {priceInfo.priceRange && <span className="text-sm font-normal text-gray-500 ml-1">(approx. {priceInfo.price} kr)</span>}
+                                        </span>
+                                    </div>
+                                    {selectedExtraId !== 'none' && selectedExtra && (
+                                        <div className="flex justify-between items-baseline pt-2 border-t border-green-200">
+                                            <span className="text-gray-600">{selectedExtra.label.replace(/\s*\+\d+\s*kr\s*$/, '')}</span>
+                                            <span className="font-semibold text-gray-800">+{selectedExtra.price} kr</span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between items-baseline pt-3 border-t-2 border-green-300 mt-2">
+                                        <span className="font-semibold text-gray-800">Total</span>
+                                        <span className="text-2xl font-bold text-green-700">{totalPrice} kr</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Add some Extra's */}
+                        <div className="mb-8">
+                            <h2 className="text-xl font-semibold text-gray-900 mb-3">Add some Extra&apos;s</h2>
+                            <select
+                                value={selectedExtraId}
+                                onChange={(e) => setSelectedExtraId(e.target.value)}
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-white text-gray-900 font-medium"
+                            >
+                                {EXTRAS_OPTIONS.map((opt) => (
+                                    <option key={opt.id} value={opt.id}>
+                                        {opt.label}
+                                    </option>
+                                ))}
+                            </select>
+                            <p className="mt-2 text-sm text-gray-500">Select an extra to add to your booking. The total price above will update automatically.</p>
+                        </div>
 
                         {/* Service Details */}
                         <div className="mb-8">
@@ -266,7 +332,7 @@ export default function ConfirmPage() {
                                 )}
                                 {priceInfo && (
                                     <div className="flex justify-between pt-3 border-t border-gray-200">
-                                        <span className="text-gray-600">Price Estimation:</span>
+                                        <span className="text-gray-600">Price:</span>
                                         <span className="font-bold text-green-600 text-lg">
                                             {priceInfo.priceRange ? `${priceInfo.priceRange} kr` : `${priceInfo.price} kr`}
                                         </span>
@@ -365,25 +431,23 @@ export default function ConfirmPage() {
                             </div>
                         </div>
 
-                        <div className="flex justify-center mb-4">
-                            <a
-                                href="https://www.skatteverket.se/privat/sjalvservice/svarpavanligafragor/rotochrutarbete/privatrotochrutarbetefaq/hurmycketmastejagtjanaforattkunnautnyttjamaximalskattereduktionforrotochrutarbete.5.5fc8c94513259a4ba1d800034104.html"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-50 border-2 border-cyan-400 text-cyan-700 font-semibold rounded-lg hover:bg-cyan-100 hover:border-cyan-500 transition-colors shadow-sm"
-                            >
-                                Calculate Rutavdrag
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                </svg>
-                            </a>
+                        <div className="mb-6">
+                            <label className="flex items-start gap-3 cursor-pointer group">
+                                <input
+                                    type="checkbox"
+                                    checked={agreeToTerms}
+                                    onChange={(e) => setAgreeToTerms(e.target.checked)}
+                                    className="mt-1 h-5 w-5 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                                />
+                                <span className="text-gray-700 font-medium group-hover:text-gray-900">Agree to terms and conditions</span>
+                            </label>
                         </div>
 
                         {/* Confirm Button */}
                         <div className="flex gap-4">
                             <button
                                 onClick={handleConfirm}
-                                disabled={submitting}
+                                disabled={submitting || !agreeToTerms}
                                 className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-4 rounded-lg font-semibold text-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {submitting ? 'Confirming...' : '✅ Confirm Booking'}
