@@ -211,7 +211,7 @@ export default function ConnectCompany() {
               </h2>
               <div className="space-y-6 text-lg text-gray-700 leading-relaxed">
                 <p className="text-justify">
-                  By collaborating with Qleano, you get more customers in a simple and risk-free way. You don't pay for potential customers or "leads", but instead have the choice to say yes or no to completed bookings. This means that you don't have to spend money without getting something in return. It also means less work for you as an affiliated company as you don't have to spend time on producing quotes, answering any questions from the customer, invoicing, any complaints and handling RUT deductions. All so that you can focus on carrying out the cleaning/moving as well as possible.
+                  By collaborating with Amples, you get more customers in a simple and risk-free way. You don&apos;t pay for potential customers or &quot;leads&quot;, but instead have the choice to say yes or no to completed bookings. This means that you don&apos;t have to spend money without getting something in return. It also means less work for you as an affiliated company as you don&apos;t have to spend time on producing quotes, answering any questions from the customer, invoicing, any complaints and handling RUT deductions. All so that you can focus on carrying out the cleaning/moving as well as possible.
                 </p>
 
                 <div className="mt-8">
@@ -402,7 +402,7 @@ export default function ConnectCompany() {
 
                   {status === 'success' && (
                     <div className="p-3 rounded-lg bg-green-50 text-green-800 text-sm border border-green-200">
-                      Thank you! We'll be in touch soon.
+                      Thank you! We&apos;ll be in touch soon.
                     </div>
                   )}
 

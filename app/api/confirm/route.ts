@@ -4,19 +4,19 @@ import { Resend } from 'resend';
 import { Prisma } from '@prisma/client';
 import { randomBytes, randomUUID } from 'crypto';
 
-function calculatePrice(squareMeters: number | string | undefined): { price: number; priceRange?: string } | null {
+function calculatePrice(squareMeters: number | string | undefined): { price: number } | null {
     if (!squareMeters) return null;
     const sqm = typeof squareMeters === 'string' ? parseFloat(squareMeters) : squareMeters;
     if (isNaN(sqm) || sqm < 0) return null;
     const roundedSqm = Math.round(sqm);
     if (roundedSqm >= 0 && roundedSqm <= 29) return { price: 1575 };
-    if (roundedSqm >= 30 && roundedSqm <= 39) return { price: 1725, priceRange: '1675-1775' };
-    if (roundedSqm >= 40 && roundedSqm <= 49) return { price: 1825, priceRange: '1775-1875' };
-    if (roundedSqm >= 50 && roundedSqm <= 59) return { price: 1925, priceRange: '1875-1975' };
-    if (roundedSqm >= 60 && roundedSqm <= 69) return { price: 2125, priceRange: '2075-2175' };
-    if (roundedSqm >= 70 && roundedSqm <= 79) return { price: 2325, priceRange: '2275-2375' };
-    if (roundedSqm >= 80 && roundedSqm <= 89) return { price: 2450, priceRange: '2400-2500' };
-    if (roundedSqm >= 90 && roundedSqm <= 100) return { price: 2900, priceRange: '2800-3000' };
+    if (roundedSqm >= 30 && roundedSqm <= 39) return { price: 1725 };
+    if (roundedSqm >= 40 && roundedSqm <= 49) return { price: 1825 };
+    if (roundedSqm >= 50 && roundedSqm <= 59) return { price: 1925 };
+    if (roundedSqm >= 60 && roundedSqm <= 69) return { price: 2125 };
+    if (roundedSqm >= 70 && roundedSqm <= 79) return { price: 2325 };
+    if (roundedSqm >= 80 && roundedSqm <= 89) return { price: 2450 };
+    if (roundedSqm >= 90 && roundedSqm <= 100) return { price: 2900 };
     if (roundedSqm > 100 && roundedSqm <= 200) return { price: 3000 + Math.ceil((roundedSqm - 100) / 10) * 200 };
     return { price: 5000 + (roundedSqm - 200) * 30 };
 }

@@ -85,7 +85,7 @@ export default function HomeCleaning() {
                 </p>
 
                 <p className="text-justify">
-                  By hiring a cleaning company via Qleano to clean your home, you can save yourself a lot of time and trouble. This time and energy can instead be spent on things you enjoy. In addition, you avoid the bad conscience that often arises when you don't have the energy or time to keep your own home clean and tidy. At Qleano, we have cleaning partners throughout Sweden. Our experienced and professional employees are always ready to step in and help with your home cleaning.
+                  By hiring a cleaning company via Amples to clean your home, you can save yourself a lot of time and trouble. This time and energy can instead be spent on things you enjoy. In addition, you avoid the bad conscience that often arises when you don&apos;t have the energy or time to keep your own home clean and tidy. At A, we have cleaning partners throughout Sweden. Our experienced and professional employees are always ready to step in and help with your home cleaning.
                 </p>
 
                 <p className="text-justify">
@@ -93,7 +93,7 @@ export default function HomeCleaning() {
                 </p>
 
                 <p className="text-justify">
-                  If you are looking for help with home cleaning, we at Qleano can help you. Qleano undertakes all types of cleaning assignments in the home, regardless of whether it is a one-off cleaning or recurring weekly cleaning. Contact us and we will get back to you with a price proposal that is relevant for the cleaning of your home.
+                  If you are looking for help with home cleaning, we at Amples can help you. Amples undertakes all types of cleaning assignments in the home, regardless of whether it is a one-off cleaning or recurring weekly cleaning. Contact us and we will get back to you with a price proposal that is relevant for the cleaning of your home.
                 </p>
               </div>
 

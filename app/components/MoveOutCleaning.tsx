@@ -92,7 +92,7 @@ export default function MoveOutCleaning() {
 
                 <p className="text-justify">
                   If you want to know more about what is included in a moving house cleaning and perhaps want to clean it yourself,
-                  we at Qleano have developed a{' '}
+                  we at Amples have developed a{' '}
                   <a
                     href="/move-out-cleaning/checklist"
                     className="text-cyan-600 hover:text-cyan-700 underline font-semibold transition-colors"

@@ -18,7 +18,7 @@ import { randomBytes } from 'crypto';
  * > 100 kvm: 3000 + (additional 10 kvm blocks * 200 kr)
  * > 200 kvm: 5000 + (additional kvm * 30 kr/kvm)
  */
-function calculatePrice(squareMeters: number | string | undefined): { price: number; priceRange?: string } | null {
+function calculatePrice(squareMeters: number | string | undefined): { price: number } | null {
     if (!squareMeters) return null;
     
     const sqm = typeof squareMeters === 'string' ? parseFloat(squareMeters) : squareMeters;
@@ -27,35 +27,22 @@ function calculatePrice(squareMeters: number | string | undefined): { price: num
     // Round to nearest integer for calculations
     const roundedSqm = Math.round(sqm);
     
-    // Base pricing tiers
-    if (roundedSqm >= 0 && roundedSqm <= 29) {
-        return { price: 1575 };
-    } else if (roundedSqm >= 30 && roundedSqm <= 39) {
-        return { price: 1725, priceRange: '1675-1775' };
-    } else if (roundedSqm >= 40 && roundedSqm <= 49) {
-        return { price: 1825, priceRange: '1775-1875' };
-    } else if (roundedSqm >= 50 && roundedSqm <= 59) {
-        return { price: 1925, priceRange: '1875-1975' };
-    } else if (roundedSqm >= 60 && roundedSqm <= 69) {
-        return { price: 2125, priceRange: '2075-2175' };
-    } else if (roundedSqm >= 70 && roundedSqm <= 79) {
-        return { price: 2325, priceRange: '2275-2375' };
-    } else if (roundedSqm >= 80 && roundedSqm <= 89) {
-        return { price: 2450, priceRange: '2400-2500' };
-    } else if (roundedSqm >= 90 && roundedSqm <= 100) {
-        return { price: 2900, priceRange: '2800-3000' };
-    } else if (roundedSqm > 100 && roundedSqm <= 200) {
-        // For > 100 kvm: 3000 + (additional 10 kvm blocks * 200 kr)
+    // Base pricing tiers (single price per tier)
+    if (roundedSqm >= 0 && roundedSqm <= 29) return { price: 1575 };
+    if (roundedSqm >= 30 && roundedSqm <= 39) return { price: 1725 };
+    if (roundedSqm >= 40 && roundedSqm <= 49) return { price: 1825 };
+    if (roundedSqm >= 50 && roundedSqm <= 59) return { price: 1925 };
+    if (roundedSqm >= 60 && roundedSqm <= 69) return { price: 2125 };
+    if (roundedSqm >= 70 && roundedSqm <= 79) return { price: 2325 };
+    if (roundedSqm >= 80 && roundedSqm <= 89) return { price: 2450 };
+    if (roundedSqm >= 90 && roundedSqm <= 100) return { price: 2900 };
+    if (roundedSqm > 100 && roundedSqm <= 200) {
         const additionalKvm = roundedSqm - 100;
         const additionalBlocks = Math.ceil(additionalKvm / 10);
-        const price = 3000 + (additionalBlocks * 200);
-        return { price };
-    } else {
-        // For > 200 kvm: 5000 + (additional kvm * 30 kr/kvm)
-        const additionalKvm = roundedSqm - 200;
-        const price = 5000 + (additionalKvm * 30);
-        return { price };
+        return { price: 3000 + (additionalBlocks * 200) };
     }
+    const additionalKvm = roundedSqm - 200;
+    return { price: 5000 + (additionalKvm * 30) };
 }
 
 export async function POST(request: Request) {
@@ -372,10 +359,7 @@ export async function POST(request: Request) {
                   ${priceInfo ? `
                   <p style="margin: 8px 0;">
                     <strong style="color: #1e293b;">Price Estimation:</strong> 
-                    <span style="color: #10b981; font-weight: 600; font-size: 16px;">
-                      ${priceInfo.priceRange ? `${priceInfo.priceRange} kr` : `${priceInfo.price} kr`}
-                    </span>
-                    ${priceInfo.priceRange ? ` <span style="color: #64748b; font-size: 12px;">(approx. ${priceInfo.price} kr)</span>` : ''}
+                    <span style="color: #10b981; font-weight: 600; font-size: 16px;">${priceInfo.price} kr</span>
                   </p>
                   ` : ''}
                 </div>
@@ -389,10 +373,7 @@ export async function POST(request: Request) {
                   ${homePriceInfo ? `
                   <p style="margin: 8px 0;">
                     <strong style="color: #1e293b;">Price Estimation:</strong> 
-                    <span style="color: #10b981; font-weight: 600; font-size: 16px;">
-                      ${homePriceInfo.priceRange ? `${homePriceInfo.priceRange} kr` : `${homePriceInfo.price} kr`}
-                    </span>
-                    ${homePriceInfo.priceRange ? ` <span style="color: #64748b; font-size: 12px;">(approx. ${homePriceInfo.price} kr)</span>` : ''}
+                    <span style="color: #10b981; font-weight: 600; font-size: 16px;">${homePriceInfo.price} kr</span>
                   </p>
                   ` : ''}
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Frequency:</strong> <span style="color: #475569;">${frequency || 'Not specified'}</span></p>
@@ -428,10 +409,7 @@ export async function POST(request: Request) {
                   ${moveOutPriceInfo ? `
                   <p style="margin: 8px 0;">
                     <strong style="color: #1e293b;">Price Estimation:</strong> 
-                    <span style="color: #10b981; font-weight: 600; font-size: 16px;">
-                      ${moveOutPriceInfo.priceRange ? `${moveOutPriceInfo.priceRange} kr` : `${moveOutPriceInfo.price} kr`}
-                    </span>
-                    ${moveOutPriceInfo.priceRange ? ` <span style="color: #64748b; font-size: 12px;">(approx. ${moveOutPriceInfo.price} kr)</span>` : ''}
+                    <span style="color: #10b981; font-weight: 600; font-size: 16px;">${moveOutPriceInfo.price} kr</span>
                   </p>
                   ` : ''}
                 </div>
@@ -509,10 +487,7 @@ export async function POST(request: Request) {
                   ${constructionPriceInfo ? `
                   <p style="margin: 8px 0;">
                     <strong style="color: #1e293b;">Price Estimation:</strong> 
-                    <span style="color: #10b981; font-weight: 600; font-size: 16px;">
-                      ${constructionPriceInfo.priceRange ? `${constructionPriceInfo.priceRange} kr` : `${constructionPriceInfo.price} kr`}
-                    </span>
-                    ${constructionPriceInfo.priceRange ? ` <span style="color: #64748b; font-size: 12px;">(approx. ${constructionPriceInfo.price} kr)</span>` : ''}
+                    <span style="color: #10b981; font-weight: 600; font-size: 16px;">${constructionPriceInfo.price} kr</span>
                   </p>
                   ` : ''}
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Floors:</strong> <span style="color: #475569;">${constructionFloors || 'Not specified'}</span></p>
@@ -558,10 +533,7 @@ export async function POST(request: Request) {
                   ${officePriceInfo ? `
                   <p style="margin: 8px 0;">
                     <strong style="color: #1e293b;">Price Estimation:</strong> 
-                    <span style="color: #10b981; font-weight: 600; font-size: 16px;">
-                      ${officePriceInfo.priceRange ? `${officePriceInfo.priceRange} kr` : `${officePriceInfo.price} kr`}
-                    </span>
-                    ${officePriceInfo.priceRange ? ` <span style="color: #64748b; font-size: 12px;">(approx. ${officePriceInfo.price} kr)</span>` : ''}
+                    <span style="color: #10b981; font-weight: 600; font-size: 16px;">${officePriceInfo.price} kr</span>
                   </p>
                   ` : ''}
                   <p style="margin: 8px 0;"><strong style="color: #1e293b;">Frequency:</strong> <span style="color: #475569;">${officeFrequency || 'Not specified'}</span></p>
@@ -608,10 +580,7 @@ export async function POST(request: Request) {
                   ${detailPriceInfo ? `
                   <p style="margin: 8px 0;">
                     <strong style="color: #1e293b;">Price Estimation:</strong> 
-                    <span style="color: #10b981; font-weight: 600; font-size: 16px;">
-                      ${detailPriceInfo.priceRange ? `${detailPriceInfo.priceRange} kr` : `${detailPriceInfo.price} kr`}
-                    </span>
-                    ${detailPriceInfo.priceRange ? ` <span style="color: #64748b; font-size: 12px;">(approx. ${detailPriceInfo.price} kr)</span>` : ''}
+                    <span style="color: #10b981; font-weight: 600; font-size: 16px;">${detailPriceInfo.price} kr</span>
                   </p>
                   ` : ''}
                 </div>
@@ -892,10 +861,7 @@ export async function POST(request: Request) {
                         </div>
                         <div style="border-top: 1px solid #86efac; padding-top: 12px; margin-top: 12px;">
                           <p style="margin: 0; color: #475569; font-size: 14px;">Price:</p>
-                          <p style="margin: 4px 0 0 0; color: #10b981; font-size: 32px; font-weight: 700;">
-                            ${priceInfo.priceRange ? `${priceInfo.priceRange} kr` : `${priceInfo.price} kr`}
-                          </p>
-                          ${priceInfo.priceRange ? `<p style="margin: 4px 0 0 0; color: #64748b; font-size: 12px;">Approximate: ${priceInfo.price} kr</p>` : ''}
+                          <p style="margin: 4px 0 0 0; color: #10b981; font-size: 32px; font-weight: 700;">${priceInfo.price} kr</p>
                         </div>
                         <p style="margin: 12px 0 0 0; color: #64748b; font-size: 12px; font-style: italic;">* This is an estimated price. Final price may vary based on specific requirements.</p>
                       </div>

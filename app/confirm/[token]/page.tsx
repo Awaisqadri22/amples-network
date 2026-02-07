@@ -56,6 +56,7 @@ export default function ConfirmPage() {
     const [agreeToTerms, setAgreeToTerms] = useState(false);
     const [selectedExtraIds, setSelectedExtraIds] = useState<string[]>([]);
     const [minDate, setMinDate] = useState('2000-01-01');
+    const [personalNumberError, setPersonalNumberError] = useState<string | null>(null);
 
     const toggleExtra = (id: string) => {
         if (id === 'none') return;
@@ -120,6 +121,7 @@ export default function ConfirmPage() {
     const handleConfirm = async () => {
         setSubmitting(true);
         setError(null);
+        setPersonalNumberError(null);
 
         if (!agreeToTerms) {
             setError('You must agree to the terms and conditions to confirm your booking.');
@@ -129,13 +131,13 @@ export default function ConfirmPage() {
 
         const personalNumber = additionalInfo.personalNumber.trim();
         if (!personalNumber) {
-            setError('Personal Number is required.');
+            setPersonalNumberError('Personal Number is required.');
             setSubmitting(false);
             return;
         }
         const digitsOnly = personalNumber.replace(/\D/g, '');
         if (digitsOnly.length < 10 || digitsOnly.length > 12) {
-            setError('Personal Number must be 10 to 12 digits.');
+            setPersonalNumberError('Personal Number must be 10 to 12 digits.');
             setSubmitting(false);
             return;
         }
@@ -188,20 +190,20 @@ export default function ConfirmPage() {
         }
     };
 
-    const calculatePrice = (squareMeters: string | null | undefined): { price: number; priceRange?: string } | null => {
+    const calculatePrice = (squareMeters: string | null | undefined): { price: number } | null => {
         if (!squareMeters) return null;
         const sqm = parseFloat(squareMeters);
         if (isNaN(sqm) || sqm < 0) return null;
         const roundedSqm = Math.round(sqm);
         
         if (roundedSqm >= 0 && roundedSqm <= 29) return { price: 1575 };
-        if (roundedSqm >= 30 && roundedSqm <= 39) return { price: 1725, priceRange: '1675-1775' };
-        if (roundedSqm >= 40 && roundedSqm <= 49) return { price: 1825, priceRange: '1775-1875' };
-        if (roundedSqm >= 50 && roundedSqm <= 59) return { price: 1925, priceRange: '1875-1975' };
-        if (roundedSqm >= 60 && roundedSqm <= 69) return { price: 2125, priceRange: '2075-2175' };
-        if (roundedSqm >= 70 && roundedSqm <= 79) return { price: 2325, priceRange: '2275-2375' };
-        if (roundedSqm >= 80 && roundedSqm <= 89) return { price: 2450, priceRange: '2400-2500' };
-        if (roundedSqm >= 90 && roundedSqm <= 100) return { price: 2900, priceRange: '2800-3000' };
+        if (roundedSqm >= 30 && roundedSqm <= 39) return { price: 1725 };
+        if (roundedSqm >= 40 && roundedSqm <= 49) return { price: 1825 };
+        if (roundedSqm >= 50 && roundedSqm <= 59) return { price: 1925 };
+        if (roundedSqm >= 60 && roundedSqm <= 69) return { price: 2125 };
+        if (roundedSqm >= 70 && roundedSqm <= 79) return { price: 2325 };
+        if (roundedSqm >= 80 && roundedSqm <= 89) return { price: 2450 };
+        if (roundedSqm >= 90 && roundedSqm <= 100) return { price: 2900 };
         if (roundedSqm > 100 && roundedSqm <= 200) {
             const additionalKvm = roundedSqm - 100;
             const additionalBlocks = Math.ceil(additionalKvm / 10);
@@ -276,7 +278,7 @@ export default function ConfirmPage() {
                     {/* Content */}
                     <div className="p-8">
                         {error && (
-                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
                                 {error}
                             </div>
                         )}
@@ -288,10 +290,7 @@ export default function ConfirmPage() {
                                 <div className="space-y-1">
                                     <div className="flex justify-between items-baseline">
                                         <span className="text-gray-600">Base price</span>
-                                        <span className="font-semibold text-gray-800">
-                                            {priceInfo.priceRange ? `${priceInfo.priceRange} kr` : `${priceInfo.price} kr`}
-                                            {priceInfo.priceRange && <span className="text-sm font-normal text-gray-500 ml-1">(approx. {priceInfo.price} kr)</span>}
-                                        </span>
+                                        <span className="font-semibold text-gray-800">{priceInfo.price} kr</span>
                                     </div>
                                     {selectedExtras.length > 0 && selectedExtras.map((extra) => (
                                         <div key={extra.id} className="flex justify-between items-baseline pt-2 border-t border-green-200">
@@ -352,9 +351,7 @@ export default function ConfirmPage() {
                                 {priceInfo && (
                                     <div className="flex justify-between pt-3 border-t border-gray-200">
                                         <span className="text-gray-600">Price:</span>
-                                        <span className="font-bold text-green-600 text-lg">
-                                            {priceInfo.priceRange ? `${priceInfo.priceRange} kr` : `${priceInfo.price} kr`}
-                                        </span>
+                                        <span className="font-bold text-green-600 text-lg">{priceInfo.price} kr</span>
                                     </div>
                                 )}
                             </div>
@@ -404,14 +401,23 @@ export default function ConfirmPage() {
                                         inputMode="numeric"
                                         id="personalNumber"
                                         value={additionalInfo.personalNumber}
-                                        onChange={(e) => setAdditionalInfo({ ...additionalInfo, personalNumber: e.target.value.replace(/\D/g, '').slice(0, 12) })}
+                                        onChange={(e) => {
+                                            setAdditionalInfo({ ...additionalInfo, personalNumber: e.target.value.replace(/\D/g, '').slice(0, 12) });
+                                            if (personalNumberError) setPersonalNumberError(null);
+                                        }}
                                         placeholder="10–12 digits"
                                         minLength={10}
                                         maxLength={12}
                                         required
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent ${personalNumberError ? 'border-red-500' : 'border-gray-300'}`}
+                                        aria-invalid={!!personalNumberError}
+                                        aria-describedby={personalNumberError ? 'personalNumber-error' : undefined}
                                     />
-                                    <p className="mt-1 text-xs text-gray-500">Enter your personal number (10–12 digits). Required to confirm.</p>
+                                    {personalNumberError ? (
+                                        <p id="personalNumber-error" className="mt-1 text-sm text-red-600" role="alert">{personalNumberError}</p>
+                                    ) : (
+                                        <p className="mt-1 text-xs text-gray-500">Enter your personal number (10–12 digits). Required to confirm.</p>
+                                    )}
                                 </div>
                             </div>
                         </div>
