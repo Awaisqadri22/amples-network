@@ -710,7 +710,7 @@ export async function POST(request: Request) {
         const adminMailOptions = {
             from: 'Amples <noreply@amples.se>',
             replyTo: email, // Set reply-to to user's email so replies go to them
-            to: 'awaisiqbalqadri22@gmail.com', // Send to admin email
+            to: 'zubair.malik806022@gmail.com', // Send to admin email
             // Optional: Add BCC for additional email records
             // bcc: 'info@amples.se', // Uncomment if you want to BCC another email
             subject: isContactForm 
