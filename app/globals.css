@@ -17,6 +17,30 @@
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+
+  /* Form inputs: visible text and placeholder in dark mode (override Tailwind bg-white etc.) */
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select {
+    background-color: #1f2937 !important;
+    color: #f3f4f6 !important;
+    border-color: #4b5563 !important;
+  }
+  input:not([type="checkbox"]):not([type="radio"])::placeholder,
+  textarea::placeholder {
+    color: #9ca3af !important;
+    opacity: 1;
+  }
+  input:not([type="checkbox"]):not([type="radio"]):focus,
+  input:not([type="checkbox"]):not([type="radio"]):active,
+  textarea:focus,
+  textarea:active,
+  select:focus {
+    background-color: #1f2937 !important;
+    color: #f3f4f6 !important;
+    border-color: #06b6d4 !important;
+    outline: none;
+  }
 }
 
 body {
