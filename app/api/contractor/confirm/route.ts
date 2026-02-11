@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { Resend } from 'resend';
 import { Prisma } from '@prisma/client';
 
-const ADMIN_EMAIL = 'zubair.malik806022@gmail.com';
+const ADMIN_EMAIL = 'info@amples.se';
 
 export async function POST(request: Request) {
     try {
