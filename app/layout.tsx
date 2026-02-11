@@ -26,6 +26,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <script
+  defer
+  data-lingrix-id="b31cd7e2-4841-447f-a101-7e4238e60b04"
+  src="https://cdn.lingrix.com/script.js"
+></script>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
