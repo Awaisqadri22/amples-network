@@ -249,7 +249,7 @@ export async function POST(request: Request) {
 
                 await resend.emails.send({
                     from: 'Amples Booking System <noreply@amples.se>',
-                    to: 'zubair.malik806022@gmail.com',
+                    to: 'info@amples.se',
                     subject: `✅ Booking Confirmed - ${serviceName} - ${confirmedRecord.name}`,
                     html: `
                         <!DOCTYPE html>

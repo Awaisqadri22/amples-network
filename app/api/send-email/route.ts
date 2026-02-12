@@ -769,6 +769,16 @@ export async function POST(request: Request) {
                           <span style="display: inline-block; width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; margin-right: 12px;"></span>
                           Service Details
                         </h2>
+                        ${priceInfo ? `
+                        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-left: 4px solid #10b981; padding: 18px; border-radius: 8px; margin: 0 0 20px 0;">
+                          <h3 style="margin: 0 0 10px 0; color: #1e293b; font-size: 17px; font-weight: 600;">Price Estimation</h3>
+                          <p style="margin: 0 0 8px 0; color: #475569; font-size: 14px;">
+                            <strong style="color: #1e293b;">Service Area:</strong> ${displaySquareMeter} m²
+                          </p>
+                          <p style="margin: 0; color: #10b981; font-size: 24px; font-weight: 700;">${priceInfo.price} kr</p>
+                          <p style="margin: 8px 0 0 0; color: #64748b; font-size: 12px; font-style: italic;">* Same estimated price shared with the customer.</p>
+                        </div>
+                        ` : ''}
                         <div style="color: #334155; font-size: 15px; line-height: 1.8;">
             ${removePriceFromServiceDetails(serviceDetails)}
                         </div>
