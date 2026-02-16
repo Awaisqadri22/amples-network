@@ -349,10 +349,24 @@ export default function ConfirmPage() {
                                     </div>
                                 )}
                                 {priceInfo && (
-                                    <div className="flex justify-between pt-3 border-t border-gray-200">
-                                        <span className="text-gray-600">Price:</span>
-                                        <span className="font-bold text-green-600 text-lg">{priceInfo.price} kr</span>
-                                    </div>
+                                    <>
+                                        {selectedExtras.length > 0 && (
+                                            <>
+                                                <div className="flex justify-between pt-3 border-t border-gray-200">
+                                                    <span className="text-gray-600">Base price:</span>
+                                                    <span className="font-semibold text-gray-900">{basePrice} kr</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">Extras:</span>
+                                                    <span className="font-semibold text-gray-900">{extraPrice} kr</span>
+                                                </div>
+                                            </>
+                                        )}
+                                        <div className="flex justify-between pt-3 border-t border-gray-200">
+                                            <span className="text-gray-600">Price:</span>
+                                            <span className="font-bold text-green-600 text-lg">{totalPrice} kr</span>
+                                        </div>
+                                    </>
                                 )}
                             </div>
                         </div>
