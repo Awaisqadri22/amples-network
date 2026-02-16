@@ -478,7 +478,7 @@ export default function ConfirmPage() {
                                     onChange={(e) => setAgreeToTerms(e.target.checked)}
                                     className="mt-1 h-5 w-5 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
                                 />
-                                <span className="text-gray-700 font-medium group-hover:text-gray-900">Agree to terms and conditions</span>
+                                <span className="text-gray-700 font-medium group-hover:text-gray-900">Agree to terms and conditions and <span className="font-bold bg-yellow-200 px-1 rounded">checklist</span></span>
                             </label>
                         </div>
 
