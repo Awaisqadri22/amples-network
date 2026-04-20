@@ -257,7 +257,7 @@ export default function ContactSection() {
             <div className="space-y-8">
               <div>
                 <h3 className="text-xl font-semibold mb-3 text-cyan-600">Phone</h3>
-                <p className="text-gray-600">0764447563</p>
+                <p className="text-gray-600">073-7211167</p>
               </div>
               <div>
                 <h3 className="text-xl font-semibold mb-3 text-cyan-600">Email</h3>

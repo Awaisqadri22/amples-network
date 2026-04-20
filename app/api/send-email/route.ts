@@ -873,11 +873,12 @@ export async function POST(request: Request) {
                           <p style="margin: 0; color: #475569; font-size: 14px;">Price:</p>
                           <p style="margin: 4px 0 0 0; color: #10b981; font-size: 32px; font-weight: 700;">${priceInfo.price} kr</p>
                         </div>
-                        <p style="margin: 12px 0 0 0; color: #64748b; font-size: 12px; font-style: italic;">* This is an estimated price. Final price may vary based on specific requirements.</p>
+                        <p style="margin: 12px 0 0 0; color: #64748b; font-size: 12px; font-style: italic;">This price is after RUTAVDRAG</p>
                       </div>
                       ` : ''}
 
                       ${confirmationUrl ? `
+                      <p style="margin: 0 0 20px 0; padding: 12px 16px; background-color: #fef08a; border-left: 4px solid #eab308; color: #713f12; font-size: 14px; font-weight: 600; border-radius: 6px; text-align: center;"><a href="${siteUrl}/checklist" style="color: #713f12; text-decoration: underline; font-weight: 600;">Please visit the checklist before proceeding with booking confirmation</a></p>
                       <div style="text-align: center; margin: 30px 0;">
                         <a href="${confirmationUrl}" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-weight: 600; font-size: 18px; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);">
                           ✅ Confirm Your Booking
@@ -893,7 +894,7 @@ export async function POST(request: Request) {
                       <div style="background: #0f172a; border-radius: 14px; padding: 22px; color: #e2e8f0; text-align: center; margin-top: 30px;">
                         <div style="font-size: 28px; margin-bottom: 6px;">☎️</div>
                         <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #ffffff;">Need immediate assistance?</h3>
-                        <p style="margin: 0 0 16px 0; font-size: 14px; color: #cbd5f5;">Call us at <strong>0764447563</strong> or email <strong>info@amples.com</strong></p>
+                        <p style="margin: 0 0 16px 0; font-size: 14px; color: #cbd5f5;">Call us at <strong>073-7211167</strong> or email <strong>info@amples.com</strong></p>
                       </div>
                     </td>
                   </tr>

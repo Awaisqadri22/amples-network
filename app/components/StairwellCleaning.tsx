@@ -158,7 +158,7 @@ export default function StairwellCleaning() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="tel:0764447563"
+              href="tel:073-7211167"
               className="bg-white text-cyan-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
             >
               📞 Call Us Now
