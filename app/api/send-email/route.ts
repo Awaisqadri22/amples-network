@@ -6,18 +6,13 @@ import { randomBytes } from 'crypto';
 
 /**
  * Calculate price based on square meters (kvm)
- * Pricing structure:
- * 0-29 kvm: 1575 kr
- * 30-39 kvm: 1725 kr (average of 1675-1775)
- * 40-49 kvm: 1825 kr (average of 1775-1875)
- * 50-59 kvm: 1925 kr (average of 1875-1975)
- * 60-69 kvm: 2125 kr (average of 2075-2175)
- * 70-79 kvm: 2325 kr (average of 2275-2375)
- * 80-89 kvm: 2450 kr (average of 2400-2500)
- * 90-100 kvm: 2900 kr (average of 2800-3000)
- * > 100 kvm: 3000 + (additional 10 kvm blocks * 200 kr)
- * > 200 kvm: 5000 + (additional kvm * 30 kr/kvm)
+ * Pricing structure (kr):
+ * 0–25, 26–39, 40–49, 50–59, 60–69, 70–79, 80–89, 90–99,
+ * 100–109, 110–119, 120–129, 130–139, 140–149
+ * Above 149 kvm: +300 kr per started 10 kvm block (same step as 130–139 → 140–149)
  */
+
+
 function calculatePrice(squareMeters: number | string | undefined): { price: number } | null {
     if (!squareMeters) return null;
     
@@ -27,22 +22,23 @@ function calculatePrice(squareMeters: number | string | undefined): { price: num
     // Round to nearest integer for calculations
     const roundedSqm = Math.round(sqm);
     
-    // Base pricing tiers (single price per tier)
-    if (roundedSqm >= 0 && roundedSqm <= 29) return { price: 1575 };
-    if (roundedSqm >= 30 && roundedSqm <= 39) return { price: 1725 };
-    if (roundedSqm >= 40 && roundedSqm <= 49) return { price: 1825 };
-    if (roundedSqm >= 50 && roundedSqm <= 59) return { price: 1925 };
-    if (roundedSqm >= 60 && roundedSqm <= 69) return { price: 2125 };
-    if (roundedSqm >= 70 && roundedSqm <= 79) return { price: 2325 };
-    if (roundedSqm >= 80 && roundedSqm <= 89) return { price: 2450 };
-    if (roundedSqm >= 90 && roundedSqm <= 100) return { price: 2900 };
-    if (roundedSqm > 100 && roundedSqm <= 200) {
-        const additionalKvm = roundedSqm - 100;
-        const additionalBlocks = Math.ceil(additionalKvm / 10);
-        return { price: 3000 + (additionalBlocks * 200) };
-    }
-    const additionalKvm = roundedSqm - 200;
-    return { price: 5000 + (additionalKvm * 30) };
+    if (roundedSqm >= 0 && roundedSqm <= 25) return { price: 1800 };
+    if (roundedSqm >= 26 && roundedSqm <= 39) return { price: 2000 };
+    if (roundedSqm >= 40 && roundedSqm <= 49) return { price: 2200 };
+    if (roundedSqm >= 50 && roundedSqm <= 59) return { price: 2350 };
+    if (roundedSqm >= 60 && roundedSqm <= 69) return { price: 2550 };
+    if (roundedSqm >= 70 && roundedSqm <= 79) return { price: 2750 };
+    if (roundedSqm >= 80 && roundedSqm <= 89) return { price: 2900 };
+    if (roundedSqm >= 90 && roundedSqm <= 99) return { price: 3100 };
+    if (roundedSqm >= 100 && roundedSqm <= 109) return { price: 3300 };
+    if (roundedSqm >= 110 && roundedSqm <= 119) return { price: 3500 };
+    if (roundedSqm >= 120 && roundedSqm <= 129) return { price: 3800 };
+    if (roundedSqm >= 130 && roundedSqm <= 139) return { price: 4100 };
+    if (roundedSqm >= 140 && roundedSqm <= 149) return { price: 4400 };
+
+    const extraKvm = roundedSqm - 149;
+    const extraBlocks = Math.ceil(extraKvm / 10);
+    return { price: 4400 + extraBlocks * 300 };
 }
 
 export async function POST(request: Request) {
