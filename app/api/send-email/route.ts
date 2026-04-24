@@ -874,7 +874,7 @@ export async function POST(request: Request) {
                       ` : ''}
 
                       ${confirmationUrl ? `
-                      <p style="margin: 0 0 20px 0; padding: 12px 16px; background-color: #fef08a; border-left: 4px solid #eab308; color: #713f12; font-size: 14px; font-weight: 600; border-radius: 6px; text-align: center;"><a href="${siteUrl}/checklist" style="color: #713f12; text-decoration: underline; font-weight: 600;">Please visit the checklist before proceeding with booking confirmation</a></p>
+                      <p style="margin: 0 0 20px 0; padding: 12px 16px; background-color: #fef08a; border-left: 4px solid #eab308; color: #713f12; font-size: 14px; font-weight: 600; border-radius: 6px; text-align: center;"><a href="${siteUrl}/move-out-cleaning/checklist" style="color: #713f12; text-decoration: underline; font-weight: 600;">Please visit the checklist before proceeding with booking confirmation</a></p>
                       <div style="text-align: center; margin: 30px 0;">
                         <a href="${confirmationUrl}" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-weight: 600; font-size: 18px; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);">
                           ✅ Confirm Your Booking

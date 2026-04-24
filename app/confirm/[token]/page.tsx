@@ -195,22 +195,24 @@ export default function ConfirmPage() {
         const sqm = parseFloat(squareMeters);
         if (isNaN(sqm) || sqm < 0) return null;
         const roundedSqm = Math.round(sqm);
-        
-        if (roundedSqm >= 0 && roundedSqm <= 29) return { price: 1575 };
-        if (roundedSqm >= 30 && roundedSqm <= 39) return { price: 1725 };
-        if (roundedSqm >= 40 && roundedSqm <= 49) return { price: 1825 };
-        if (roundedSqm >= 50 && roundedSqm <= 59) return { price: 1925 };
-        if (roundedSqm >= 60 && roundedSqm <= 69) return { price: 2125 };
-        if (roundedSqm >= 70 && roundedSqm <= 79) return { price: 2325 };
-        if (roundedSqm >= 80 && roundedSqm <= 89) return { price: 2450 };
-        if (roundedSqm >= 90 && roundedSqm <= 100) return { price: 2900 };
-        if (roundedSqm > 100 && roundedSqm <= 200) {
-            const additionalKvm = roundedSqm - 100;
-            const additionalBlocks = Math.ceil(additionalKvm / 10);
-            return { price: 3000 + (additionalBlocks * 200) };
-        }
-        const additionalKvm = roundedSqm - 200;
-        return { price: 5000 + (additionalKvm * 30) };
+
+        if (roundedSqm >= 0 && roundedSqm <= 25) return { price: 1800 };
+        if (roundedSqm >= 26 && roundedSqm <= 39) return { price: 2000 };
+        if (roundedSqm >= 40 && roundedSqm <= 49) return { price: 2200 };
+        if (roundedSqm >= 50 && roundedSqm <= 59) return { price: 2350 };
+        if (roundedSqm >= 60 && roundedSqm <= 69) return { price: 2550 };
+        if (roundedSqm >= 70 && roundedSqm <= 79) return { price: 2750 };
+        if (roundedSqm >= 80 && roundedSqm <= 89) return { price: 2900 };
+        if (roundedSqm >= 90 && roundedSqm <= 99) return { price: 3100 };
+        if (roundedSqm >= 100 && roundedSqm <= 109) return { price: 3300 };
+        if (roundedSqm >= 110 && roundedSqm <= 119) return { price: 3500 };
+        if (roundedSqm >= 120 && roundedSqm <= 129) return { price: 3800 };
+        if (roundedSqm >= 130 && roundedSqm <= 139) return { price: 4100 };
+        if (roundedSqm >= 140 && roundedSqm <= 149) return { price: 4400 };
+
+        const extraKvm = roundedSqm - 149;
+        const extraBlocks = Math.ceil(extraKvm / 10);
+        return { price: 4400 + extraBlocks * 300 };
     };
 
     if (loading) {
@@ -478,7 +480,17 @@ export default function ConfirmPage() {
                                     onChange={(e) => setAgreeToTerms(e.target.checked)}
                                     className="mt-1 h-5 w-5 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
                                 />
-                                <span className="text-gray-700 font-medium group-hover:text-gray-900">Agree to terms and conditions and <span className="font-bold bg-yellow-200 px-1 rounded">checklist</span></span>
+                                <span className="text-gray-700 font-medium group-hover:text-gray-900">
+                                    Agree to terms and conditions and{' '}
+                                    <Link
+                                        href="/move-out-cleaning/checklist"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="font-bold bg-yellow-200 px-1 rounded underline decoration-cyan-600 hover:text-cyan-700"
+                                    >
+                                        checklist
+                                    </Link>
+                                </span>
                             </label>
                         </div>
 

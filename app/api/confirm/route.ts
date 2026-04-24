@@ -9,16 +9,20 @@ function calculatePrice(squareMeters: number | string | undefined): { price: num
     const sqm = typeof squareMeters === 'string' ? parseFloat(squareMeters) : squareMeters;
     if (isNaN(sqm) || sqm < 0) return null;
     const roundedSqm = Math.round(sqm);
-    if (roundedSqm >= 0 && roundedSqm <= 29) return { price: 1575 };
-    if (roundedSqm >= 30 && roundedSqm <= 39) return { price: 1725 };
-    if (roundedSqm >= 40 && roundedSqm <= 49) return { price: 1825 };
-    if (roundedSqm >= 50 && roundedSqm <= 59) return { price: 1925 };
-    if (roundedSqm >= 60 && roundedSqm <= 69) return { price: 2125 };
-    if (roundedSqm >= 70 && roundedSqm <= 79) return { price: 2325 };
-    if (roundedSqm >= 80 && roundedSqm <= 89) return { price: 2450 };
-    if (roundedSqm >= 90 && roundedSqm <= 100) return { price: 2900 };
-    if (roundedSqm > 100 && roundedSqm <= 200) return { price: 3000 + Math.ceil((roundedSqm - 100) / 10) * 200 };
-    return { price: 5000 + (roundedSqm - 200) * 30 };
+    if (roundedSqm >= 0 && roundedSqm <= 25) return { price: 1800 };
+    if (roundedSqm >= 26 && roundedSqm <= 39) return { price: 2000 };
+    if (roundedSqm >= 40 && roundedSqm <= 49) return { price: 2200 };
+    if (roundedSqm >= 50 && roundedSqm <= 59) return { price: 2350 };
+    if (roundedSqm >= 60 && roundedSqm <= 69) return { price: 2550 };
+    if (roundedSqm >= 70 && roundedSqm <= 79) return { price: 2750 };
+    if (roundedSqm >= 80 && roundedSqm <= 89) return { price: 2900 };
+    if (roundedSqm >= 90 && roundedSqm <= 99) return { price: 3100 };
+    if (roundedSqm >= 100 && roundedSqm <= 109) return { price: 3300 };
+    if (roundedSqm >= 110 && roundedSqm <= 119) return { price: 3500 };
+    if (roundedSqm >= 120 && roundedSqm <= 129) return { price: 3800 };
+    if (roundedSqm >= 130 && roundedSqm <= 139) return { price: 4100 };
+    if (roundedSqm >= 140 && roundedSqm <= 149) return { price: 4400 };
+    return { price: 4400 + Math.ceil((roundedSqm - 149) / 10) * 300 };
 }
 
 export async function POST(request: Request) {
