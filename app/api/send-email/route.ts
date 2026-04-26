@@ -668,7 +668,14 @@ export async function POST(request: Request) {
         
         // Generate confirmation link
         const confirmationToken = savedRecord?.confirmationToken || '';
-        const confirmationUrl = confirmationToken ? `${siteUrl}/confirm/${confirmationToken}` : null;
+        const requestLanguage = (typeof requestData?.lang === 'string' && requestData.lang) ||
+            (typeof requestData?.language === 'string' && requestData.language) ||
+            (typeof requestData?.locale === 'string' && requestData.locale) ||
+            request.headers.get('accept-language') ||
+            '';
+        const normalizedLanguage = requestLanguage.toLowerCase();
+        const confirmationLang = normalizedLanguage.includes('en') && !normalizedLanguage.includes('sv') ? 'en' : 'sv';
+        const confirmationUrl = confirmationToken ? `${siteUrl}/confirm/${confirmationToken}?lang=${confirmationLang}` : null;
         
         console.log('🔗 Confirmation URL generated:', confirmationUrl);
 

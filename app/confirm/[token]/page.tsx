@@ -198,7 +198,7 @@ export default function ConfirmPage() {
     const [selectedExtraIds, setSelectedExtraIds] = useState<string[]>([]);
     const [minDate, setMinDate] = useState('2000-01-01');
     const [personalNumberError, setPersonalNumberError] = useState<string | null>(null);
-    const [language, setLanguage] = useState<Language>('en');
+    const [language, setLanguage] = useState<Language>('sv');
 
     const t = UI_TEXT[language];
     const getExtraLabel = (extraId: string) => EXTRA_LABELS[language][extraId] ?? EXTRA_LABELS.en[extraId] ?? extraId;
@@ -214,12 +214,6 @@ export default function ConfirmPage() {
         const queryLang = searchParams.get('lang')?.toLowerCase();
         if (queryLang === 'sv' || queryLang === 'en') {
             setLanguage(queryLang);
-            return;
-        }
-
-        if (typeof window !== 'undefined') {
-            const browserLang = window.navigator.language.toLowerCase();
-            setLanguage(browserLang.startsWith('sv') ? 'sv' : 'en');
         }
     }, [searchParams]);
 
