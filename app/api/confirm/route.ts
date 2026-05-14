@@ -174,15 +174,20 @@ export async function POST(request: Request) {
                 const customerEmail = (rec.email as string) ?? (rec.userEmail as string) ?? '';
                 const confDetails = rec.details as { confirmedTotalPriceKr?: number; confirmedExtraLabels?: string[] } | undefined;
                 const preferredDt = rec.preferredDateTime as Date | string | null | undefined;
-                const dateTimeStr = preferredDt
-                    ? new Date(preferredDt).toLocaleString('sv-SE', { dateStyle: 'long', timeStyle: 'short' })
-                    : (rec.moveOutCleaningDate
-                        ? new Date(rec.moveOutCleaningDate as Date).toLocaleString('sv-SE', { dateStyle: 'long', timeStyle: 'short' })
-                        : rec.windowCleaningDate
-                            ? new Date(rec.windowCleaningDate as Date).toLocaleString('sv-SE', { dateStyle: 'long', timeStyle: 'short' })
-                            : rec.constructionCleaningDate
-                                ? new Date(rec.constructionCleaningDate as Date).toLocaleString('sv-SE', { dateStyle: 'long', timeStyle: 'short' })
-                                : 'To be agreed');
+                // The customer only picks a date, not a time. Always present the
+                // scheduled time as 09:00 in the morning in the confirmation email.
+                const formatDateAt9 = (d: Date | string): string => {
+                    const dateOnly = new Date(d).toLocaleDateString('sv-SE', { dateStyle: 'long' });
+                    return `${dateOnly} kl. 09:00`;
+                };
+                const rawScheduledDate =
+                    preferredDt
+                    ?? (rec.moveOutCleaningDate as Date | string | null | undefined)
+                    ?? (rec.windowCleaningDate as Date | string | null | undefined)
+                    ?? (rec.constructionCleaningDate as Date | string | null | undefined);
+                const dateTimeStr = rawScheduledDate
+                    ? formatDateAt9(rawScheduledDate)
+                    : 'To be agreed';
                 const houseType = (rec.homeType as string) || (rec.constructionHomeType as string) || (rec.detailHomeType as string) || (rec.officePremisesType as string) || '—';
                 const areaStr = (rec.squareMeter as string) || (rec.areaSize as string) || (rec.constructionAreaSize as string) || (rec.officeAreaSize as string) || (rec.detailAreaSize as string) || '—';
                 const extrasList = Array.isArray(confDetails?.confirmedExtraLabels) && confDetails.confirmedExtraLabels.length > 0
