@@ -136,7 +136,8 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
   const validateSwedishPhone = (phone: string): boolean => {
     if (!phone.trim()) return false;
     const digits = phone.replace(/\D/g, '');
-    return digits.length === 9;
+    // Must be exactly 9 digits and cannot start with 0
+    return digits.length === 9 && !digits.startsWith('0');
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -146,7 +147,8 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
     // Mark field as touched when user interacts with it
     setTouchedFields(prev => new Set(prev).add(fieldName));
     
-    // Restrict phone to digits only, max 9
+    // Restrict phone to digits only, max 9. We intentionally keep a leading
+    // 0 here so the validation error below stays visible to the user.
     if (fieldName === 'phone') {
       value = value.replace(/\D/g, '').slice(0, 9);
     }
@@ -209,6 +211,7 @@ export default function ContactForm({ defaultService = null }: ContactFormProps 
         return value.trim() === '' ? 'Name is required' : null;
       case 'phone':
         if (value.trim() === '') return 'Phone number is required';
+        if (value.replace(/\D/g, '').startsWith('0')) return 'Phone Number cannot start with Zero';
         return !validateSwedishPhone(value) ? 'Phone number must be exactly 9 digits (numbers only)' : null;
       case 'email':
         if (value.trim() === '') return 'Email address is required';

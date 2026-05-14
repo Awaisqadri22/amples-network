@@ -20,7 +20,8 @@ export default function QuoteForm({ idPrefix = 'form', sticky = true }: QuoteFor
   const validateSwedishPhone = (phone: string): boolean => {
     if (!phone.trim()) return false;
     const digits = phone.replace(/\D/g, '');
-    return digits.length === 9;
+    // Must be exactly 9 digits and cannot start with 0
+    return digits.length === 9 && !digits.startsWith('0');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,21 +54,35 @@ export default function QuoteForm({ idPrefix = 'form', sticky = true }: QuoteFor
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    const nextValue = name === 'phone' ? value.replace(/\D/g, '').slice(0, 9) : value;
+    // Keep digits only and cap at 9. Leading 0 is intentionally NOT stripped
+    // here so the user can see the error message below.
+    const nextValue = name === 'phone'
+      ? value.replace(/\D/g, '').slice(0, 9)
+      : value;
     setFormData({
       ...formData,
       [name]: nextValue
     });
-    
-    // Clear phone error when user starts typing
-    if (name === 'phone' && phoneError) {
-      setPhoneError('');
+
+    if (name === 'phone') {
+      if (nextValue.startsWith('0')) {
+        setPhoneError('Phone Number cannot start with Zero');
+      } else if (phoneError) {
+        setPhoneError('');
+      }
     }
   };
 
   const handlePhoneBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value && !validateSwedishPhone(value)) {
+    if (!value) {
+      setPhoneError('');
+      return;
+    }
+    const digits = value.replace(/\D/g, '');
+    if (digits.startsWith('0')) {
+      setPhoneError('Phone Number cannot start with Zero');
+    } else if (!validateSwedishPhone(value)) {
       setPhoneError('Phone number must be exactly 9 digits (numbers only)');
     } else {
       setPhoneError('');

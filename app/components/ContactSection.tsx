@@ -40,7 +40,8 @@ export default function ContactSection() {
   const validatePhone = (phone: string): boolean => {
     if (!phone.trim()) return false;
     const digits = phone.replace(/\D/g, '');
-    return digits.length === 9;
+    // Must be exactly 9 digits and cannot start with 0
+    return digits.length === 9 && !digits.startsWith('0');
   };
 
   const validateArea = (value: string): boolean => {
@@ -65,8 +66,9 @@ export default function ContactSection() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     let processedValue = value;
-    
-    // Restrict phone to digits only, max 9
+
+    // Keep digits only and cap at 9. Leading 0 is intentionally kept so the
+    // user can see the inline error below.
     if (name === 'phone') {
       processedValue = value.replace(/\D/g, '').slice(0, 9);
     }
@@ -91,6 +93,25 @@ export default function ContactSection() {
       [name]: processedValue
     });
 
+    // Phone-specific live validation: surface the leading-zero error as soon
+    // as the user types it.
+    if (name === 'phone') {
+      if (processedValue.startsWith('0')) {
+        setErrors({
+          ...errors,
+          phone: 'Phone Number cannot start with Zero'
+        });
+        return;
+      }
+      if (errors.phone) {
+        setErrors({
+          ...errors,
+          phone: undefined
+        });
+        return;
+      }
+    }
+
     // Clear error when user starts typing
     if (errors[name as keyof typeof errors]) {
       setErrors({
@@ -104,9 +125,12 @@ export default function ContactSection() {
     const { name, value } = e.target;
     
     if (name === 'phone' && value && !validatePhone(value)) {
+      const digits = value.replace(/\D/g, '');
       setErrors({
         ...errors,
-        phone: 'Phone number must be exactly 9 digits (numbers only)'
+        phone: digits.startsWith('0')
+          ? 'Phone Number cannot start with Zero'
+          : 'Phone number must be exactly 9 digits (numbers only)'
       });
     } else if (name === 'email' && value && !validateEmail(value)) {
       setErrors({
@@ -143,7 +167,10 @@ export default function ContactSection() {
     // Validate all fields
     const newErrors: typeof errors = {};
     if (formData.phone && !validatePhone(formData.phone)) {
-      newErrors.phone = 'Phone number must be exactly 9 digits (numbers only)';
+      const digits = formData.phone.replace(/\D/g, '');
+      newErrors.phone = digits.startsWith('0')
+        ? 'Phone Number cannot start with Zero'
+        : 'Phone number must be exactly 9 digits (numbers only)';
     }
     if (formData.email && !validateEmail(formData.email)) {
       newErrors.email = 'Please enter a valid email address';

@@ -36,15 +36,25 @@ export default function ConnectCompany() {
     if (name === 'organizationNumber') {
       const digitsOnly = value.replace(/\D/g, '').slice(0, 12);
       setFormData({ ...formData, [name]: digitsOnly });
-    } else if (name === 'phone') {
+      setError('');
+      return;
+    }
+    if (name === 'phone') {
+      // Keep digits only and cap at 9. Leading 0 is intentionally kept so
+      // the error message stays visible to the user.
       const digitsOnly = value.replace(/\D/g, '').slice(0, 9);
       setFormData({ ...formData, [name]: digitsOnly });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: type === 'checkbox' ? checked : value
-      });
+      if (digitsOnly.startsWith('0')) {
+        setError('Phone Number cannot start with Zero');
+      } else {
+        setError('');
+      }
+      return;
     }
+    setFormData({
+      ...formData,
+      [name]: type === 'checkbox' ? checked : value
+    });
     setError('');
   };
 
@@ -54,7 +64,8 @@ export default function ConnectCompany() {
 
   const validatePhone = (phone: string): boolean => {
     const digits = phone.replace(/\D/g, '');
-    return digits.length === 9;
+    // Must be exactly 9 digits and cannot start with 0
+    return digits.length === 9 && !digits.startsWith('0');
   };
 
   const validateOrganizationNumber = (val: string): boolean => {
@@ -93,7 +104,12 @@ export default function ConnectCompany() {
     }
 
     if (!validatePhone(formData.phone)) {
-      setError('Phone number must be exactly 9 digits (numbers only)');
+      const digits = formData.phone.replace(/\D/g, '');
+      setError(
+        digits.startsWith('0')
+          ? 'Phone Number cannot start with Zero'
+          : 'Phone number must be exactly 9 digits (numbers only)'
+      );
       return;
     }
 
